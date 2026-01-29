@@ -11,6 +11,11 @@
 
 	// Determine if we're creating or editing
 	const isEditing = $derived(!!id);
+
+	function handlePrint() {
+		// Navigate to the dedicated print page
+		window.location.href = '/templates/print';
+	}
 </script>
 
 <div class="edit-template-page">
@@ -23,6 +28,7 @@
 			{#if isEditing}
 				<button type="button">Preview</button>
 			{/if}
+			<button type="button" on:click={handlePrint}>Print</button>
 		</div>
 	</header>
 
