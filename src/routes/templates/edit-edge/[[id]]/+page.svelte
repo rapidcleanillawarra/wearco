@@ -25,21 +25,7 @@
 
 	<main class="template-main">
 		<div class="a4-canvas">
-			<h1>{isEditing ? 'Edit Template' : 'Create Template'}</h1>
-
-			<p>{isEditing ? 'Edit your template content here.' : 'Create a new template here.'}</p>
-
-			<!-- Template editor content will go here -->
-			<div>
-				<label for="template-content">Template Content:</label>
-				<textarea id="template-content" rows="10" cols="50" placeholder="Enter your template content here..."></textarea>
-			</div>
-
-			{#if isEditing}
-				<div>
-					<p><strong>Template ID:</strong> {id}</p>
-				</div>
-			{/if}
+			<div class="content-box"></div>
 		</div>
 	</main>
 </div>
@@ -91,5 +77,9 @@
 		padding: 1cm;
 		background: #fff;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	:global(body) {
+		margin: 0;
 	}
 </style>
