@@ -79,6 +79,13 @@
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
+	.content-box {
+		width: 100%;
+		height: 100%;
+		border: 1px solid #000;
+		box-sizing: border-box;
+	}
+
 	:global(body) {
 		margin: 0;
 	}
