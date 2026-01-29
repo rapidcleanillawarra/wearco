@@ -124,6 +124,74 @@
 				<div class="svg-container svg-3">
 					<img src={edgeTopSide} alt="Top Side" class="svg-item" />
 				</div>
+
+				<!-- Specifications Table -->
+				<div class="table-container table-1">
+					<table class="specs-table">
+						<thead>
+							<tr>
+								<th class="label-column"></th>
+								<th>CENTRE EDGE</th>
+								<th>END EDGE(s)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> PLATE THICKNESS
+									& GRADE</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> QTY</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> NO. OF HOLES @
+									CENTERS</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> TYPES OF HOLES</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> BEVEL ANGLE &
+									TYPE</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> BEVEL TOP OR BOTTOM</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label-cell"
+									><span class="bullet">•</span> SINGLE OR DOUBLE
+									BEVEL</td
+								>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</main>
@@ -231,6 +299,71 @@
 		left: 875px;
 		width: 125px;
 		height: 212px;
+	}
+
+	/* Table container - same positioning system as SVGs */
+	.table-container {
+		position: absolute;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	/* Individual table positioning - adjust these values as needed */
+	.table-1 {
+		top: 318px;
+		left: 382px;
+		width: 501px;
+		height: 200px;
+	}
+
+	/* Specifications table styling */
+	.specs-table {
+		width: 100%;
+		height: 100%;
+		border-collapse: collapse;
+		font-family: "Arial", sans-serif;
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.specs-table th,
+	.specs-table td {
+		border: 1px solid #000;
+		padding: 6px 10px;
+		text-align: left;
+		vertical-align: middle;
+	}
+
+	.specs-table thead th {
+		font-weight: normal;
+		text-align: center;
+		background: transparent;
+	}
+
+	.specs-table .label-column {
+		width: 50%;
+		border-top: none;
+	}
+
+	.specs-table thead th:first-child {
+		border-top: none;
+		border-left: none;
+	}
+
+	.specs-table .label-cell {
+		text-align: left;
+		padding-left: 20px;
+	}
+
+	.specs-table .bullet {
+		margin-right: 15px;
+	}
+
+	.specs-table tbody td:not(.label-cell) {
+		width: 25%;
+		text-align: center;
 	}
 
 	:global(body) {
