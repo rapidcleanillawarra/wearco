@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import edgeCenter from '$lib/assets/edge_center.svg';
+	import edgeEnd from '$lib/assets/edge_end.svg';
+	import edgeTopSide from '$lib/assets/edge_top_side.svg';
 
 	let { data } = $props();
 
@@ -25,7 +28,17 @@
 
 	<main class="template-main">
 		<div class="a4-canvas">
-			<div class="content-box"></div>
+			<div class="content-box">
+				<div class="svg-container">
+					<img src={edgeCenter} alt="Cutting Edge" class="svg-item" />
+				</div>
+				<div class="svg-container">
+					<img src={edgeEnd} alt="End Edge" class="svg-item" />
+				</div>
+				<div class="svg-container">
+					<img src={edgeTopSide} alt="Top Side" class="svg-item" />
+				</div>
+			</div>
 		</div>
 	</main>
 </div>
@@ -84,6 +97,25 @@
 		height: 100%;
 		border: 5px double #000;
 		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1rem;
+	}
+
+	.svg-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.svg-item {
+		max-width: 100%;
+		max-height: 100%;
+		width: auto;
+		height: auto;
 	}
 
 	:global(body) {
