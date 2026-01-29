@@ -1,15 +1,3 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
-declare global {
-	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-	}
-}
-
 export interface WearcoTemplate {
   id: string
   template_name: string
@@ -22,5 +10,3 @@ export interface WearcoTemplate {
   created_at: string
   updated_at: string
 }
-
-export {};
