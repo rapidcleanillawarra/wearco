@@ -181,9 +181,13 @@
 	.content-box {
 		width: 100%;
 		height: 100%;
-		border: 4px double #000;
+		border: 1px solid #000;
 		box-sizing: border-box;
 		position: relative;
+		/* Double line effect: white gap (4px) then inner black line (1px) */
+		box-shadow:
+			inset 0 0 0 4px #fff,
+			inset 0 0 0 5px #000;
 	}
 
 	.svg-container {
@@ -201,7 +205,7 @@
 
 	/* Individual SVG positioning and sizing - adjust these values as needed */
 	.svg-1 {
-		top: 0px;
+		top: 15px;
 		left: 30px;
 		width: 800px;
 		height: 300px;
