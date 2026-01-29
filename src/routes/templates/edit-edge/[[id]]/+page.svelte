@@ -29,13 +29,13 @@
 	<main class="template-main">
 		<div class="a4-canvas">
 			<div class="content-box">
-				<div class="svg-container">
+				<div class="svg-container svg-1">
 					<img src={edgeCenter} alt="Cutting Edge" class="svg-item" />
 				</div>
-				<div class="svg-container">
+				<div class="svg-container svg-2">
 					<img src={edgeEnd} alt="End Edge" class="svg-item" />
 				</div>
-				<div class="svg-container">
+				<div class="svg-container svg-3">
 					<img src={edgeTopSide} alt="Top Side" class="svg-item" />
 				</div>
 			</div>
@@ -97,25 +97,43 @@
 		height: 100%;
 		border: 5px double #000;
 		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding: 1rem;
+		position: relative;
 	}
 
 	.svg-container {
+		position: absolute;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		flex: 1;
-		min-height: 0;
 	}
 
 	.svg-item {
-		max-width: 100%;
-		max-height: 100%;
-		width: auto;
-		height: auto;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	/* Individual SVG positioning and sizing - adjust these values as needed */
+	.svg-1 {
+		top: 0px;
+		left: 30px;
+		width: 800px;
+		height: 300px;
+	}
+
+	.svg-2 {
+		top: 10%;
+		right: 10%;
+		width: 25%;
+		height: 25%;
+	}
+
+	.svg-3 {
+		bottom: 10%;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 40%;
+		height: 20%;
 	}
 
 	:global(body) {
