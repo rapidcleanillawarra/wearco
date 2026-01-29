@@ -169,13 +169,21 @@
 	}
 
 	.a4-canvas {
-		width: 297mm;
-		height: 210mm;
+		/* Fixed A4 landscape dimensions in pixels (at 96 DPI: 297mm = 1122px, 210mm = 793px) */
+		width: 1122px;
+		height: 793px;
+		min-width: 1122px;
+		min-height: 793px;
+		max-width: 1122px;
+		max-height: 793px;
 		box-sizing: border-box;
 		border: 1px solid #ccc;
-		padding: 0.5cm;
+		padding: 22px; /* ~0.5cm at 96 DPI */
 		background: #fff;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		/* Prevent browser zoom from affecting the canvas */
+		transform-origin: top left;
+		flex-shrink: 0;
 	}
 
 	.content-box {
