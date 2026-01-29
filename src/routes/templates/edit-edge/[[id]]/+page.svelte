@@ -6,6 +6,7 @@
 	import edgeEnd from "$lib/assets/edge_end.svg";
 	import edgeTopSide from "$lib/assets/edge_top_side.svg";
 	import rpgSmallLogo from "$lib/assets/rpg_small_logo.png";
+	import rpgLogo from "$lib/assets/rpg_logo.svg";
 
 	let { data } = $props();
 
@@ -199,6 +200,7 @@
 					<table class="bottom-table">
 						<colgroup>
 							<col class="col-logo" />
+							<col class="col-logo-secondary" />
 							<col class="col-label" />
 							<col class="col-value" />
 							<col class="col-extra-label" />
@@ -212,15 +214,13 @@
 										alt="RPG Australia Logo"
 										class="rpg-logo"
 									/>
-									<div class="address-block">
-										<p>E: cad@rpg-australia.com.au</p>
-										<p>
-											36 Industrial Avenue Wacol Qld 4076
-										</p>
-										<p>
-											P: (07) 3723 9000 F: (07) 3721 5542
-										</p>
-									</div>
+								</td>
+								<td rowspan="2" class="logo-secondary-cell">
+									<img
+										src={rpgLogo}
+										alt="RPG Logo"
+										class="rpg-logo-secondary"
+									/>
 								</td>
 								<td class="label">Quantity :</td>
 								<td></td>
@@ -238,6 +238,17 @@
 								>
 							</tr>
 							<tr>
+								<td rowspan="2" class="address-cell">
+									<div class="address-block">
+										<p>E: cad@rpg-australia.com.au</p>
+										<p>
+											36 Industrial Avenue Wacol Qld 4076
+										</p>
+										<p>
+											P: (07) 3723 9000 F: (07) 3721 5542
+										</p>
+									</div>
+								</td>
 								<td class="label">W / O # :</td>
 								<td></td>
 							</tr>
@@ -452,19 +463,22 @@
 
 	/* Column Widths */
 	.col-logo {
-		width: 25%;
+		width: 10%;
+	}
+	.col-logo-secondary {
+		width: 10%;
 	}
 	.col-label {
-		width: 15%;
+		width: 12%;
 	}
 	.col-value {
-		width: 20%;
+		width: 16%;
 	}
 	.col-extra-label {
-		width: 15%;
+		width: 16%;
 	}
 	.col-extra-value {
-		width: 25%;
+		width: 16%;
 	}
 
 	/* Logo Cell Special Styling */
@@ -475,10 +489,41 @@
 	}
 
 	.rpg-logo {
-		max-width: 36%;
+		max-width: 100%;
 		height: auto;
 		display: block;
 		margin: 0 auto 8px;
+	}
+
+	.logo-secondary-cell {
+		padding: 8px;
+		vertical-align: middle !important;
+		text-align: center;
+	}
+
+	.rpg-logo-secondary {
+		max-width: 100%;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+	}
+
+	.address-cell {
+		padding: 8px;
+		vertical-align: middle !important;
+		text-align: center;
+		border-left: none !important;
+		border-top: none !important;
+	}
+
+	/* Border modifications for specific cells */
+	.logo-cell {
+		border-right: none !important;
+	}
+
+	.logo-secondary-cell {
+		border-bottom: none !important;
+		border-left: none !important;
 	}
 
 	.address-block {
@@ -487,7 +532,6 @@
 		color: #000;
 		font-weight: bold;
 		text-align: left;
-		margin-left: 10px;
 	}
 
 	.address-block p {
