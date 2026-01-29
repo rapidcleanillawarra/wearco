@@ -206,24 +206,23 @@
 	/* Individual SVG positioning and sizing - adjust these values as needed */
 	.svg-1 {
 		top: 15px;
+		left: 85px;
+		width: 750px;
+		height: 250px;
+	}
+
+	.svg-2 {
+		top: 330px;
 		left: 30px;
 		width: 800px;
 		height: 300px;
 	}
 
-	.svg-2 {
-		top: 10%;
-		right: 10%;
-		width: 25%;
-		height: 25%;
-	}
-
 	.svg-3 {
-		bottom: 10%;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 40%;
-		height: 20%;
+		top: 63px;
+		left: 875px;
+		width: 125px;
+		height: 212px;
 	}
 
 	:global(body) {
