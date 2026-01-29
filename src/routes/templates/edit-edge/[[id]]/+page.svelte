@@ -47,6 +47,9 @@
 	let endEdgeBevelTopBottom = $state('');
 	let centerEdgeSingleDoubleBevel = $state('');
 	let endEdgeSingleDoubleBevel = $state('');
+	
+	// Overlay input state
+	let centerEdgeOverall = $state('');
 
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
@@ -153,6 +156,16 @@
 				</div>
 				<div class="svg-container svg-3">
 					<img src={edgeTopSide} alt="Top Side" class="svg-item" />
+				</div>
+
+				<!-- Center Edge Overall Overlay Input -->
+				<div class="overlay-input-container overlay-1">
+					<input 
+						type="text" 
+						bind:value={centerEdgeOverall} 
+						class="overlay-input"
+						placeholder="Center Edge Overall"
+					/>
 				</div>
 
 				<!-- Specifications Table -->
@@ -395,6 +408,45 @@
 		left: 875px;
 		width: 125px;
 		height: 212px;
+	}
+
+	/* Overlay input container - same positioning system as SVGs */
+	.overlay-input-container {
+		position: absolute;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	/* Individual overlay input positioning - adjust these values as needed */
+	.overlay-1 {
+		top: 280px;
+		left: 85px;
+		width: 750px;
+		height: 30px;
+	}
+
+	.overlay-input {
+		width: 100%;
+		height: 100%;
+		border: 1px solid #000;
+		background: rgba(255, 255, 255, 0.9);
+		font-family: "Arial", sans-serif;
+		font-size: 14px;
+		text-align: center;
+		padding: 4px 8px;
+		box-sizing: border-box;
+		outline: none;
+	}
+
+	.overlay-input:focus {
+		background: #f0f8ff;
+		border: 2px solid #007bff;
+	}
+
+	.overlay-input::placeholder {
+		color: #999;
+		font-style: italic;
 	}
 
 	/* Table container - same positioning system as SVGs */
