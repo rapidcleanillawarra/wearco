@@ -210,18 +210,6 @@
 				<!-- Bottom Specifications Table -->
 				<div class="table-container table-2">
 					<table class="bottom-table">
-						<colgroup>
-							<col class="col-logo" />
-							<col class="col-logo-secondary" />
-							<col class="col-label" />
-							<col class="col-value" />
-							<col class="col-new-label" />
-							<col class="col-new-value" />
-							<col class="col-extra-label" />
-							<col class="col-extra-value" />
-							<col class="col-material-label" />
-							<col class="col-material-value" />
-						</colgroup>
 						<tbody>
 							<tr>
 								<td rowspan="4" class="logo-cell">
@@ -253,8 +241,8 @@
 								<td><input type="text" bind:value={jobNo} class="table-input" /></td>
 								<td class="label">Checked By:</td>
 								<td><input type="text" bind:value={checkedBy} class="table-input" /></td>
-								<td class="label">Customer:</td>
-								<td colspan="3"><input type="text" bind:value={customer} class="table-input" /></td>
+								<td class="label" rowspan="2">Customer:</td>
+								<td colspan="3" rowspan="2"><input type="text" bind:value={customer} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td rowspan="2" class="address-cell">
@@ -276,10 +264,10 @@
 							<tr>
 								<td class="label">Dwg No.:</td>
 								<td colspan="3"><input type="text" bind:value={drawingNo} class="table-input" /></td>
-								<td class="label">Material:</td>
-								<td><input type="text" bind:value={material} class="table-input" /></td>
-								<td class="label">THK :</td>
-								<td><input type="text" bind:value={thickness} class="table-input" /></td>
+								<td class="label material-label">Material:</td>
+								<td class="material-value"><input type="text" bind:value={material} class="table-input" /></td>
+								<td class="label thk-label">THK :</td>
+								<td class="thk-value"><input type="text" bind:value={thickness} class="table-input" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -485,47 +473,12 @@
 		height: 24px; /* Fixed height for consistency */
 	}
 
-	/* Column Widths */
-	.col-logo {
-		width: 10%;
-	}
-	.col-logo-secondary {
-		width: 10%;
-	}
-	.col-label {
-		width: 2%;
-	}
-	.col-value {
-		width: 16%;
-	}
-	.col-extra-label {
-		width: 16%;
-	}
-	.col-extra-value {
-		width: 16%;
-	}
-
-	.col-new-label {
-		width: 10%;
-	}
-
-	.col-new-value {
-		width: 12%;
-	}
-
-	.col-material-label {
-		width: 10%;
-	}
-
-	.col-material-value {
-		width: 12%;
-	}
-
 	/* Logo Cell Special Styling */
 	.logo-cell {
-		padding: 8px;
+		padding: 0;
 		vertical-align: middle !important;
 		text-align: center;
+		width: 80px;
 	}
 
 	.rpg-logo {
@@ -539,6 +492,7 @@
 		padding: 8px;
 		vertical-align: middle !important;
 		text-align: center;
+		width: 125px;
 	}
 
 	.rpg-logo-secondary {
@@ -584,6 +538,21 @@
 		white-space: nowrap;
 		vertical-align: middle;
 		border-right: none !important;
+	}
+
+	/* Material and THK specific widths - all equal */
+	.material-label,
+	.thk-label {
+		width: 60px !important;
+		min-width: 60px !important;
+		max-width: 60px !important;
+	}
+
+	.material-value,
+	.thk-value {
+		width: 80px !important;
+		min-width: 80px !important;
+		max-width: 80px !important;
 	}
 
 	.edge-template-text {
