@@ -158,15 +158,15 @@
 					<img src={edgeTopSide} alt="Top Side" class="svg-item" />
 				</div>
 
-				<!-- Center Edge Overall Overlay Input -->
-				<div class="overlay-input-container overlay-1">
-					<input 
-						type="text" 
-						bind:value={centerEdgeOverall} 
-						class="overlay-input"
-						placeholder="Center Edge Overall"
-					/>
-				</div>
+			<!-- Center Edge Overall Overlay Input -->
+			<div class="overlay-input-container center_edge-overall">
+				<input 
+					type="text" 
+					bind:value={centerEdgeOverall} 
+					class="overlay-input"
+					placeholder="Center Edge Overall"
+				/>
+			</div>
 
 				<!-- Specifications Table -->
 				<div class="table-container table-1">
@@ -419,24 +419,22 @@
 	}
 
 	/* Individual overlay input positioning - adjust these values as needed */
-	.overlay-1 {
-		top: 280px;
-		left: 85px;
-		width: 750px;
-		height: 30px;
+	.center_edge-overall {
+		top: 16px;
+		left: 449px;
+		width: 89px;
+		height: 20px;
 	}
 
 	.overlay-input {
 		width: 100%;
 		height: 100%;
-		border: 1px solid #000;
-		background: rgba(255, 255, 255, 0.9);
 		font-family: "Arial", sans-serif;
-		font-size: 14px;
+		font-size: 13px;
 		text-align: center;
-		padding: 4px 8px;
-		box-sizing: border-box;
-		outline: none;
+		padding: 0;
+		border: 0;
+		background: transparent;
 	}
 
 	.overlay-input:focus {
