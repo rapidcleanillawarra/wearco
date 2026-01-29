@@ -430,9 +430,9 @@
 
 	/* Bottom Table Positioning - Adjustable like Table 1 */
 	.table-2 {
-		top: 635px;
-		left: 5px;
-		width: 99%;
+		top: 644px;
+		left: 4px;
+		width: 1066px;
 		height: 61px;
 	}
 
