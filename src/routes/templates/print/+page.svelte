@@ -8,7 +8,7 @@
 
 <nav>
 	<a href="/templates">← Back to Templates</a>
-	<a href="/templates/edit">Edit Template</a>
+	<a href="/templates/edit-edge">Create Template</a>
 </nav>
 
 <main>

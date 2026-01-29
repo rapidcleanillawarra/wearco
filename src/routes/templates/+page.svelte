@@ -13,7 +13,7 @@
 <p>Manage your templates here.</p>
 
 <nav>
-	<a href="/templates/edit">Edit Template</a>
+	<a href="/templates/edit-edge">Create Template</a>
 	<a href="/templates/print">Print Template</a>
 </nav>
 
@@ -34,6 +34,7 @@
 					<th>Created By</th>
 					<th>Created At</th>
 					<th>Updated At</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -49,12 +50,13 @@
 						<td>{template.created_by || ''}</td>
 						<td>{new Date(template.created_at).toLocaleString()}</td>
 						<td>{new Date(template.updated_at).toLocaleString()}</td>
+						<td><a href="/templates/edit-edge/{template.id}">Edit</a></td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	{:else}
-		<p>No templates found. <a href="/templates/edit">Create your first template</a>.</p>
+		<p>No templates found. <a href="/templates/edit-edge">Create your first template</a>.</p>
 	{/if}
 </main>
 
