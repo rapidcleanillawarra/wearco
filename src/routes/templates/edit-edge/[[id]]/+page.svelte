@@ -32,6 +32,22 @@
 	let material = $state('');
 	let thickness = $state('');
 
+	// Form state for specifications table inputs
+	let centerEdgePlateThickness = $state('');
+	let endEdgePlateThickness = $state('');
+	let centerEdgeQty = $state('');
+	let endEdgeQty = $state('');
+	let centerEdgeHoles = $state('');
+	let endEdgeHoles = $state('');
+	let centerEdgeHoleTypes = $state('');
+	let endEdgeHoleTypes = $state('');
+	let centerEdgeBevelAngle = $state('');
+	let endEdgeBevelAngle = $state('');
+	let centerEdgeBevelTopBottom = $state('');
+	let endEdgeBevelTopBottom = $state('');
+	let centerEdgeSingleDoubleBevel = $state('');
+	let endEdgeSingleDoubleBevel = $state('');
+
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
 	const A4_HEIGHT_MM = 210;
@@ -155,53 +171,53 @@
 									><span class="bullet">•</span> PLATE THICKNESS
 									& GRADE</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgePlateThickness} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgePlateThickness} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> QTY</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeQty} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeQty} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> NO. OF HOLES @
 									CENTERS</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeHoles} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeHoles} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> TYPES OF HOLES</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeHoleTypes} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeHoleTypes} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> BEVEL ANGLE &
 									TYPE</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeBevelAngle} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeBevelAngle} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> BEVEL TOP OR BOTTOM</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeBevelTopBottom} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeBevelTopBottom} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> SINGLE OR DOUBLE
 									BEVEL</td
 								>
-								<td></td>
-								<td></td>
+								<td><input type="text" bind:value={centerEdgeSingleDoubleBevel} class="table-input" /></td>
+								<td><input type="text" bind:value={endEdgeSingleDoubleBevel} class="table-input" /></td>
 							</tr>
 						</tbody>
 					</table>
