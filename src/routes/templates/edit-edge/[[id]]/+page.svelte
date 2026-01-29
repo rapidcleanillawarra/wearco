@@ -171,53 +171,53 @@
 									><span class="bullet">•</span> PLATE THICKNESS
 									& GRADE</td
 								>
-								<td><input type="text" bind:value={centerEdgePlateThickness} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgePlateThickness} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgePlateThickness} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgePlateThickness} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> QTY</td
 								>
-								<td><input type="text" bind:value={centerEdgeQty} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeQty} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeQty} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeQty} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> NO. OF HOLES @
 									CENTERS</td
 								>
-								<td><input type="text" bind:value={centerEdgeHoles} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeHoles} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeHoles} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeHoles} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> TYPES OF HOLES</td
 								>
-								<td><input type="text" bind:value={centerEdgeHoleTypes} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeHoleTypes} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeHoleTypes} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeHoleTypes} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> BEVEL ANGLE &
 									TYPE</td
 								>
-								<td><input type="text" bind:value={centerEdgeBevelAngle} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeBevelAngle} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeBevelAngle} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeBevelAngle} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> BEVEL TOP OR BOTTOM</td
 								>
-								<td><input type="text" bind:value={centerEdgeBevelTopBottom} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeBevelTopBottom} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeBevelTopBottom} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeBevelTopBottom} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label-cell"
 									><span class="bullet">•</span> SINGLE OR DOUBLE
 									BEVEL</td
 								>
-								<td><input type="text" bind:value={centerEdgeSingleDoubleBevel} class="table-input" /></td>
-								<td><input type="text" bind:value={endEdgeSingleDoubleBevel} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={centerEdgeSingleDoubleBevel} class="table-input" /></td>
+								<td class="value-cell"><input type="text" bind:value={endEdgeSingleDoubleBevel} class="table-input" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -467,6 +467,10 @@
 		text-align: center;
 	}
 
+	.specs-table .value-cell {
+		padding: 0;
+	}
+
 	/* Bottom Table Positioning - Adjustable like Table 1 */
 	.table-2 {
 		top: 644px;
@@ -579,7 +583,6 @@
 	/* Table Input Styles */
 	.table-input {
 		width: 100%;
-		padding: 2px 4px;
 		border: none;
 		background: transparent;
 		font-family: "Arial", sans-serif;
@@ -591,5 +594,8 @@
 
 	.table-input:focus {
 		background: #f0f8ff;
+	}
+	.value-cell{
+		padding: 0;
 	}
 </style>
