@@ -20,6 +20,12 @@
 	let canvasRef: HTMLDivElement;
 	let isGenerating = $state(false);
 
+	// Form state for bottom table inputs
+	let quantity = $state('');
+	let jobNo = $state('');
+	let workOrder = $state('');
+	let drawingNo = $state('');
+
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
 	const A4_HEIGHT_MM = 210;
@@ -223,7 +229,7 @@
 									/>
 								</td>
 								<td class="label">Quantity :</td>
-								<td></td>
+								<td><input type="number" bind:value={quantity} class="table-input" /></td>
 								<td class="label" colspan="2"
 									>Part : <span class="edge-template-text"
 										>EDGE TEMPLATE</span
@@ -232,7 +238,7 @@
 							</tr>
 							<tr>
 								<td class="label">Job No :</td>
-								<td></td>
+								<td><input type="text" bind:value={jobNo} class="table-input" /></td>
 								<td class="label" colspan="2" rowspan="2"
 									>Customer:</td
 								>
@@ -250,10 +256,11 @@
 									</div>
 								</td>
 								<td class="label">W / O # :</td>
-								<td></td>
+								<td><input type="text" bind:value={workOrder} class="table-input" /></td>
 							</tr>
 							<tr>
-								<td class="label" colspan="2">Dwg No.:</td>
+								<td class="label">Dwg No.:</td>
+								<td><input type="text" bind:value={drawingNo} class="table-input" /></td>
 								<td class="label">Material:</td>
 								<td class="label">THK :</td>
 							</tr>
@@ -548,5 +555,21 @@
 		float: right;
 		font-weight: normal;
 		margin-right: 20px;
+	}
+
+	/* Table Input Styles */
+	.table-input {
+		width: 100%;
+		padding: 2px 4px;
+		border: none;
+		background: transparent;
+		font-family: "Arial", sans-serif;
+		font-size: 11px;
+		outline: none;
+		box-sizing: border-box;
+	}
+
+	.table-input:focus {
+		background: #f0f8ff;
 	}
 </style>
