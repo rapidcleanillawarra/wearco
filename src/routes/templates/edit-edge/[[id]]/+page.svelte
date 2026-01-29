@@ -220,10 +220,10 @@
 	}
 
 	.svg-2 {
-		top: 330px;
-		left: 30px;
-		width: 800px;
-		height: 300px;
+		top: 305px;
+		left: 105px;
+		width: 250px;
+		height: 230px;
 	}
 
 	.svg-3 {
