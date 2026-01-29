@@ -25,6 +25,12 @@
 	let jobNo = $state('');
 	let workOrder = $state('');
 	let drawingNo = $state('');
+	let dl = $state('');
+	let checkedBy = $state('');
+	let progBy = $state('');
+	let customer = $state('');
+	let material = $state('');
+	let thickness = $state('');
 
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
@@ -209,8 +215,12 @@
 							<col class="col-logo-secondary" />
 							<col class="col-label" />
 							<col class="col-value" />
+							<col class="col-new-label" />
+							<col class="col-new-value" />
 							<col class="col-extra-label" />
 							<col class="col-extra-value" />
+							<col class="col-material-label" />
+							<col class="col-material-value" />
 						</colgroup>
 						<tbody>
 							<tr>
@@ -228,9 +238,11 @@
 										class="rpg-logo-secondary"
 									/>
 								</td>
-								<td class="label">Quantity :</td>
+								<td class="label">Quantity:</td>
 								<td><input type="number" bind:value={quantity} class="table-input" /></td>
-								<td class="label" colspan="2"
+								<td class="label">DL:</td>
+								<td><input type="text" bind:value={dl} class="table-input" /></td>
+								<td class="label" colspan="4"
 									>Part : <span class="edge-template-text"
 										>EDGE TEMPLATE</span
 									></td
@@ -239,9 +251,10 @@
 							<tr>
 								<td class="label">Job No :</td>
 								<td><input type="text" bind:value={jobNo} class="table-input" /></td>
-								<td class="label" colspan="2" rowspan="2"
-									>Customer:</td
-								>
+								<td class="label">Checked By:</td>
+								<td><input type="text" bind:value={checkedBy} class="table-input" /></td>
+								<td class="label">Customer:</td>
+								<td colspan="3"><input type="text" bind:value={customer} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td rowspan="2" class="address-cell">
@@ -255,14 +268,18 @@
 										</p>
 									</div>
 								</td>
-								<td class="label">W / O # :</td>
+								<td class="label">W / O #:</td>
 								<td><input type="text" bind:value={workOrder} class="table-input" /></td>
+								<td class="label">Prog By:</td>
+								<td><input type="text" bind:value={progBy} class="table-input" /></td>
 							</tr>
 							<tr>
 								<td class="label">Dwg No.:</td>
-								<td><input type="text" bind:value={drawingNo} class="table-input" /></td>
+								<td colspan="3"><input type="text" bind:value={drawingNo} class="table-input" /></td>
 								<td class="label">Material:</td>
+								<td><input type="text" bind:value={material} class="table-input" /></td>
 								<td class="label">THK :</td>
+								<td><input type="text" bind:value={thickness} class="table-input" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -464,7 +481,7 @@
 	.bottom-table td {
 		border: 1px solid #000;
 		padding: 4px 8px;
-		vertical-align: top;
+		vertical-align: middle;
 		height: 24px; /* Fixed height for consistency */
 	}
 
@@ -476,7 +493,7 @@
 		width: 10%;
 	}
 	.col-label {
-		width: 10%;
+		width: 2%;
 	}
 	.col-value {
 		width: 16%;
@@ -486,6 +503,22 @@
 	}
 	.col-extra-value {
 		width: 16%;
+	}
+
+	.col-new-label {
+		width: 10%;
+	}
+
+	.col-new-value {
+		width: 12%;
+	}
+
+	.col-material-label {
+		width: 10%;
+	}
+
+	.col-material-value {
+		width: 12%;
 	}
 
 	/* Logo Cell Special Styling */
@@ -549,10 +582,11 @@
 	.label {
 		font-weight: normal;
 		white-space: nowrap;
+		vertical-align: middle;
+		border-right: none !important;
 	}
 
 	.edge-template-text {
-		float: right;
 		font-weight: normal;
 		margin-right: 20px;
 	}
