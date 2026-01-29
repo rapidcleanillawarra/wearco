@@ -8,7 +8,6 @@
 
 <nav>
 	<a href="/templates">← Back to Templates</a>
-	<a href="/templates/print">Print Template</a>
 </nav>
 
 <main>
