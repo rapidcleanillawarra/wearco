@@ -5,6 +5,7 @@
 	import edgeCenter from "$lib/assets/edge_center.svg";
 	import edgeEnd from "$lib/assets/edge_end.svg";
 	import edgeTopSide from "$lib/assets/edge_top_side.svg";
+	import rpgSmallLogo from "$lib/assets/rpg_small_logo.png";
 
 	let { data } = $props();
 
@@ -192,6 +193,62 @@
 						</tbody>
 					</table>
 				</div>
+
+				<!-- Bottom Specifications Table -->
+				<div class="table-container table-2">
+					<table class="bottom-table">
+						<colgroup>
+							<col class="col-logo" />
+							<col class="col-label" />
+							<col class="col-value" />
+							<col class="col-extra-label" />
+							<col class="col-extra-value" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<td rowspan="4" class="logo-cell">
+									<img
+										src={rpgSmallLogo}
+										alt="RPG Australia Logo"
+										class="rpg-logo"
+									/>
+									<div class="address-block">
+										<p>E: cad@rpg-australia.com.au</p>
+										<p>
+											36 Industrial Avenue Wacol Qld 4076
+										</p>
+										<p>
+											P: (07) 3723 9000 F: (07) 3721 5542
+										</p>
+									</div>
+								</td>
+								<td class="label">Quantity :</td>
+								<td></td>
+								<td class="label" colspan="2"
+									>Part : <span class="edge-template-text"
+										>EDGE TEMPLATE</span
+									></td
+								>
+							</tr>
+							<tr>
+								<td class="label">Job No :</td>
+								<td></td>
+								<td class="label" colspan="2" rowspan="2"
+									>Customer:</td
+								>
+							</tr>
+							<tr>
+								<td class="label">W / O # :</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="label" colspan="2">Dwg No.:</td>
+								<td class="label">Material:</td>
+								<td class="label">THK :</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</main>
@@ -366,7 +423,86 @@
 		text-align: center;
 	}
 
-	:global(body) {
+	.specs-table tbody td:not(.label-cell) {
+		width: 25%;
+		text-align: center;
+	}
+
+	/* Bottom Table Positioning - Adjustable like Table 1 */
+	.table-2 {
+		top: 635px;
+		left: 5px;
+		width: 99%;
+		height: 61px;
+	}
+
+	.bottom-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-family: "Arial", sans-serif;
+		font-size: 11px;
+	}
+
+	.bottom-table td {
+		border: 1px solid #000;
+		padding: 4px 8px;
+		vertical-align: top;
+		height: 24px; /* Fixed height for consistency */
+	}
+
+	/* Column Widths */
+	.col-logo {
+		width: 25%;
+	}
+	.col-label {
+		width: 15%;
+	}
+	.col-value {
+		width: 20%;
+	}
+	.col-extra-label {
+		width: 15%;
+	}
+	.col-extra-value {
+		width: 25%;
+	}
+
+	/* Logo Cell Special Styling */
+	.logo-cell {
+		padding: 8px;
+		vertical-align: middle !important;
+		text-align: center;
+	}
+
+	.rpg-logo {
+		max-width: 36%;
+		height: auto;
+		display: block;
+		margin: 0 auto 8px;
+	}
+
+	.address-block {
+		font-size: 7px;
+		line-height: 1.2;
+		color: #000;
+		font-weight: bold;
+		text-align: left;
+		margin-left: 10px;
+	}
+
+	.address-block p {
 		margin: 0;
+	}
+
+	/* Table Text Styles */
+	.label {
+		font-weight: normal;
+		white-space: nowrap;
+	}
+
+	.edge-template-text {
+		float: right;
+		font-weight: normal;
+		margin-right: 20px;
 	}
 </style>
