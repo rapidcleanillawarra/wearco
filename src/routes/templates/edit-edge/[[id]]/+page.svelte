@@ -476,7 +476,7 @@
 		width: 10%;
 	}
 	.col-label {
-		width: 12%;
+		width: 10%;
 	}
 	.col-value {
 		width: 16%;
@@ -567,6 +567,7 @@
 		font-size: 11px;
 		outline: none;
 		box-sizing: border-box;
+		height: 100%;
 	}
 
 	.table-input:focus {
