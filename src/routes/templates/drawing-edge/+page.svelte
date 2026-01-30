@@ -377,6 +377,9 @@
 					fill="#ef4444"
 					class="resize-handle"
 					onmousedown={handleResizeMouseDown}
+					role="button"
+					tabindex="0"
+					aria-label="Resize handle"
 				/>
 
 				<!-- Position indicator -->
