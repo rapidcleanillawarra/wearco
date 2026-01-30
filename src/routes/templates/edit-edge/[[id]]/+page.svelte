@@ -58,6 +58,10 @@
 	let endEdgeHoleLeft = $state('');
 	let endEdgeHoleRight = $state('');
 	let endEdgeHolesDistance = $state('');
+	let topSideWidth = $state('');
+	let topSideAfterCurve = $state('');
+	let topSideBeforeCurve = $state('');
+	let topSideCurve = $state('');
 
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
@@ -253,6 +257,46 @@
 					bind:value={endEdgeHolesDistance}
 					class="overlay-input"
 					placeholder="0 mm"
+				/>
+			</div>
+
+			<!-- Top Side Width Overlay Input -->
+			<div class="overlay-input-container top_side-width">
+				<input
+					type="text"
+					bind:value={topSideWidth}
+					class="overlay-input"
+					placeholder="Width"
+				/>
+			</div>
+
+			<!-- Top Side After Curve Overlay Input -->
+			<div class="overlay-input-container top_side-after_curve">
+				<input
+					type="text"
+					bind:value={topSideAfterCurve}
+					class="overlay-input"
+					placeholder="After Curve"
+				/>
+			</div>
+
+			<!-- Top Side Before Curve Overlay Input -->
+			<div class="overlay-input-container top_side-before_curve">
+				<input
+					type="text"
+					bind:value={topSideBeforeCurve}
+					class="overlay-input"
+					placeholder="Before Curve"
+				/>
+			</div>
+
+			<!-- Top Side Curve Overlay Input -->
+			<div class="overlay-input-container top_side-curve">
+				<input
+					type="text"
+					bind:value={topSideCurve}
+					class="overlay-input"
+					placeholder="Curve"
 				/>
 			</div>
 
@@ -570,15 +614,43 @@
 		height: 30px;
 	}
 
+	.top_side-width {
+		top: 150px;
+		left: 825px;
+		width: 100px;
+		height: 30px;
+	}
+
+	.top_side-after_curve {
+		top: 36px;
+		left: 867px;
+		width: 100px;
+		height: 30px;
+	}
+
+	.top_side-before_curve {
+		top: 270px;
+		left: 861px;
+		width: 100px;
+		height: 30px;
+	}
+
+	.top_side-curve {
+		top: 221px;
+		left: 924px;
+		width: 100px;
+		height: 30px;
+	}
+
 	.overlay-input {
 		width: 100%;
 		height: 100%;
 		font-family: "Arial", sans-serif;
 		font-size: 13px;
 		text-align: center;
-		padding: 0;
 		border: 0;
 		background: transparent;
+		padding: 0;
 	}
 
 	.overlay-input:focus {
