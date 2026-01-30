@@ -54,6 +54,10 @@
 	let centerEdgeHoleLeft = $state('');
 	let centerEdgeHoleRight = $state('');
 	let centerEdgeHeight = $state('');
+	let endEdgeOverall = $state('');
+	let endEdgeHoleLeft = $state('');
+	let endEdgeHoleRight = $state('');
+	let endEdgeHolesDistance = $state('');
 
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
@@ -209,6 +213,46 @@
 					bind:value={centerEdgeHeight}
 					class="overlay-input"
 					placeholder="Height"
+				/>
+			</div>
+
+			<!-- End Edge Overall Overlay Input -->
+			<div class="overlay-input-container end_edge-overall">
+				<input
+					type="text"
+					bind:value={endEdgeOverall}
+					class="overlay-input"
+					placeholder="0"
+				/>
+			</div>
+
+			<!-- End Edge Hole Left Overlay Input -->
+			<div class="overlay-input-container end_edge-hole_left">
+				<input
+					type="text"
+					bind:value={endEdgeHoleLeft}
+					class="overlay-input"
+					placeholder="0 mm"
+				/>
+			</div>
+
+			<!-- End Edge Hole Right Overlay Input -->
+			<div class="overlay-input-container end_edge-hole_right">
+				<input
+					type="text"
+					bind:value={endEdgeHoleRight}
+					class="overlay-input"
+					placeholder="0 mm"
+				/>
+			</div>
+
+			<!-- End Edge Holes Distance Overlay Input -->
+			<div class="overlay-input-container end_edge-holes_distance">
+				<input
+					type="text"
+					bind:value={endEdgeHolesDistance}
+					class="overlay-input"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -495,6 +539,34 @@
 		top: 114px;
 		left: 8px;
 		width: 100px;
+		height: 30px;
+	}
+
+	.end_edge-overall {
+		top: 302px;
+		left: 193px;
+		width: 120px;
+		height: 30px;
+	}
+
+	.end_edge-hole_left {
+		top: 321px;
+		left: 94px;
+		width: 80px;
+		height: 30px;
+	}
+
+	.end_edge-hole_right {
+		top: 321px;
+		left: 288px;
+		width: 80px;
+		height: 30px;
+	}
+
+	.end_edge-holes_distance {
+		top: 323px;
+		left: 155px;
+		width: 150px;
 		height: 30px;
 	}
 
