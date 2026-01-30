@@ -551,28 +551,36 @@
 
 				<!-- Resize handles -->
 
-				<!-- Hole Span Dimension (First to Last) -->
+				<!-- Hole Dimensions -->
 				{#if holeCount > 1}
 					{@const firstHoleX = rectX + holeSpacing}
+					{@const secondHoleX = rectX + 2 * holeSpacing}
 					{@const lastHoleX = rectX + holeCount * holeSpacing}
 					{@const holeCenterY = rectY + rectHeight / 2}
-					{@const dimY = holeCenterY + holeSize / 2 + 20}
+
+					<!-- Top Dimension Position (Pitch) -->
+					{@const dimY_top = holeCenterY - holeSize / 2 - 20}
+
+					<!-- Bottom Dimension Position (Total) -->
+					{@const dimY_bottom = holeCenterY + holeSize / 2 + 20}
+
+					<!-- First to Second Hole (Pitch) - TOP -->
 					<g class="dimension-line">
-						<!-- Extension lines -->
+						<!-- Extension lines (going up) -->
 						<line
 							x1={firstHoleX}
-							y1={holeCenterY + holeSize / 2 + 5}
+							y1={holeCenterY - holeSize / 2 - 5}
 							x2={firstHoleX}
-							y2={dimY + 10}
+							y2={dimY_top - 10}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
 						/>
 						<line
-							x1={lastHoleX}
-							y1={holeCenterY + holeSize / 2 + 5}
-							x2={lastHoleX}
-							y2={dimY + 10}
+							x1={secondHoleX}
+							y1={holeCenterY - holeSize / 2 - 5}
+							x2={secondHoleX}
+							y2={dimY_top - 10}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
@@ -581,24 +589,70 @@
 						<!-- Dimension line -->
 						<line
 							x1={firstHoleX}
-							y1={dimY}
-							x2={lastHoleX}
-							y2={dimY}
+							y1={dimY_top}
+							x2={secondHoleX}
+							y2={dimY_top}
 							stroke="#374151"
 							stroke-width="1.5"
 							marker-start="url(#arrow-start)"
 							marker-end="url(#arrow-end)"
 						/>
 						<text
-							x={firstHoleX + (lastHoleX - firstHoleX) / 2}
-							y={dimY + 15}
+							x={firstHoleX + (secondHoleX - firstHoleX) / 2}
+							y={dimY_top - 10}
 							fill="#374151"
 							font-size="12"
 							text-anchor="middle"
 						>
-							{getMm(lastHoleX - firstHoleX)} mm
+							{getMm(holeSpacing)} mm
 						</text>
 					</g>
+
+					<!-- First to Last Hole (Total) - BOTTOM - Only if more than 2 holes -->
+					{#if holeCount > 2}
+						<g class="dimension-line">
+							<!-- Extension lines (going down) -->
+							<line
+								x1={firstHoleX}
+								y1={holeCenterY + holeSize / 2 + 5}
+								x2={firstHoleX}
+								y2={dimY_bottom + 10}
+								stroke="#9ca3af"
+								stroke-width="1"
+								stroke-dasharray="4 2"
+							/>
+							<line
+								x1={lastHoleX}
+								y1={holeCenterY + holeSize / 2 + 5}
+								x2={lastHoleX}
+								y2={dimY_bottom + 10}
+								stroke="#9ca3af"
+								stroke-width="1"
+								stroke-dasharray="4 2"
+							/>
+
+							<!-- Dimension line -->
+							<line
+								x1={firstHoleX}
+								y1={dimY_bottom}
+								x2={lastHoleX}
+								y2={dimY_bottom}
+								stroke="#374151"
+								stroke-width="1.5"
+								marker-start="url(#arrow-start)"
+								marker-end="url(#arrow-end)"
+							/>
+							<text
+								x={firstHoleX + (lastHoleX - firstHoleX) / 2}
+								y={dimY_bottom + 15}
+								fill="#374151"
+								font-size="12"
+								text-anchor="middle"
+							>
+								{getMm(lastHoleX - firstHoleX)} mm
+							</text>
+						</g>
+					{/if}
 				{/if}
 				<circle
 					cx={rectX + rectWidth}
