@@ -183,6 +183,57 @@
 		rectWidth = newWidth;
 		rectHeight = newHeight;
 	}
+
+	function exportSvg() {
+		const svg = document.querySelector(".svg-canvas") as SVGSVGElement;
+		if (!svg) return;
+
+		// Clone the SVG to clean it up for export
+		const clone = svg.cloneNode(true) as SVGSVGElement;
+
+		// Remove UI elements like resize handles from the export
+		const handles = clone.querySelectorAll(".resize-handle");
+		handles.forEach((h) => h.remove());
+
+		const serializer = new XMLSerializer();
+		let source = serializer.serializeToString(clone);
+
+		// Add name spaces if missing
+		if (
+			!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)
+		) {
+			source = source.replace(
+				/^<svg/,
+				'<svg xmlns="http://www.w3.org/2000/svg" ',
+			);
+		}
+		if (
+			!source.match(
+				/^<svg[^>]+xmlns:xlink="http\:\/\/www\.w3\.org\/1999\/xlink"/,
+			)
+		) {
+			source = source.replace(
+				/^<svg/,
+				'<svg xmlns:xlink="http://www.w3.org/1999/xlink" ',
+			);
+		}
+
+		// Add xml declaration
+		source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+		const blob = new Blob([source], {
+			type: "image/svg+xml;charset=utf-8",
+		});
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = "drawing-edge.svg";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}
 </script>
 
 <main class="editor-container">
@@ -190,6 +241,7 @@
 		<h1>SVG Rectangle Editor</h1>
 
 		<div class="editor-controls">
+			<button class="export-btn" onclick={exportSvg}>Export SVG</button>
 			<div class="control-panel">
 				<div class="dimension-section">
 					<h3>Dimensions</h3>
@@ -772,5 +824,20 @@
 		margin-bottom: 0;
 		font-style: italic;
 		color: #6b7280;
+	}
+	.export-btn {
+		background-color: #4f46e5;
+		color: white;
+		border: none;
+		padding: 8px 16px;
+		border-radius: 6px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		margin-right: 20px;
+	}
+
+	.export-btn:hover {
+		background-color: #4338ca;
 	}
 </style>
