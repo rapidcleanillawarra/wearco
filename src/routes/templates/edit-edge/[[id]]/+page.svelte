@@ -53,6 +53,7 @@
 	let centerEdgeHolesDistance = $state('');
 	let centerEdgeHoleLeft = $state('');
 	let centerEdgeHoleRight = $state('');
+	let centerEdgeHeight = $state('');
 
 	// A4 dimensions in mm (landscape)
 	const A4_WIDTH_MM = 297;
@@ -198,6 +199,16 @@
 					bind:value={centerEdgeHoleRight}
 					class="overlay-input"
 					placeholder="Hole Right"
+				/>
+			</div>
+
+			<!-- Center Edge Height Overlay Input -->
+			<div class="overlay-input-container center_edge-height">
+				<input
+					type="text"
+					bind:value={centerEdgeHeight}
+					class="overlay-input"
+					placeholder="Height"
 				/>
 			</div>
 
@@ -477,6 +488,13 @@
 		top: 43px;
 		left: 762px;
 		width: 80px;
+		height: 30px;
+	}
+
+	.center_edge-height {
+		top: 114px;
+		left: 8px;
+		width: 100px;
 		height: 30px;
 	}
 
