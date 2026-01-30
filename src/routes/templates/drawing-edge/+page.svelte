@@ -26,19 +26,26 @@
 
 	// Conversion factor: pixels to mm (approximately 3.78 pixels per mm at 96 DPI)
 	// Using 1:1 for simplicity as per original
-	const PIXELS_TO_MM = 0.5;
+	const PIXELS_TO_MM = 0.2;
 
 	// Computed mm values
 	$effect(() => {
 		// This effect runs when rectWidth or rectHeight changes
 	});
 
+	// Derived values for layout
+	let holeSpacing = $derived(rectWidth / (holeCount + 1));
+
+	function getMm(pixels: number): number {
+		return Math.round(pixels / PIXELS_TO_MM);
+	}
+
 	function getWidthMm(): number {
-		return Math.round(rectWidth / PIXELS_TO_MM);
+		return getMm(rectWidth);
 	}
 
 	function getHeightMm(): number {
-		return Math.round(rectHeight / PIXELS_TO_MM);
+		return getMm(rectHeight);
 	}
 
 	function handleWidthChange(event: Event) {
@@ -421,17 +428,65 @@
 					y={rectY}
 					width={rectWidth}
 					height={rectHeight}
-					fill="#4f46e5"
+					fill="white"
 					stroke="#1e1b4b"
 					stroke-width="2"
 					rx="4"
 					class="rectangle"
 				/>
 
+				<!-- Hole Spacing Dimensions -->
+				{#if holeCount > 0}
+					<!-- Left Edge to First Hole -->
+					<g class="dimension-line">
+						<line
+							x1={rectX}
+							y1={rectY + rectHeight / 2}
+							x2={rectX + holeSpacing}
+							y2={rectY + rectHeight / 2}
+							stroke="#374151"
+							stroke-width="1.5"
+							marker-start="url(#arrow-start)"
+							marker-end="url(#arrow-end)"
+						/>
+						<text
+							x={rectX + holeSpacing / 2}
+							y={rectY + rectHeight / 2 - 10}
+							fill="#374151"
+							font-size="12"
+							text-anchor="middle"
+						>
+							{getMm(holeSpacing)} mm
+						</text>
+					</g>
+
+					<!-- Last Hole to Right Edge -->
+					<g class="dimension-line">
+						<line
+							x1={rectX + rectWidth - holeSpacing}
+							y1={rectY + rectHeight / 2}
+							x2={rectX + rectWidth}
+							y2={rectY + rectHeight / 2}
+							stroke="#374151"
+							stroke-width="1.5"
+							marker-start="url(#arrow-start)"
+							marker-end="url(#arrow-end)"
+						/>
+						<text
+							x={rectX + rectWidth - holeSpacing / 2}
+							y={rectY + rectHeight / 2 - 10}
+							fill="#374151"
+							font-size="12"
+							text-anchor="middle"
+						>
+							{getMm(holeSpacing)} mm
+						</text>
+					</g>
+				{/if}
+
 				<!-- Holes -->
 				{#each Array(holeCount) as _, i}
-					{@const spacing = rectWidth / (holeCount + 1)}
-					{@const cx = rectX + (i + 1) * spacing}
+					{@const cx = rectX + (i + 1) * holeSpacing}
 					{@const cy = rectY + rectHeight / 2}
 
 					{#if holeType === "circle"}
@@ -468,17 +523,6 @@
 					tabindex="0"
 					aria-label="Resize handle"
 				/>
-
-				<!-- Position indicator -->
-				<text
-					x={rectX + 5}
-					y={rectY + 20}
-					fill="white"
-					font-size="12"
-					font-weight="bold"
-				>
-					({Math.round(rectX)}, {Math.round(rectY)})
-				</text>
 			</svg>
 		</div>
 	</div>
@@ -695,10 +739,6 @@
 	.rectangle {
 		transition: stroke-width 0.2s;
 		cursor: move;
-	}
-
-	.rectangle:hover {
-		fill: #6366f1;
 	}
 
 	.resize-handle {
