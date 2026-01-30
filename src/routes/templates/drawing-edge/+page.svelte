@@ -388,19 +388,6 @@
 			>
 				<!-- Grid background for better positioning -->
 				<defs>
-					<pattern
-						id="grid"
-						width="20"
-						height="20"
-						patternUnits="userSpaceOnUse"
-					>
-						<path
-							d="M 20 0 L 0 0 0 20"
-							fill="none"
-							stroke="#e0e0e0"
-							stroke-width="1"
-						/>
-					</pattern>
 					<marker
 						id="arrow-start"
 						viewBox="0 0 10 10"
@@ -424,7 +411,6 @@
 						<path d="M 0 0 L 10 5 L 0 10 z" fill="#374151" />
 					</marker>
 				</defs>
-				<rect width="100%" height="100%" fill="url(#grid)" />
 
 				<!-- Width Dimension -->
 				<g class="dimension-line">
@@ -564,6 +550,56 @@
 				{/each}
 
 				<!-- Resize handles -->
+
+				<!-- Hole Span Dimension (First to Last) -->
+				{#if holeCount > 1}
+					{@const firstHoleX = rectX + holeSpacing}
+					{@const lastHoleX = rectX + holeCount * holeSpacing}
+					{@const holeCenterY = rectY + rectHeight / 2}
+					{@const dimY = holeCenterY + holeSize / 2 + 20}
+					<g class="dimension-line">
+						<!-- Extension lines -->
+						<line
+							x1={firstHoleX}
+							y1={holeCenterY + holeSize / 2 + 5}
+							x2={firstHoleX}
+							y2={dimY + 10}
+							stroke="#9ca3af"
+							stroke-width="1"
+							stroke-dasharray="4 2"
+						/>
+						<line
+							x1={lastHoleX}
+							y1={holeCenterY + holeSize / 2 + 5}
+							x2={lastHoleX}
+							y2={dimY + 10}
+							stroke="#9ca3af"
+							stroke-width="1"
+							stroke-dasharray="4 2"
+						/>
+
+						<!-- Dimension line -->
+						<line
+							x1={firstHoleX}
+							y1={dimY}
+							x2={lastHoleX}
+							y2={dimY}
+							stroke="#374151"
+							stroke-width="1.5"
+							marker-start="url(#arrow-start)"
+							marker-end="url(#arrow-end)"
+						/>
+						<text
+							x={firstHoleX + (lastHoleX - firstHoleX) / 2}
+							y={dimY + 15}
+							fill="#374151"
+							font-size="12"
+							text-anchor="middle"
+						>
+							{getMm(lastHoleX - firstHoleX)} mm
+						</text>
+					</g>
+				{/if}
 				<circle
 					cx={rectX + rectWidth}
 					cy={rectY + rectHeight}
