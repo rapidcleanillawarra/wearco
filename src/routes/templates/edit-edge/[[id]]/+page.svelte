@@ -176,7 +176,7 @@
 					type="text" 
 					bind:value={centerEdgeOverall} 
 					class="overlay-input"
-					placeholder="Center Edge Overall"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -186,7 +186,7 @@
 					type="text"
 					bind:value={centerEdgeHolesDistance}
 					class="overlay-input"
-					placeholder="Holes Distance"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -196,7 +196,7 @@
 					type="text"
 					bind:value={centerEdgeHoleLeft}
 					class="overlay-input"
-					placeholder="Hole Left"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -206,7 +206,7 @@
 					type="text"
 					bind:value={centerEdgeHoleRight}
 					class="overlay-input"
-					placeholder="Hole Right"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -216,7 +216,7 @@
 					type="text"
 					bind:value={centerEdgeHeight}
 					class="overlay-input"
-					placeholder="Height"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -226,7 +226,7 @@
 					type="text"
 					bind:value={endEdgeOverall}
 					class="overlay-input"
-					placeholder="0"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -266,7 +266,7 @@
 					type="text"
 					bind:value={topSideWidth}
 					class="overlay-input"
-					placeholder="Width"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -276,7 +276,7 @@
 					type="text"
 					bind:value={topSideAfterCurve}
 					class="overlay-input"
-					placeholder="After Curve"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -286,7 +286,7 @@
 					type="text"
 					bind:value={topSideBeforeCurve}
 					class="overlay-input"
-					placeholder="Before Curve"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -296,7 +296,7 @@
 					type="text"
 					bind:value={topSideCurve}
 					class="overlay-input"
-					placeholder="Curve"
+					placeholder="0 mm"
 				/>
 			</div>
 
@@ -740,8 +740,8 @@
 	/* Bottom Table Positioning - Adjustable like Table 1 */
 	.table-2 {
 		top: 644px;
-		left: 4px;
-		width: 1066px;
+		left: 3px;
+		width: 1067px;
 		height: 61px;
 	}
 
