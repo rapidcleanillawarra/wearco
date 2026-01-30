@@ -10,7 +10,7 @@
 	let resizeStart = $state({ width: 0, height: 0 });
 
 	// SVG canvas dimensions
-	const svgWidth = 600;
+	let svgWidth = $state(600);
 	const svgHeight = 400;
 
 	// Zoom functionality
@@ -20,7 +20,8 @@
 	const ZOOM_STEP = 0.1;
 
 	// Conversion factor: pixels to mm (approximately 3.78 pixels per mm at 96 DPI)
-	const PIXELS_TO_MM = 3.78;
+	// Using 1:1 for simplicity as per original
+	const PIXELS_TO_MM = 0.5;
 
 	// Computed mm values
 	$effect(() => {
@@ -92,9 +93,10 @@
 		isDragging = true;
 		const svg = event.currentTarget as SVGSVGElement;
 		const rect = svg.getBoundingClientRect();
+		// Adjust coordinates for zoom
 		dragStart = {
-			x: event.clientX - rect.left - rectX,
-			y: event.clientY - rect.top - rectY
+			x: (event.clientX - rect.left) / zoomLevel - rectX,
+			y: (event.clientY - rect.top) / zoomLevel - rectY,
 		};
 	}
 
@@ -103,8 +105,12 @@
 
 		const svg = event.currentTarget as SVGSVGElement;
 		const rect = svg.getBoundingClientRect();
-		const newX = event.clientX - rect.left - dragStart.x;
-		const newY = event.clientY - rect.top - dragStart.y;
+
+		const mouseX = (event.clientX - rect.left) / zoomLevel;
+		const mouseY = (event.clientY - rect.top) / zoomLevel;
+
+		const newX = mouseX - dragStart.x;
+		const newY = mouseY - dragStart.y;
 
 		// Keep rectangle within bounds
 		rectX = Math.max(0, Math.min(newX, svgWidth - rectWidth));
@@ -120,11 +126,14 @@
 		event.stopPropagation(); // Prevent triggering drag
 		isResizing = true;
 		resizeStart = { width: rectWidth, height: rectHeight };
-		const svg = (event.currentTarget as Element).closest('svg') as SVGSVGElement;
+		const svg = (event.currentTarget as Element).closest(
+			"svg",
+		) as SVGSVGElement;
 		const rect = svg.getBoundingClientRect();
+
 		dragStart = {
-			x: event.clientX - rect.left,
-			y: event.clientY - rect.top
+			x: (event.clientX - rect.left) / zoomLevel,
+			y: (event.clientY - rect.top) / zoomLevel,
 		};
 	}
 
@@ -133,8 +142,9 @@
 
 		const svg = event.currentTarget as SVGSVGElement;
 		const rect = svg.getBoundingClientRect();
-		const currentX = event.clientX - rect.left;
-		const currentY = event.clientY - rect.top;
+
+		const currentX = (event.clientX - rect.left) / zoomLevel;
+		const currentY = (event.clientY - rect.top) / zoomLevel;
 
 		const deltaX = currentX - dragStart.x;
 		const deltaY = currentY - dragStart.y;
@@ -148,136 +158,185 @@
 </script>
 
 <main class="editor-container">
-	<h1>SVG Rectangle Editor</h1>
+	<div class="header-section">
+		<h1>SVG Rectangle Editor</h1>
 
-	<div class="editor-controls">
-		<div class="dimension-section">
-			<h3>Dimensions</h3>
-			<div class="input-row">
-				<div class="control-group">
-					<label for="width-input">Width:</label>
-					<input
-						id="width-input"
-						type="number"
-						min="10"
-						max="500"
-						value={rectWidth}
-						onchange={handleWidthChange}
-					/>
-					<span>px</span>
+		<div class="editor-controls">
+			<div class="control-panel">
+				<div class="dimension-section">
+					<h3>Dimensions</h3>
+					<div class="input-row">
+						<div class="control-group">
+							<label for="width-input">W:</label>
+							<input
+								id="width-input"
+								type="number"
+								min="10"
+								max="500"
+								value={rectWidth}
+								onchange={handleWidthChange}
+							/>
+							<span>px</span>
+						</div>
+
+						<div class="control-group">
+							<label for="height-input">H:</label>
+							<input
+								id="height-input"
+								type="number"
+								min="10"
+								max="300"
+								value={rectHeight}
+								onchange={handleHeightChange}
+							/>
+							<span>px</span>
+						</div>
+
+						<div class="control-group separator">
+							<label for="width-mm-input">W:</label>
+							<input
+								id="width-mm-input"
+								type="number"
+								min="1"
+								max="9999"
+								value={getWidthMm()}
+								onchange={handleWidthMmChange}
+							/>
+							<span>mm</span>
+						</div>
+
+						<div class="control-group">
+							<label for="height-mm-input">H:</label>
+							<input
+								id="height-mm-input"
+								type="number"
+								min="1"
+								max="9999"
+								value={getHeightMm()}
+								onchange={handleHeightMmChange}
+							/>
+							<span>mm</span>
+						</div>
+					</div>
 				</div>
 
-				<div class="control-group">
-					<label for="width-mm-input">Width:</label>
-					<input
-						id="width-mm-input"
-						type="number"
-						min="1"
-						max="9999"
-						value={getWidthMm()}
-						onchange={handleWidthMmChange}
-					/>
-					<span>mm</span>
+				<div class="zoom-controls">
+					<h3>Zoom</h3>
+					<div class="zoom-buttons">
+						<button
+							onclick={zoomOut}
+							disabled={zoomLevel <= MIN_ZOOM}
+							class="zoom-btn">-</button
+						>
+						<span class="zoom-level"
+							>{Math.round(zoomLevel * 100)}%</span
+						>
+						<button
+							onclick={zoomIn}
+							disabled={zoomLevel >= MAX_ZOOM}
+							class="zoom-btn">+</button
+						>
+						<button onclick={resetZoom} class="zoom-btn reset"
+							>Reset</button
+						>
+					</div>
 				</div>
-			</div>
-
-			<div class="input-row">
-				<div class="control-group">
-					<label for="height-input">Height:</label>
-					<input
-						id="height-input"
-						type="number"
-						min="10"
-						max="300"
-						value={rectHeight}
-						onchange={handleHeightChange}
-					/>
-					<span>px</span>
-				</div>
-
-				<div class="control-group">
-					<label for="height-mm-input">Height:</label>
-					<input
-						id="height-mm-input"
-						type="number"
-						min="1"
-						max="9999"
-						value={getHeightMm()}
-						onchange={handleHeightMmChange}
-					/>
-					<span>mm</span>
-				</div>
-			</div>
-		</div>
-
-		<div class="zoom-controls">
-			<h3>Zoom</h3>
-			<div class="zoom-buttons">
-				<button onclick={zoomOut} disabled={zoomLevel <= MIN_ZOOM} class="zoom-btn">-</button>
-				<span class="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-				<button onclick={zoomIn} disabled={zoomLevel >= MAX_ZOOM} class="zoom-btn">+</button>
-				<button onclick={resetZoom} class="zoom-btn reset">Reset</button>
 			</div>
 		</div>
 	</div>
 
-	<div class="svg-container">
-		<div class="svg-wrapper" style="transform: scale({zoomLevel}); transform-origin: center;">
+	<!-- Bind container clientWidth to svgWidth state -->
+	<div class="svg-container" bind:clientWidth={svgWidth}>
+		<div
+			class="svg-wrapper"
+			style="transform: scale({zoomLevel}); transform-origin: top left; width: 100%; height: 100%;"
+		>
+			<!-- Use dynamic svgWidth -->
 			<svg
 				width={svgWidth}
 				height={svgHeight}
 				viewBox="0 0 {svgWidth} {svgHeight}"
 				class="svg-canvas"
 				onmousedown={handleMouseDown}
-				onmousemove={(e) => { handleMouseMove(e); handleResizeMouseMove(e); }}
+				onmousemove={(e) => {
+					handleMouseMove(e);
+					handleResizeMouseMove(e);
+				}}
 				onmouseup={handleMouseUp}
 				onmouseleave={handleMouseUp}
 				onwheel={handleWheelZoom}
 			>
-			<!-- Grid background for better positioning -->
-			<defs>
-				<pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-					<path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="1"/>
-				</pattern>
-			</defs>
-			<rect width="100%" height="100%" fill="url(#grid)" />
+				<!-- Grid background for better positioning -->
+				<defs>
+					<pattern
+						id="grid"
+						width="20"
+						height="20"
+						patternUnits="userSpaceOnUse"
+					>
+						<path
+							d="M 20 0 L 0 0 0 20"
+							fill="none"
+							stroke="#e0e0e0"
+							stroke-width="1"
+						/>
+					</pattern>
+				</defs>
+				<rect width="100%" height="100%" fill="url(#grid)" />
 
-			<!-- Main rectangle -->
-			<rect
-				x={rectX}
-				y={rectY}
-				width={rectWidth}
-				height={rectHeight}
-				fill="#4f46e5"
-				stroke="#1e1b4b"
-				stroke-width="2"
-				rx="4"
-				class="rectangle"
-			/>
+				<!-- Main rectangle -->
+				<rect
+					x={rectX}
+					y={rectY}
+					width={rectWidth}
+					height={rectHeight}
+					fill="#4f46e5"
+					stroke="#1e1b4b"
+					stroke-width="2"
+					rx="4"
+					class="rectangle"
+				/>
 
-			<!-- Resize handles -->
-			<circle
-				cx={rectX + rectWidth}
-				cy={rectY + rectHeight}
-				r="6"
-				fill="#ef4444"
-				class="resize-handle"
-				onmousedown={handleResizeMouseDown}
-			/>
+				<!-- Resize handles -->
+				<circle
+					cx={rectX + rectWidth}
+					cy={rectY + rectHeight}
+					r="6"
+					fill="#ef4444"
+					class="resize-handle"
+					onmousedown={handleResizeMouseDown}
+				/>
 
-			<!-- Position indicator -->
-			<text x={rectX + 5} y={rectY + 20} fill="white" font-size="12" font-weight="bold">
-				({rectX}, {rectY})
-			</text>
-		</svg>
+				<!-- Position indicator -->
+				<text
+					x={rectX + 5}
+					y={rectY + 20}
+					fill="white"
+					font-size="12"
+					font-weight="bold"
+				>
+					({Math.round(rectX)}, {Math.round(rectY)})
+				</text>
+			</svg>
 		</div>
 	</div>
 
 	<div class="info-panel">
-		<p><strong>Position:</strong> ({rectX}, {rectY}) pixels</p>
-		<p><strong>Size:</strong> {rectWidth} × {rectHeight} pixels ({getWidthMm()} × {getHeightMm()} mm)</p>
+		<p>
+			<strong>Position:</strong> ({Math.round(rectX)}, {Math.round(
+				rectY,
+			)}) pixels
+		</p>
+		<p>
+			<strong>Size:</strong>
+			{rectWidth} × {rectHeight} pixels ({getWidthMm()} × {getHeightMm()} mm)
+		</p>
 		<p><strong>Zoom:</strong> {Math.round(zoomLevel * 100)}%</p>
-		<p><strong>Instructions:</strong> Click and drag the rectangle to move it around. Use the pixel or millimeter input fields above to adjust width and height. Use zoom controls or mouse wheel to zoom in/out.</p>
+		<p>
+			<strong>Instructions:</strong> Click and drag the rectangle to move it
+			around. Use the pixel or millimeter input fields above to adjust width
+			and height. Use zoom controls or mouse wheel to zoom in/out.
+		</p>
 	</div>
 </main>
 
@@ -286,62 +345,75 @@
 		width: 100%;
 		margin: 0 auto;
 		padding: 20px;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+			sans-serif;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.header-section {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20px;
+		border-bottom: 1px solid #e5e7eb;
+		padding-bottom: 20px;
+		flex-wrap: wrap;
+		gap: 20px;
 	}
 
 	h1 {
 		color: #1f2937;
-		margin-bottom: 30px;
-		text-align: center;
+		margin: 0;
+		font-size: 24px;
 	}
 
 	.editor-controls {
-		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
 	}
 
-	.dimension-section {
-		background: #f9fafb;
-		padding: 16px;
-		border-radius: 8px;
-		border: 1px solid #e5e7eb;
+	.control-panel {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		flex-wrap: wrap;
 	}
 
-	.dimension-section h3 {
-		margin: 0 0 12px 0;
-		color: #1f2937;
-		font-size: 16px;
-		font-weight: 600;
-	}
-
+	.dimension-section,
 	.zoom-controls {
 		background: #f9fafb;
-		padding: 16px;
+		padding: 8px 16px;
 		border-radius: 8px;
 		border: 1px solid #e5e7eb;
-		margin-top: 16px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
 	}
 
+	.dimension-section h3,
 	.zoom-controls h3 {
-		margin: 0 0 12px 0;
+		margin: 0;
 		color: #1f2937;
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 600;
+		white-space: nowrap;
 	}
 
 	.zoom-buttons {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		gap: 12px;
+		gap: 8px;
 	}
 
 	.zoom-btn {
-		width: 40px;
-		height: 40px;
+		width: 32px;
+		height: 32px;
 		border: 2px solid #d1d5db;
 		background: white;
 		border-radius: 6px;
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: bold;
 		cursor: pointer;
 		transition: all 0.2s;
@@ -363,83 +435,84 @@
 
 	.zoom-btn.reset {
 		width: auto;
-		padding: 0 16px;
-		font-size: 14px;
-		font-weight: normal;
+		padding: 0 12px;
+		font-size: 12px;
+		font-weight: 600;
 	}
 
 	.zoom-level {
 		font-weight: 600;
 		color: #1f2937;
-		min-width: 60px;
+		min-width: 50px;
 		text-align: center;
-		font-size: 16px;
+		font-size: 14px;
 	}
 
 	.input-row {
 		display: flex;
-		gap: 20px;
-		margin-bottom: 12px;
-		justify-content: center;
-		flex-wrap: wrap;
-	}
-
-	.input-row:last-child {
-		margin-bottom: 0;
+		gap: 16px;
+		align-items: center;
 	}
 
 	.control-group {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
+	}
+
+	.control-group.separator {
+		border-left: 1px solid #d1d5db;
+		padding-left: 16px;
 	}
 
 	label {
 		font-weight: 500;
 		color: #374151;
-		min-width: 60px;
+		font-size: 14px;
 	}
 
 	input {
-		width: 90px;
-		padding: 8px 12px;
-		border: 2px solid #d1d5db;
-		border-radius: 6px;
-		font-size: 14px;
+		width: 60px;
+		padding: 6px;
+		border: 1px solid #d1d5db;
+		border-radius: 4px;
+		font-size: 13px;
 		transition: border-color 0.2s;
 	}
 
 	input:focus {
 		outline: none;
 		border-color: #4f46e5;
-		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+		box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 	}
 
 	span {
 		color: #6b7280;
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	.svg-container {
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
-		overflow: hidden;
+		overflow: hidden; /* Important so SVG doesn't overflow */
 		background: white;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 		margin-bottom: 20px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		min-height: 420px;
+		flex: 1; /* Consume remaining height */
+		position: relative;
 	}
 
 	.svg-wrapper {
-		transition: transform 0.1s ease-out;
+		transform-origin: top left;
+		width: 100%;
+		height: 100%;
+		/* removed overflow hidden to allow scaling */
 	}
 
 	.svg-canvas {
 		cursor: move;
 		display: block;
+		background-color: #ffffff;
 	}
 
 	.svg-canvas:hover .rectangle {
@@ -467,15 +540,15 @@
 
 	.info-panel {
 		background: #f9fafb;
-		padding: 16px;
+		padding: 12px 16px;
 		border-radius: 8px;
 		border: 1px solid #e5e7eb;
 	}
 
 	.info-panel p {
-		margin: 8px 0;
+		margin: 4px 0;
 		color: #374151;
-		font-size: 14px;
+		font-size: 13px;
 	}
 
 	.info-panel p:first-child {
