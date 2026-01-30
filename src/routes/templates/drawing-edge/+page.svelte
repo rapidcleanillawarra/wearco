@@ -251,7 +251,7 @@
 			class="svg-wrapper"
 			style="transform: scale({zoomLevel}); transform-origin: top left; width: 100%; height: 100%;"
 		>
-			<!-- Use dynamic svgWidth -->
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<svg
 				width={svgWidth}
 				height={svgHeight}
@@ -265,6 +265,8 @@
 				onmouseup={handleMouseUp}
 				onmouseleave={handleMouseUp}
 				onwheel={handleWheelZoom}
+				role="application"
+				aria-label="Drawing canvas"
 			>
 				<!-- Grid background for better positioning -->
 				<defs>
@@ -305,6 +307,29 @@
 					</marker>
 				</defs>
 				<rect width="100%" height="100%" fill="url(#grid)" />
+
+				<!-- Width Dimension -->
+				<g class="dimension-line">
+					<line
+						x1={rectX}
+						y1={rectY - 20}
+						x2={rectX + rectWidth}
+						y2={rectY - 20}
+						stroke="#374151"
+						stroke-width="1.5"
+						marker-start="url(#arrow-start)"
+						marker-end="url(#arrow-end)"
+					/>
+					<text
+						x={rectX + rectWidth / 2}
+						y={rectY - 30}
+						fill="#374151"
+						font-size="12"
+						text-anchor="middle"
+					>
+						{getWidthMm()} mm
+					</text>
+				</g>
 
 				<!-- Height Dimension -->
 				<g class="dimension-line">
