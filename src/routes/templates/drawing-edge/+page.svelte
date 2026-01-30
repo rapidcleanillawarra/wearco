@@ -9,6 +9,11 @@
 	let dragStart = $state({ x: 0, y: 0 });
 	let resizeStart = $state({ width: 0, height: 0 });
 
+	// Hole properties
+	let holeType = $state("circle"); // 'circle' | 'square'
+	let holeCount = $state(2);
+	let holeSize = $state(20); // Diameter for circle, side length for square
+
 	// SVG canvas dimensions
 	let svgWidth = $state(600);
 	const svgHeight = 400;
@@ -65,6 +70,22 @@
 		const value = parseInt(target.value);
 		if (!isNaN(value) && value > 0 && value <= 9999) {
 			rectHeight = Math.round(value * PIXELS_TO_MM);
+		}
+	}
+
+	function handleHoleCountChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value);
+		if (!isNaN(value) && value >= 0) {
+			holeCount = value;
+		}
+	}
+
+	function handleHoleSizeChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value);
+		if (!isNaN(value) && value > 0) {
+			holeSize = value;
 		}
 	}
 
@@ -220,6 +241,44 @@
 					</div>
 				</div>
 
+				<div class="holes-section">
+					<h3>Holes</h3>
+					<div class="input-row">
+						<div class="control-group">
+							<label for="hole-type">Type:</label>
+							<select id="hole-type" bind:value={holeType}>
+								<option value="circle">Circle</option>
+								<option value="square">Square</option>
+							</select>
+						</div>
+
+						<div class="control-group">
+							<label for="hole-count">Count:</label>
+							<input
+								id="hole-count"
+								type="number"
+								min="0"
+								max="20"
+								value={holeCount}
+								onchange={handleHoleCountChange}
+							/>
+						</div>
+
+						<div class="control-group">
+							<label for="hole-size">Size:</label>
+							<input
+								id="hole-size"
+								type="number"
+								min="1"
+								max="100"
+								value={holeSize}
+								onchange={handleHoleSizeChange}
+							/>
+							<span>px</span>
+						</div>
+					</div>
+				</div>
+
 				<div class="zoom-controls">
 					<h3>Zoom</h3>
 					<div class="zoom-buttons">
@@ -369,6 +428,34 @@
 					class="rectangle"
 				/>
 
+				<!-- Holes -->
+				{#each Array(holeCount) as _, i}
+					{@const spacing = rectWidth / (holeCount + 1)}
+					{@const cx = rectX + (i + 1) * spacing}
+					{@const cy = rectY + rectHeight / 2}
+
+					{#if holeType === "circle"}
+						<circle
+							{cx}
+							{cy}
+							r={holeSize / 2}
+							fill="white"
+							stroke="#1e1b4b"
+							stroke-width="1.5"
+						/>
+					{:else}
+						<rect
+							x={cx - holeSize / 2}
+							y={cy - holeSize / 2}
+							width={holeSize}
+							height={holeSize}
+							fill="white"
+							stroke="#1e1b4b"
+							stroke-width="1.5"
+						/>
+					{/if}
+				{/each}
+
 				<!-- Resize handles -->
 				<circle
 					cx={rectX + rectWidth}
@@ -467,8 +554,19 @@
 		gap: 12px;
 	}
 
+	.holes-section {
+		background: #f9fafb;
+		padding: 8px 16px;
+		border-radius: 8px;
+		border: 1px solid #e5e7eb;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
 	.dimension-section h3,
-	.zoom-controls h3 {
+	.zoom-controls h3,
+	.holes-section h3 {
 		margin: 0;
 		color: #1f2937;
 		font-size: 14px;
