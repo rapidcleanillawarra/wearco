@@ -281,8 +281,55 @@
 							stroke-width="1"
 						/>
 					</pattern>
+					<marker
+						id="arrow-start"
+						viewBox="0 0 10 10"
+						refX="5"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto"
+					>
+						<path d="M 10 0 L 0 5 L 10 10 z" fill="#374151" />
+					</marker>
+					<marker
+						id="arrow-end"
+						viewBox="0 0 10 10"
+						refX="5"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto"
+					>
+						<path d="M 0 0 L 10 5 L 0 10 z" fill="#374151" />
+					</marker>
 				</defs>
 				<rect width="100%" height="100%" fill="url(#grid)" />
+
+				<!-- Height Dimension -->
+				<g class="dimension-line">
+					<line
+						x1={rectX - 20}
+						y1={rectY}
+						x2={rectX - 20}
+						y2={rectY + rectHeight}
+						stroke="#374151"
+						stroke-width="1.5"
+						marker-start="url(#arrow-start)"
+						marker-end="url(#arrow-end)"
+					/>
+					<text
+						x={rectX - 35}
+						y={rectY + rectHeight / 2}
+						fill="#374151"
+						font-size="12"
+						text-anchor="middle"
+						transform="rotate(-90, {rectX - 35}, {rectY +
+							rectHeight / 2})"
+					>
+						{getHeightMm()} mm
+					</text>
+				</g>
 
 				<!-- Main rectangle -->
 				<rect
