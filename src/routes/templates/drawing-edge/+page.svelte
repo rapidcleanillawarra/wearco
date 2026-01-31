@@ -249,7 +249,7 @@
 
 <main class="editor-container">
 	<div class="header-section">
-		<h1>SVG Rectangle Editor</h1>
+		<h1>Center Edge Drawing</h1>
 
 		<div class="editor-controls">
 			<button class="export-btn" onclick={exportSvg}>Export SVG</button>
@@ -774,23 +774,6 @@
 		</div>
 	</div>
 
-	<div class="info-panel">
-		<p>
-			<strong>Position:</strong> ({Math.round(rectX)}, {Math.round(
-				rectY,
-			)}) pixels
-		</p>
-		<p>
-			<strong>Size:</strong>
-			{rectWidth} × {rectHeight} pixels ({widthMm} × {heightMm} mm)
-		</p>
-		<p><strong>Zoom:</strong> {Math.round(zoomLevel * 100)}%</p>
-		<p>
-			<strong>Instructions:</strong> Click and drag the rectangle to move it
-			around. Use the pixel or millimeter input fields above to adjust width
-			and height. Use zoom controls or mouse wheel to zoom in/out.
-		</p>
-	</div>
 </main>
 
 <style>
