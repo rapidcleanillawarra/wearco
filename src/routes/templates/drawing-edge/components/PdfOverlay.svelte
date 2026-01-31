@@ -16,7 +16,7 @@
         orderNumber = $bindable(""),
         date = $bindable(""),
         material = $bindable(""),
-        pdfUrl = "/assets/edge_template.pdf",
+        pdfUrl = "/assets/edge_template2.pdf",
     }: {
         widthMm?: number;
         heightMm?: number;

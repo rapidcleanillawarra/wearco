@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PdfOverlay from "./components/PdfOverlay.svelte";
 	import SvgDrawing from "./components/SvgDrawing.svelte";
+	import edgePdf from "$lib/assets/edge.pdf";
 	import {
 		exportPdfWithOverlay,
 		mapStateToFieldValues,
@@ -50,7 +51,7 @@
 			const fieldValues = mapStateToFieldValues(stateValues);
 
 			await exportPdfWithOverlay({
-				pdfUrl: "/assets/edge_template.pdf",
+				pdfUrl: edgePdf,
 				fieldValues,
 				filename: `edge-template-${orderNumber || "filled"}.pdf`,
 			});
@@ -98,7 +99,7 @@
 			bind:orderNumber
 			bind:date
 			bind:material
-			pdfUrl="/assets/edge_template.pdf"
+			pdfUrl={edgePdf}
 		/>
 	</section>
 
