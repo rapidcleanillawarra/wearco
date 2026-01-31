@@ -83,6 +83,14 @@
 		}
 	}
 
+	function handleHoleSizeMmChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value);
+		if (!isNaN(value) && value > 0 && value <= 99999) {
+			holeSizeMm = value;
+		}
+	}
+
 	function handleHoleCountChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const value = parseInt(target.value);
@@ -337,6 +345,50 @@
 								onchange={handleHoleSizeChange}
 							/>
 							<span>px</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="mm-labels-section">
+					<h3>MM Labels</h3>
+					<div class="input-row">
+						<div class="control-group">
+							<label for="hole-spacing-mm">Spacing:</label>
+							<input
+								id="hole-spacing-mm"
+								type="number"
+								min="1"
+								max="99999"
+								value={holeSpacingMm}
+								onchange={handleHoleSpacingMmChange}
+							/>
+							<span>mm</span>
+						</div>
+
+						<div class="control-group">
+							<label for="total-distance-mm">Total:</label>
+							<input
+								id="total-distance-mm"
+								type="number"
+								min="1"
+								max="99999"
+								value={totalHoleDistanceMm}
+								onchange={handleTotalHoleDistanceMmChange}
+							/>
+							<span>mm</span>
+						</div>
+
+						<div class="control-group">
+							<label for="hole-size-mm">Hole Ø:</label>
+							<input
+								id="hole-size-mm"
+								type="number"
+								min="1"
+								max="99999"
+								value={holeSizeMm}
+								onchange={handleHoleSizeMmChange}
+							/>
+							<span>mm</span>
 						</div>
 					</div>
 				</div>
@@ -743,7 +795,8 @@
 		gap: 12px;
 	}
 
-	.holes-section {
+	.holes-section,
+	.mm-labels-section {
 		background: #f9fafb;
 		padding: 8px 16px;
 		border-radius: 8px;
@@ -755,7 +808,8 @@
 
 	.dimension-section h3,
 	.zoom-controls h3,
-	.holes-section h3 {
+	.holes-section h3,
+	.mm-labels-section h3 {
 		margin: 0;
 		color: #1f2937;
 		font-size: 14px;
