@@ -3,27 +3,31 @@
 
     // Props for editable drawing values (bindable for two-way sync)
     let {
-        rectWidth = $bindable(1000),
-        rectHeight = $bindable(200),
+        centerEdgeWidthPx = $bindable(1000),
+        centerEdgeHeightPx = $bindable(200),
         holeType = $bindable("circle"),
         holeCount = $bindable(10),
-        holeSize = $bindable(20),
-        widthMm = $bindable(1000),
-        heightMm = $bindable(500),
+        centerEdgeHoleSizePx = $bindable(20),
+        centerEdgeWidth = $bindable(1000),
+        centerEdgeHeight = $bindable(500),
         holeSizeMm = $bindable(100),
-        holeSpacingMm = $bindable(250),
+        centerEdgePitch = $bindable(250),
         totalHoleDistanceMm = $bindable(500),
+        centerEdgeHoleLeft = $bindable(250),
+        centerEdgeHoleRight = $bindable(250),
     }: {
-        rectWidth?: number;
-        rectHeight?: number;
+        centerEdgeWidthPx?: number;
+        centerEdgeHeightPx?: number;
         holeType?: string;
         holeCount?: number;
-        holeSize?: number;
-        widthMm?: number;
-        heightMm?: number;
+        centerEdgeHoleSizePx?: number;
+        centerEdgeWidth?: number;
+        centerEdgeHeight?: number;
         holeSizeMm?: number;
-        holeSpacingMm?: number;
+        centerEdgePitch?: number;
         totalHoleDistanceMm?: number;
+        centerEdgeHoleLeft?: number;
+        centerEdgeHoleRight?: number;
     } = $props();
 
     // Internal state for positioning and interaction
@@ -45,13 +49,13 @@
     const ZOOM_STEP = 0.1;
 
     // Derived values for layout (px only)
-    let holeSpacing = $derived(rectWidth / (holeCount + 1));
+    let centerEdgePitchPx = $derived(centerEdgeWidthPx / (holeCount + 1));
 
     function handleWidthChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0) {
-            rectWidth = value;
+            centerEdgeWidthPx = value;
         }
     }
 
@@ -59,7 +63,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0) {
-            rectHeight = value;
+            centerEdgeHeightPx = value;
         }
     }
 
@@ -68,7 +72,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0 && value <= 99999) {
-            widthMm = value;
+            centerEdgeWidth = value;
         }
     }
 
@@ -76,15 +80,31 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0 && value <= 99999) {
-            heightMm = value;
+            centerEdgeHeight = value;
         }
     }
 
-    function handleHoleSpacingMmChange(event: Event) {
+    function handleHolePitchMmChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0 && value <= 99999) {
-            holeSpacingMm = value;
+            centerEdgePitch = value;
+        }
+    }
+
+    function handleHoleLeftMmChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const value = parseInt(target.value);
+        if (!isNaN(value) && value >= 0 && value <= 99999) {
+            centerEdgeHoleLeft = value;
+        }
+    }
+
+    function handleHoleRightMmChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const value = parseInt(target.value);
+        if (!isNaN(value) && value >= 0 && value <= 99999) {
+            centerEdgeHoleRight = value;
         }
     }
 
@@ -116,7 +136,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0) {
-            holeSize = value;
+            centerEdgeHoleSizePx = value;
         }
     }
 
@@ -165,8 +185,8 @@
         const newY = mouseY - dragStart.y;
 
         // Keep rectangle within bounds
-        rectX = Math.max(0, Math.min(newX, svgWidth - rectWidth));
-        rectY = Math.max(0, Math.min(newY, svgHeight - rectHeight));
+        rectX = Math.max(0, Math.min(newX, svgWidth - centerEdgeWidthPx));
+        rectY = Math.max(0, Math.min(newY, svgHeight - centerEdgeHeightPx));
     }
 
     function handleMouseUp() {
@@ -177,7 +197,7 @@
     function handleResizeMouseDown(event: MouseEvent) {
         event.stopPropagation(); // Prevent triggering drag
         isResizing = true;
-        resizeStart = { width: rectWidth, height: rectHeight };
+        resizeStart = { width: centerEdgeWidthPx, height: centerEdgeHeightPx };
         const svg = (event.currentTarget as Element).closest(
             "svg",
         ) as SVGSVGElement;
@@ -204,8 +224,8 @@
         const newWidth = Math.max(10, resizeStart.width + deltaX);
         const newHeight = Math.max(10, resizeStart.height + deltaY);
 
-        rectWidth = newWidth;
-        rectHeight = newHeight;
+        centerEdgeWidthPx = newWidth;
+        centerEdgeHeightPx = newHeight;
     }
 
     function exportSvg() {
@@ -262,7 +282,7 @@
 
 <div class="svg-drawing-container">
     <div class="header-section">
-        <h2>SVG Drawing Preview</h2>
+        <h2>Center Edge Drawing</h2>
 
         <div class="editor-controls">
             <button class="export-btn" onclick={exportSvg}>Export SVG</button>
@@ -277,7 +297,7 @@
                                 type="number"
                                 min="10"
                                 max="500"
-                                value={rectWidth}
+                                value={centerEdgeWidthPx}
                                 onchange={handleWidthChange}
                             />
                             <span>px</span>
@@ -290,7 +310,7 @@
                                 type="number"
                                 min="10"
                                 max="300"
-                                value={rectHeight}
+                                value={centerEdgeHeightPx}
                                 onchange={handleHeightChange}
                             />
                             <span>px</span>
@@ -303,7 +323,7 @@
                                 type="number"
                                 min="1"
                                 max="9999"
-                                value={widthMm}
+                                value={centerEdgeWidth}
                                 onchange={handleWidthMmChange}
                             />
                             <span>mm</span>
@@ -316,7 +336,7 @@
                                 type="number"
                                 min="1"
                                 max="9999"
-                                value={heightMm}
+                                value={centerEdgeHeight}
                                 onchange={handleHeightMmChange}
                             />
                             <span>mm</span>
@@ -354,7 +374,7 @@
                                 type="number"
                                 min="1"
                                 max="100"
-                                value={holeSize}
+                                value={centerEdgeHoleSizePx}
                                 onchange={handleHoleSizeChange}
                             />
                             <span>px</span>
@@ -366,14 +386,40 @@
                     <h3>MM Labels</h3>
                     <div class="input-row">
                         <div class="control-group">
+                            <label for="hole-left-mm">Left:</label>
+                            <input
+                                id="hole-left-mm"
+                                type="number"
+                                min="0"
+                                max="99999"
+                                value={centerEdgeHoleLeft}
+                                onchange={handleHoleLeftMmChange}
+                            />
+                            <span>mm</span>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="hole-right-mm">Right:</label>
+                            <input
+                                id="hole-right-mm"
+                                type="number"
+                                min="0"
+                                max="99999"
+                                value={centerEdgeHoleRight}
+                                onchange={handleHoleRightMmChange}
+                            />
+                            <span>mm</span>
+                        </div>
+
+                        <div class="control-group">
                             <label for="hole-spacing-mm">Pitch:</label>
                             <input
                                 id="hole-spacing-mm"
                                 type="number"
                                 min="1"
                                 max="99999"
-                                value={holeSpacingMm}
-                                onchange={handleHoleSpacingMmChange}
+                                value={centerEdgePitch}
+                                onchange={handleHolePitchMmChange}
                             />
                             <span>mm</span>
                         </div>
@@ -485,7 +531,7 @@
                     <line
                         x1={rectX}
                         y1={rectY - 20}
-                        x2={rectX + rectWidth}
+                        x2={rectX + centerEdgeWidthPx}
                         y2={rectY - 20}
                         stroke="#374151"
                         stroke-width="1.5"
@@ -493,13 +539,13 @@
                         marker-end="url(#arrow-end)"
                     />
                     <text
-                        x={rectX + rectWidth / 2}
+                        x={rectX + centerEdgeWidthPx / 2}
                         y={rectY - 30}
                         fill="#374151"
                         font-size="12"
                         text-anchor="middle"
                     >
-                        {widthMm} mm
+                        {centerEdgeWidth} mm
                     </text>
                 </g>
 
@@ -509,7 +555,7 @@
                         x1={rectX - 20}
                         y1={rectY}
                         x2={rectX - 20}
-                        y2={rectY + rectHeight}
+                        y2={rectY + centerEdgeHeightPx}
                         stroke="#374151"
                         stroke-width="1.5"
                         marker-start="url(#arrow-start)"
@@ -517,14 +563,14 @@
                     />
                     <text
                         x={rectX - 35}
-                        y={rectY + rectHeight / 2}
+                        y={rectY + centerEdgeHeightPx / 2}
                         fill="#374151"
                         font-size="12"
                         text-anchor="middle"
                         transform="rotate(-90, {rectX - 35}, {rectY +
-                            rectHeight / 2})"
+                            centerEdgeHeightPx / 2})"
                     >
-                        {heightMm} mm
+                        {centerEdgeHeight} mm
                     </text>
                 </g>
 
@@ -532,8 +578,8 @@
                 <rect
                     x={rectX}
                     y={rectY}
-                    width={rectWidth}
-                    height={rectHeight}
+                    width={centerEdgeWidthPx}
+                    height={centerEdgeHeightPx}
                     fill="white"
                     stroke="#1e1b4b"
                     stroke-width="2"
@@ -547,69 +593,71 @@
                     <g class="dimension-line">
                         <line
                             x1={rectX}
-                            y1={rectY + rectHeight / 2}
-                            x2={rectX + holeSpacing}
-                            y2={rectY + rectHeight / 2}
+                            y1={rectY + centerEdgeHeightPx / 2}
+                            x2={rectX + centerEdgePitchPx}
+                            y2={rectY + centerEdgeHeightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
                             marker-start="url(#arrow-start)"
                             marker-end="url(#arrow-end)"
                         />
                         <text
-                            x={rectX + holeSpacing / 2}
-                            y={rectY + rectHeight / 2 - 10}
+                            x={rectX + centerEdgePitchPx / 2}
+                            y={rectY + centerEdgeHeightPx / 2 - 10}
                             fill="#374151"
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {holeSpacingMm} mm
+                            {centerEdgeHoleLeft} mm
                         </text>
                     </g>
 
                     <!-- Last Hole to Right Edge -->
                     <g class="dimension-line">
                         <line
-                            x1={rectX + rectWidth - holeSpacing}
-                            y1={rectY + rectHeight / 2}
-                            x2={rectX + rectWidth}
-                            y2={rectY + rectHeight / 2}
+                            x1={rectX + centerEdgeWidthPx - centerEdgePitchPx}
+                            y1={rectY + centerEdgeHeightPx / 2}
+                            x2={rectX + centerEdgeWidthPx}
+                            y2={rectY + centerEdgeHeightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
                             marker-start="url(#arrow-start)"
                             marker-end="url(#arrow-end)"
                         />
                         <text
-                            x={rectX + rectWidth - holeSpacing / 2}
-                            y={rectY + rectHeight / 2 - 10}
+                            x={rectX +
+                                centerEdgeWidthPx -
+                                centerEdgePitchPx / 2}
+                            y={rectY + centerEdgeHeightPx / 2 - 10}
                             fill="#374151"
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {holeSpacingMm} mm
+                            {centerEdgeHoleRight} mm
                         </text>
                     </g>
                 {/if}
 
                 <!-- Holes -->
                 {#each Array(holeCount) as _, i}
-                    {@const cx = rectX + (i + 1) * holeSpacing}
-                    {@const cy = rectY + rectHeight / 2}
+                    {@const cx = rectX + (i + 1) * centerEdgePitchPx}
+                    {@const cy = rectY + centerEdgeHeightPx / 2}
 
                     {#if holeType === "circle"}
                         <circle
                             {cx}
                             {cy}
-                            r={holeSize / 2}
+                            r={centerEdgeHoleSizePx / 2}
                             fill="white"
                             stroke="#1e1b4b"
                             stroke-width="1.5"
                         />
                     {:else}
                         <rect
-                            x={cx - holeSize / 2}
-                            y={cy - holeSize / 2}
-                            width={holeSize}
-                            height={holeSize}
+                            x={cx - centerEdgeHoleSizePx / 2}
+                            y={cy - centerEdgeHoleSizePx / 2}
+                            width={centerEdgeHoleSizePx}
+                            height={centerEdgeHoleSizePx}
                             fill="white"
                             stroke="#1e1b4b"
                             stroke-width="1.5"
@@ -619,16 +667,16 @@
 
                 <!-- Hole Diameter Dimension (on top of first hole) -->
                 {#if holeCount > 0}
-                    {@const firstHoleCx = rectX + holeSpacing}
-                    {@const firstHoleCy = rectY + rectHeight / 2}
-                    {@const dimY = firstHoleCy - holeSize / 2 - 15}
+                    {@const firstHoleCx = rectX + centerEdgePitchPx}
+                    {@const firstHoleCy = rectY + centerEdgeHeightPx / 2}
+                    {@const dimY = firstHoleCy - centerEdgeHoleSizePx / 2 - 15}
 
                     <g class="dimension-line">
                         <!-- Horizontal dimension line (showing diameter) -->
                         <line
-                            x1={firstHoleCx - holeSize / 2}
+                            x1={firstHoleCx - centerEdgeHoleSizePx / 2}
                             y1={dimY}
-                            x2={firstHoleCx + holeSize / 2}
+                            x2={firstHoleCx + centerEdgeHoleSizePx / 2}
                             y2={dimY}
                             stroke="#374151"
                             stroke-width="1.5"
@@ -637,18 +685,18 @@
                         />
                         <!-- Extension lines (going up) -->
                         <line
-                            x1={firstHoleCx - holeSize / 2}
-                            y1={firstHoleCy - holeSize / 2 - 3}
-                            x2={firstHoleCx - holeSize / 2}
+                            x1={firstHoleCx - centerEdgeHoleSizePx / 2}
+                            y1={firstHoleCy - centerEdgeHoleSizePx / 2 - 3}
+                            x2={firstHoleCx - centerEdgeHoleSizePx / 2}
                             y2={dimY - 5}
                             stroke="#9ca3af"
                             stroke-width="1"
                             stroke-dasharray="4 2"
                         />
                         <line
-                            x1={firstHoleCx + holeSize / 2}
-                            y1={firstHoleCy - holeSize / 2 - 3}
-                            x2={firstHoleCx + holeSize / 2}
+                            x1={firstHoleCx + centerEdgeHoleSizePx / 2}
+                            y1={firstHoleCy - centerEdgeHoleSizePx / 2 - 3}
+                            x2={firstHoleCx + centerEdgeHoleSizePx / 2}
                             y2={dimY - 5}
                             stroke="#9ca3af"
                             stroke-width="1"
@@ -671,23 +719,25 @@
 
                 <!-- Hole Dimensions -->
                 {#if holeCount > 1}
-                    {@const firstHoleX = rectX + holeSpacing}
-                    {@const secondHoleX = rectX + 2 * holeSpacing}
-                    {@const lastHoleX = rectX + holeCount * holeSpacing}
-                    {@const holeCenterY = rectY + rectHeight / 2}
+                    {@const firstHoleX = rectX + centerEdgePitchPx}
+                    {@const secondHoleX = rectX + 2 * centerEdgePitchPx}
+                    {@const lastHoleX = rectX + holeCount * centerEdgePitchPx}
+                    {@const holeCenterY = rectY + centerEdgeHeightPx / 2}
 
                     <!-- Top Dimension Position (Pitch) -->
-                    {@const dimY_top = holeCenterY - holeSize / 2 - 20}
+                    {@const dimY_top =
+                        holeCenterY - centerEdgeHoleSizePx / 2 - 20}
 
                     <!-- Bottom Dimension Position (Total) -->
-                    {@const dimY_bottom = holeCenterY + holeSize / 2 + 20}
+                    {@const dimY_bottom =
+                        holeCenterY + centerEdgeHoleSizePx / 2 + 20}
 
                     <!-- First to Second Hole (Pitch) - BOTTOM -->
                     <g class="dimension-line">
                         <!-- Extension lines (going down) -->
                         <line
                             x1={firstHoleX}
-                            y1={holeCenterY + holeSize / 2 + 5}
+                            y1={holeCenterY + centerEdgeHoleSizePx / 2 + 5}
                             x2={firstHoleX}
                             y2={dimY_bottom + 10}
                             stroke="#9ca3af"
@@ -696,7 +746,7 @@
                         />
                         <line
                             x1={secondHoleX}
-                            y1={holeCenterY + holeSize / 2 + 5}
+                            y1={holeCenterY + centerEdgeHoleSizePx / 2 + 5}
                             x2={secondHoleX}
                             y2={dimY_bottom + 10}
                             stroke="#9ca3af"
@@ -722,7 +772,7 @@
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {holeSpacingMm} mm
+                            {centerEdgePitch} mm
                         </text>
                     </g>
 
@@ -732,7 +782,7 @@
                             <!-- Extension lines (going down) -->
                             <line
                                 x1={firstHoleX}
-                                y1={holeCenterY + holeSize / 2 + 5}
+                                y1={holeCenterY + centerEdgeHoleSizePx / 2 + 5}
                                 x2={firstHoleX}
                                 y2={dimY_bottom + 10}
                                 stroke="#9ca3af"
@@ -741,7 +791,7 @@
                             />
                             <line
                                 x1={lastHoleX}
-                                y1={holeCenterY + holeSize / 2 + 5}
+                                y1={holeCenterY + centerEdgeHoleSizePx / 2 + 5}
                                 x2={lastHoleX}
                                 y2={dimY_bottom + 10}
                                 stroke="#9ca3af"
@@ -773,8 +823,8 @@
                     {/if}
                 {/if}
                 <circle
-                    cx={rectX + rectWidth}
-                    cy={rectY + rectHeight}
+                    cx={rectX + centerEdgeWidthPx}
+                    cy={rectY + centerEdgeHeightPx}
                     r="6"
                     fill="#ef4444"
                     class="resize-handle"

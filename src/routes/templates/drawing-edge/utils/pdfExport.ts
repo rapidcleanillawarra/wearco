@@ -112,12 +112,14 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
  * Get field values mapped by field ID from the state values
  */
 export function mapStateToFieldValues(stateValues: {
-    widthMm: number;
-    heightMm: number;
+    centerEdgeWidth: number;
+    centerEdgeHeight: number;
     holeCount: number;
     holeSizeMm: number;
-    holeSpacingMm: number;
+    centerEdgePitch: number;
     totalHoleDistanceMm: number;
+    centerEdgeHoleLeft: number;
+    centerEdgeHoleRight: number;
     customerName: string;
     orderNumber: string;
     date: string;

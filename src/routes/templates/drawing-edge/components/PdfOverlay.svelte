@@ -6,24 +6,28 @@
 
     // Bindable props for all overlay values
     let {
-        widthMm = $bindable(1000),
-        heightMm = $bindable(500),
+        centerEdgeWidth = $bindable(1000),
+        centerEdgeHeight = $bindable(500),
         holeCount = $bindable(10),
         holeSizeMm = $bindable(100),
-        holeSpacingMm = $bindable(250),
+        centerEdgePitch = $bindable(250),
         totalHoleDistanceMm = $bindable(500),
+        centerEdgeHoleLeft = $bindable(0),
+        centerEdgeHoleRight = $bindable(0),
         customerName = $bindable(""),
         orderNumber = $bindable(""),
         date = $bindable(""),
         material = $bindable(""),
         pdfUrl = "/assets/edge_template2.pdf",
     }: {
-        widthMm?: number;
-        heightMm?: number;
+        centerEdgeWidth?: number;
+        centerEdgeHeight?: number;
         holeCount?: number;
         holeSizeMm?: number;
-        holeSpacingMm?: number;
+        centerEdgePitch?: number;
         totalHoleDistanceMm?: number;
+        centerEdgeHoleLeft?: number;
+        centerEdgeHoleRight?: number;
         customerName?: string;
         orderNumber?: string;
         date?: string;
@@ -33,12 +37,14 @@
 
     // Map of bindsTo keys to their values
     const valueMap = $derived({
-        widthMm,
-        heightMm,
+        centerEdgeWidth,
+        centerEdgeHeight,
         holeCount,
         holeSizeMm,
-        holeSpacingMm,
+        centerEdgePitch,
         totalHoleDistanceMm,
+        centerEdgeHoleLeft,
+        centerEdgeHoleRight,
         customerName,
         orderNumber,
         date,
@@ -78,11 +84,11 @@
 
         // Update the corresponding prop
         switch (field.bindsTo) {
-            case "widthMm":
-                widthMm = Number(value);
+            case "centerEdgeWidth":
+                centerEdgeWidth = Number(value);
                 break;
-            case "heightMm":
-                heightMm = Number(value);
+            case "centerEdgeHeight":
+                centerEdgeHeight = Number(value);
                 break;
             case "holeCount":
                 holeCount = Number(value);
@@ -90,11 +96,17 @@
             case "holeSizeMm":
                 holeSizeMm = Number(value);
                 break;
-            case "holeSpacingMm":
-                holeSpacingMm = Number(value);
+            case "centerEdgePitch":
+                centerEdgePitch = Number(value);
                 break;
             case "totalHoleDistanceMm":
                 totalHoleDistanceMm = Number(value);
+                break;
+            case "centerEdgeHoleLeft":
+                centerEdgeHoleLeft = Number(value);
+                break;
+            case "centerEdgeHoleRight":
+                centerEdgeHoleRight = Number(value);
                 break;
             case "customerName":
                 customerName = String(value);

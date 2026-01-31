@@ -8,12 +8,14 @@
 	} from "./utils/pdfExport";
 
 	// Shared state for all editable values (source of truth)
-	let widthMm = $state(1000);
-	let heightMm = $state(500);
+	let centerEdgeWidth = $state(1000);
+	let centerEdgeHeight = $state(500);
 	let holeCount = $state(10);
 	let holeSizeMm = $state(100);
-	let holeSpacingMm = $state(250);
+	let centerEdgePitch = $state(250);
 	let totalHoleDistanceMm = $state(500);
+	let centerEdgeHoleLeft = $state(250);
+	let centerEdgeHoleRight = $state(250);
 
 	// Additional PDF overlay fields
 	let customerName = $state("");
@@ -22,10 +24,10 @@
 	let material = $state("");
 
 	// SVG-specific values (internal to drawing, not from PDF)
-	let rectWidth = $state(1000);
-	let rectHeight = $state(200);
+	let centerEdgeWidthPx = $state(1000);
+	let centerEdgeHeightPx = $state(200);
 	let holeType = $state("circle");
-	let holeSize = $state(20);
+	let centerEdgeHoleSizePx = $state(20);
 
 	let isExporting = $state(false);
 	let exportError = $state<string | null>(null);
@@ -36,12 +38,14 @@
 
 		try {
 			const stateValues = {
-				widthMm,
-				heightMm,
+				centerEdgeWidth,
+				centerEdgeHeight,
 				holeCount,
 				holeSizeMm,
-				holeSpacingMm,
+				centerEdgePitch,
 				totalHoleDistanceMm,
+				centerEdgeHoleLeft,
+				centerEdgeHoleRight,
 				customerName,
 				orderNumber,
 				date,
@@ -89,12 +93,14 @@
 	<!-- PDF Overlay Section -->
 	<section class="pdf-section">
 		<PdfOverlay
-			bind:widthMm
-			bind:heightMm
+			bind:centerEdgeWidth
+			bind:centerEdgeHeight
 			bind:holeCount
 			bind:holeSizeMm
-			bind:holeSpacingMm
+			bind:centerEdgePitch
 			bind:totalHoleDistanceMm
+			bind:centerEdgeHoleLeft
+			bind:centerEdgeHoleRight
 			bind:customerName
 			bind:orderNumber
 			bind:date
@@ -106,16 +112,18 @@
 	<!-- SVG Drawing Section -->
 	<section class="svg-section">
 		<SvgDrawing
-			bind:rectWidth
-			bind:rectHeight
+			bind:centerEdgeWidthPx
+			bind:centerEdgeHeightPx
 			bind:holeType
 			bind:holeCount
-			bind:holeSize
-			bind:widthMm
-			bind:heightMm
+			bind:centerEdgeHoleSizePx
+			bind:centerEdgeWidth
+			bind:centerEdgeHeight
 			bind:holeSizeMm
-			bind:holeSpacingMm
+			bind:centerEdgePitch
 			bind:totalHoleDistanceMm
+			bind:centerEdgeHoleLeft
+			bind:centerEdgeHoleRight
 		/>
 	</section>
 </main>

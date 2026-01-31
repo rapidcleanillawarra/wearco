@@ -13,7 +13,7 @@
                 "width": 30,
                 "height": 12
             },
-            "bindsTo": "widthMm",
+            "bindsTo": "centerEdgeWidth",
             "fontSize": 10
         },
         {
@@ -26,7 +26,7 @@
                 "width": 80,
                 "height": 22
             },
-            "bindsTo": "heightMm",
+            "bindsTo": "centerEdgeHeight",
             "fontSize": 12
         },
         {
@@ -65,7 +65,7 @@
                 "width": 80,
                 "height": 22
             },
-            "bindsTo": "holeSpacingMm",
+            "bindsTo": "centerEdgePitch",
             "fontSize": 12
         },
         {
@@ -79,6 +79,32 @@
                 "height": 22
             },
             "bindsTo": "totalHoleDistanceMm",
+            "fontSize": 12
+        },
+        {
+            "id": "hole_left_mm",
+            "type": "number",
+            "label": "Hole Left (mm)",
+            "position": {
+                "x": 150,
+                "y": 280,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "centerEdgeHoleLeft",
+            "fontSize": 12
+        },
+        {
+            "id": "hole_right_mm",
+            "type": "number",
+            "label": "Hole Right (mm)",
+            "position": {
+                "x": 150,
+                "y": 310,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "centerEdgeHoleRight",
             "fontSize": 12
         },
         {
