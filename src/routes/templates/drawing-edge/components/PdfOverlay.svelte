@@ -42,6 +42,16 @@
         topSideBeforeCurve = $bindable(50),
         topSideAfterCurve = $bindable(50),
         topSideAngle = $bindable(45),
+        generalQuantity = $bindable(1),
+        generalJobNumber = $bindable(""),
+        generalWorkOrder = $bindable(""),
+        generalDwgNumber = $bindable(""),
+        generalDl = $bindable(""),
+        generalCheckedBy = $bindable(""),
+        generalProgBy = $bindable(""),
+        generalCustomer = $bindable(""),
+        generalMaterial = $bindable(""),
+        generalThk = $bindable(""),
         customerName = $bindable(""),
         orderNumber = $bindable(""),
         date = $bindable(""),
@@ -80,6 +90,16 @@
         topSideBeforeCurve?: number;
         topSideAfterCurve?: number;
         topSideAngle?: number;
+        generalQuantity?: number;
+        generalJobNumber?: string;
+        generalWorkOrder?: string;
+        generalDwgNumber?: string;
+        generalDl?: string;
+        generalCheckedBy?: string;
+        generalProgBy?: string;
+        generalCustomer?: string;
+        generalMaterial?: string;
+        generalThk?: string;
         customerName?: string;
         orderNumber?: string;
         date?: string;
@@ -121,6 +141,16 @@
         topSideBeforeCurve,
         topSideAfterCurve,
         topSideAngle,
+        generalQuantity,
+        generalJobNumber,
+        generalWorkOrder,
+        generalDwgNumber,
+        generalDl,
+        generalCheckedBy,
+        generalProgBy,
+        generalCustomer,
+        generalMaterial,
+        generalThk,
         customerName,
         orderNumber,
         date,
@@ -255,6 +285,36 @@
                 break;
             case "topSideAngle":
                 topSideAngle = Number(value);
+                break;
+            case "generalQuantity":
+                generalQuantity = Number(value);
+                break;
+            case "generalJobNumber":
+                generalJobNumber = String(value);
+                break;
+            case "generalWorkOrder":
+                generalWorkOrder = String(value);
+                break;
+            case "generalDwgNumber":
+                generalDwgNumber = String(value);
+                break;
+            case "generalDl":
+                generalDl = String(value);
+                break;
+            case "generalCheckedBy":
+                generalCheckedBy = String(value);
+                break;
+            case "generalProgBy":
+                generalProgBy = String(value);
+                break;
+            case "generalCustomer":
+                generalCustomer = String(value);
+                break;
+            case "generalMaterial":
+                generalMaterial = String(value);
+                break;
+            case "generalThk":
+                generalThk = String(value);
                 break;
             case "customerName":
                 customerName = String(value);
