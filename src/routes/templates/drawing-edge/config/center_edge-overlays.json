@@ -30,6 +30,45 @@
             "fontSize": 10
         },
         {
+            "id": "centerEdgeHoleCount",
+            "type": "number",
+            "label": "Hole Count",
+            "position": {
+                "x": 45,
+                "y": 125,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleCount",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleSize",
+            "type": "number",
+            "label": "Hole Size (mm)",
+            "position": {
+                "x": 45,
+                "y": 145,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleSize",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleType",
+            "type": "text",
+            "label": "Hole Type",
+            "position": {
+                "x": 45,
+                "y": 165,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleType",
+            "fontSize": 10
+        },
+        {
             "id": "centerEdgePitch",
             "type": "number",
             "label": "Pitch (mm)",

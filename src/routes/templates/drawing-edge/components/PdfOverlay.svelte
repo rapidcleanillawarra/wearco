@@ -10,6 +10,7 @@
         centerEdgeHeight = $bindable(500),
         centerEdgeHoleCount = $bindable(10),
         centerEdgeHoleSize = $bindable(100),
+        centerEdgeHoleType = $bindable("circle"),
         centerEdgePitch = $bindable(250),
         centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(0),
@@ -24,6 +25,7 @@
         centerEdgeHeight?: number;
         centerEdgeHoleCount?: number;
         centerEdgeHoleSize?: number;
+        centerEdgeHoleType?: string;
         centerEdgePitch?: number;
         centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
@@ -41,6 +43,7 @@
         centerEdgeHeight,
         centerEdgeHoleCount,
         centerEdgeHoleSize,
+        centerEdgeHoleType,
         centerEdgePitch,
         centerEdgeTotalHoleDistance,
         centerEdgeHoleLeft,
@@ -95,6 +98,9 @@
                 break;
             case "centerEdgeHoleSize":
                 centerEdgeHoleSize = Number(value);
+                break;
+            case "centerEdgeHoleType":
+                centerEdgeHoleType = String(value);
                 break;
             case "centerEdgePitch":
                 centerEdgePitch = Number(value);

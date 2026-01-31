@@ -10,6 +10,7 @@
 	// Shared state for all editable values (source of truth)
 	let centerEdgeWidth = $state(1000);
 	let centerEdgeHeight = $state(500);
+	let centerEdgeHoleType = $state("circle");
 	let centerEdgeHoleCount = $state(10);
 	let centerEdgeHoleSize = $state(100);
 	let centerEdgePitch = $state(250);
@@ -42,6 +43,7 @@
 				centerEdgeHeight,
 				centerEdgeHoleCount,
 				centerEdgeHoleSize,
+				centerEdgeHoleType,
 				centerEdgePitch,
 				centerEdgeTotalHoleDistance,
 				centerEdgeHoleLeft,
@@ -97,6 +99,7 @@
 			bind:centerEdgeHeight
 			bind:centerEdgeHoleCount
 			bind:centerEdgeHoleSize
+			bind:centerEdgeHoleType
 			bind:centerEdgePitch
 			bind:centerEdgeTotalHoleDistance
 			bind:centerEdgeHoleLeft
