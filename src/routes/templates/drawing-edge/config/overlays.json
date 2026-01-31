@@ -119,6 +119,123 @@
             },
             "bindsTo": "centerEdgeHoleRight",
             "fontSize": 10
+        },
+        {
+            "id": "endEdgeWidth",
+            "type": "number",
+            "label": "End Width (mm)",
+            "position": {
+                "x": 190,
+                "y": 244,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeWidth",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHeight",
+            "type": "number",
+            "label": "End Height (mm)",
+            "position": {
+                "x": 60,
+                "y": 320,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHeight",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleCount",
+            "type": "number",
+            "label": "End Hole Count",
+            "position": {
+                "x": 615,
+                "y": 315,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleCount",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleSize",
+            "type": "number",
+            "label": "End Hole Size (mm)",
+            "position": {
+                "x": 120,
+                "y": 360,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleSize",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleType",
+            "type": "dropdown",
+            "label": "End Hole Type",
+            "position": {
+                "x": 610,
+                "y": 345,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleType",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgePitch",
+            "type": "number",
+            "label": "End Pitch (mm)",
+            "position": {
+                "x": 175,
+                "y": 300,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgePitch",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeTotalHoleDistance",
+            "type": "number",
+            "label": "End Total Distance (mm)",
+            "position": {
+                "x": 175,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeTotalHoleDistance",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleLeft",
+            "type": "number",
+            "label": "End Hole Left (mm)",
+            "position": {
+                "x": 105,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleLeft",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleRight",
+            "type": "number",
+            "label": "End Hole Right (mm)",
+            "position": {
+                "x": 250,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleRight",
+            "fontSize": 10
         }
     ]
 }

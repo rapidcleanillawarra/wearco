@@ -15,6 +15,15 @@
         centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(0),
         centerEdgeHoleRight = $bindable(0),
+        endEdgeWidth = $bindable(300),
+        endEdgeHeight = $bindable(150),
+        endEdgeHoleCount = $bindable(4),
+        endEdgeHoleSize = $bindable(10),
+        endEdgeHoleType = $bindable("circle"),
+        endEdgePitch = $bindable(60),
+        endEdgeTotalHoleDistance = $bindable(180),
+        endEdgeHoleLeft = $bindable(60),
+        endEdgeHoleRight = $bindable(60),
         customerName = $bindable(""),
         orderNumber = $bindable(""),
         date = $bindable(""),
@@ -30,6 +39,15 @@
         centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
         centerEdgeHoleRight?: number;
+        endEdgeWidth?: number;
+        endEdgeHeight?: number;
+        endEdgeHoleCount?: number;
+        endEdgeHoleSize?: number;
+        endEdgeHoleType?: string;
+        endEdgePitch?: number;
+        endEdgeTotalHoleDistance?: number;
+        endEdgeHoleLeft?: number;
+        endEdgeHoleRight?: number;
         customerName?: string;
         orderNumber?: string;
         date?: string;
@@ -48,6 +66,15 @@
         centerEdgeTotalHoleDistance,
         centerEdgeHoleLeft,
         centerEdgeHoleRight,
+        endEdgeWidth,
+        endEdgeHeight,
+        endEdgeHoleCount,
+        endEdgeHoleSize,
+        endEdgeHoleType,
+        endEdgePitch,
+        endEdgeTotalHoleDistance,
+        endEdgeHoleLeft,
+        endEdgeHoleRight,
         customerName,
         orderNumber,
         date,
@@ -113,6 +140,33 @@
                 break;
             case "centerEdgeHoleRight":
                 centerEdgeHoleRight = Number(value);
+                break;
+            case "endEdgeWidth":
+                endEdgeWidth = Number(value);
+                break;
+            case "endEdgeHeight":
+                endEdgeHeight = Number(value);
+                break;
+            case "endEdgeHoleCount":
+                endEdgeHoleCount = Number(value);
+                break;
+            case "endEdgeHoleSize":
+                endEdgeHoleSize = Number(value);
+                break;
+            case "endEdgeHoleType":
+                endEdgeHoleType = String(value);
+                break;
+            case "endEdgePitch":
+                endEdgePitch = Number(value);
+                break;
+            case "endEdgeTotalHoleDistance":
+                endEdgeTotalHoleDistance = Number(value);
+                break;
+            case "endEdgeHoleLeft":
+                endEdgeHoleLeft = Number(value);
+                break;
+            case "endEdgeHoleRight":
+                endEdgeHoleRight = Number(value);
                 break;
             case "customerName":
                 customerName = String(value);

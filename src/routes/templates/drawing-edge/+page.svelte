@@ -118,6 +118,15 @@
 			bind:centerEdgeTotalHoleDistance
 			bind:centerEdgeHoleLeft
 			bind:centerEdgeHoleRight
+			bind:endEdgeWidth
+			bind:endEdgeHeight
+			bind:endEdgeHoleCount
+			bind:endEdgeHoleSize
+			bind:endEdgeHoleType
+			bind:endEdgePitch
+			bind:endEdgeTotalHoleDistance
+			bind:endEdgeHoleLeft
+			bind:endEdgeHoleRight
 			bind:customerName
 			bind:orderNumber
 			bind:date
