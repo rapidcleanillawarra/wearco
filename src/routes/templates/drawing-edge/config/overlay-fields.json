@@ -1,0 +1,137 @@
+{
+    "pdfPath": "/assets/edge_template.pdf",
+    "pageWidth": 595,
+    "pageHeight": 842,
+    "fields": [
+        {
+            "id": "width_mm",
+            "type": "number",
+            "label": "Width (mm)",
+            "position": {
+                "x": 150,
+                "y": 100,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "widthMm",
+            "fontSize": 12
+        },
+        {
+            "id": "height_mm",
+            "type": "number",
+            "label": "Height (mm)",
+            "position": {
+                "x": 150,
+                "y": 130,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "heightMm",
+            "fontSize": 12
+        },
+        {
+            "id": "hole_count",
+            "type": "number",
+            "label": "No. of Holes",
+            "position": {
+                "x": 150,
+                "y": 160,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "holeCount",
+            "fontSize": 12
+        },
+        {
+            "id": "hole_size_mm",
+            "type": "number",
+            "label": "Hole Ø (mm)",
+            "position": {
+                "x": 150,
+                "y": 190,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "holeSizeMm",
+            "fontSize": 12
+        },
+        {
+            "id": "hole_spacing_mm",
+            "type": "number",
+            "label": "Pitch (mm)",
+            "position": {
+                "x": 150,
+                "y": 220,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "holeSpacingMm",
+            "fontSize": 12
+        },
+        {
+            "id": "total_hole_distance_mm",
+            "type": "number",
+            "label": "Total Distance (mm)",
+            "position": {
+                "x": 150,
+                "y": 250,
+                "width": 80,
+                "height": 22
+            },
+            "bindsTo": "totalHoleDistanceMm",
+            "fontSize": 12
+        },
+        {
+            "id": "customer_name",
+            "type": "text",
+            "label": "Customer Name",
+            "position": {
+                "x": 350,
+                "y": 100,
+                "width": 150,
+                "height": 22
+            },
+            "bindsTo": "customerName",
+            "fontSize": 12
+        },
+        {
+            "id": "order_number",
+            "type": "text",
+            "label": "Order No.",
+            "position": {
+                "x": 350,
+                "y": 130,
+                "width": 150,
+                "height": 22
+            },
+            "bindsTo": "orderNumber",
+            "fontSize": 12
+        },
+        {
+            "id": "date",
+            "type": "text",
+            "label": "Date",
+            "position": {
+                "x": 350,
+                "y": 160,
+                "width": 150,
+                "height": 22
+            },
+            "bindsTo": "date",
+            "fontSize": 12
+        },
+        {
+            "id": "material",
+            "type": "text",
+            "label": "Material",
+            "position": {
+                "x": 350,
+                "y": 190,
+                "width": 150,
+                "height": 22
+            },
+            "bindsTo": "material",
+            "fontSize": 12
+        }
+    ]
+}
