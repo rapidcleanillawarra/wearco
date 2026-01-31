@@ -14,7 +14,7 @@
 
 <nav>
 	<a href="/templates/edit-edge">Create Template</a>
-	<a href="/templates/print">Print Template</a>
+	<a href="/templates/print">Edge Template</a>
 </nav>
 
 <main>

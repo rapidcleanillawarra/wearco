@@ -94,8 +94,8 @@
 </script>
 
 <main class="editor-container">
-	<div class="page-header">
-		<h1>Center Edge Drawing</h1>
+	<div class="page-header" style="background-color: #000;">
+		<img src="https://wearco.com.au/wp-content/uploads/2024/08/logo-1.png" alt="Wearco Logo" style="max-height: 60px;" />
 		<div class="header-actions">
 			<button
 				class="print-pdf-btn"

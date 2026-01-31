@@ -258,7 +258,7 @@
 
 <div class="pdf-overlay-container" bind:this={containerElement}>
     <div class="pdf-header">
-        <h2>PDF Template</h2>
+        <h2>Edge Template</h2>
         <p class="hint">
             Fill in the fields below. Values will sync with the drawing.
         </p>
