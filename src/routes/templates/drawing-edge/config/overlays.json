@@ -242,7 +242,7 @@
             "type": "dropdown",
             "label": "End Hole Type",
             "position": {
-                "x": 610,
+                "x": 615,
                 "y": 345,
                 "width": 40,
                 "height": 12
@@ -307,9 +307,9 @@
             "type": "text",
             "label": "End Plate Thickness & Grade",
             "position": {
-                "x": 600,
-                "y": 400,
-                "width": 80,
+                "x": 615,
+                "y": 260,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "endEdgePlateThicknessAndGrade",
@@ -320,8 +320,8 @@
             "type": "number",
             "label": "End Quantity",
             "position": {
-                "x": 600,
-                "y": 400,
+                "x": 615,
+                "y": 285,
                 "width": 30,
                 "height": 12
             },
@@ -333,9 +333,9 @@
             "type": "text",
             "label": "End Bevel Angle & Type",
             "position": {
-                "x": 600,
-                "y": 400,
-                "width": 80,
+                "x": 615,
+                "y": 375,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "endEdgeBevelAngleAndType",
@@ -346,9 +346,9 @@
             "type": "dropdown",
             "label": "End Bevel Top/Bottom",
             "position": {
-                "x": 600,
+                "x": 615,
                 "y": 400,
-                "width": 60,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "endEdgeBevelTopAndBottom",
@@ -359,9 +359,9 @@
             "type": "dropdown",
             "label": "End Single/Double Bevel",
             "position": {
-                "x": 600,
-                "y": 400,
-                "width": 60,
+                "x": 615,
+                "y": 430,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "endEdgeSingleOrDoubleBevel",
