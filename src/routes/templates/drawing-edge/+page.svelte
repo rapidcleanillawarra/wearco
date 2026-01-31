@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PdfOverlay from "./components/PdfOverlay.svelte";
-	import SvgDrawing from "./components/SvgDrawing.svelte";
+	import SvgCenterEdgeDrawing from "./components/SvgCenterEdgeDrawing.svelte";
+	import SvgEndEdgeDrawing from "./components/SvgEndEdgeDrawing.svelte";
 	import edgePdf from "$lib/assets/edge.pdf";
 	import {
 		exportPdfWithOverlay,
@@ -28,6 +29,20 @@
 	let centerEdgeWidthPx = $state(1000);
 	let centerEdgeHeightPx = $state(200);
 	let centerEdgeHoleSizePx = $state(20);
+
+	// End Edge state values
+	let endEdgeWidthPx = $state(300);
+	let endEdgeHeightPx = $state(100);
+	let endEdgeHoleType = $state("circle");
+	let endEdgeHoleCount = $state(4);
+	let endEdgeHoleSizePx = $state(20);
+	let endEdgeWidth = $state(300);
+	let endEdgeHeight = $state(150);
+	let endEdgeHoleSize = $state(10);
+	let endEdgePitch = $state(60);
+	let endEdgeTotalHoleDistance = $state(180);
+	let endEdgeHoleLeft = $state(60);
+	let endEdgeHoleRight = $state(60);
 
 	let isExporting = $state(false);
 	let exportError = $state<string | null>(null);
@@ -113,7 +128,7 @@
 
 	<!-- SVG Drawing Section -->
 	<section class="svg-section">
-		<SvgDrawing
+		<SvgCenterEdgeDrawing
 			bind:centerEdgeWidthPx
 			bind:centerEdgeHeightPx
 			bind:centerEdgeHoleType
@@ -126,6 +141,24 @@
 			bind:centerEdgeTotalHoleDistance
 			bind:centerEdgeHoleLeft
 			bind:centerEdgeHoleRight
+		/>
+	</section>
+
+	<!-- End Edge SVG Drawing Section -->
+	<section class="svg-section">
+		<SvgEndEdgeDrawing
+			bind:endEdgeWidthPx
+			bind:endEdgeHeightPx
+			bind:endEdgeHoleType
+			bind:endEdgeHoleCount
+			bind:endEdgeHoleSizePx
+			bind:endEdgeWidth
+			bind:endEdgeHeight
+			bind:endEdgeHoleSize
+			bind:endEdgePitch
+			bind:endEdgeTotalHoleDistance
+			bind:endEdgeHoleLeft
+			bind:endEdgeHoleRight
 		/>
 	</section>
 </main>
