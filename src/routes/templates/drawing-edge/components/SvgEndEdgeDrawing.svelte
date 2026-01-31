@@ -544,6 +544,9 @@
                     {@const dimY_bottom =
                         holeCenterY + endEdgeHoleSizePx / 2 + 20}
 
+                    <!-- Total Distance Dimension Position (Lower) -->
+                    {@const dimY_total = dimY_bottom + 30}
+
                     <!-- First to Second Hole (Pitch) - BOTTOM -->
                     <g class="dimension-line">
                         <!-- Extension lines (going down) -->
@@ -596,7 +599,7 @@
                                 x1={firstHoleX}
                                 y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
                                 x2={firstHoleX}
-                                y2={dimY_bottom + 10}
+                                y2={dimY_total + 10}
                                 stroke="#9ca3af"
                                 stroke-width="1"
                                 stroke-dasharray="4 2"
@@ -605,7 +608,7 @@
                                 x1={lastHoleX}
                                 y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
                                 x2={lastHoleX}
-                                y2={dimY_bottom + 10}
+                                y2={dimY_total + 10}
                                 stroke="#9ca3af"
                                 stroke-width="1"
                                 stroke-dasharray="4 2"
@@ -614,9 +617,9 @@
                             <!-- Dimension line -->
                             <line
                                 x1={firstHoleX + 5}
-                                y1={dimY_bottom}
+                                y1={dimY_total}
                                 x2={lastHoleX - 5}
-                                y2={dimY_bottom}
+                                y2={dimY_total}
                                 stroke="#374151"
                                 stroke-width="1.5"
                                 marker-start="url(#end-arrow-start)"
@@ -624,7 +627,7 @@
                             />
                             <text
                                 x={firstHoleX + (lastHoleX - firstHoleX) / 2}
-                                y={dimY_bottom + 15}
+                                y={dimY_total + 15}
                                 fill="#374151"
                                 font-size="12"
                                 text-anchor="middle"
