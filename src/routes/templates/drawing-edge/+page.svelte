@@ -10,10 +10,10 @@
 	// Shared state for all editable values (source of truth)
 	let centerEdgeWidth = $state(1000);
 	let centerEdgeHeight = $state(500);
-	let holeCount = $state(10);
-	let holeSizeMm = $state(100);
+	let centerEdgeHoleCount = $state(10);
+	let centerEdgeHoleSize = $state(100);
 	let centerEdgePitch = $state(250);
-	let totalHoleDistanceMm = $state(500);
+	let centerEdgeTotalHoleDistance = $state(500);
 	let centerEdgeHoleLeft = $state(250);
 	let centerEdgeHoleRight = $state(250);
 
@@ -40,10 +40,10 @@
 			const stateValues = {
 				centerEdgeWidth,
 				centerEdgeHeight,
-				holeCount,
-				holeSizeMm,
+				centerEdgeHoleCount,
+				centerEdgeHoleSize,
 				centerEdgePitch,
-				totalHoleDistanceMm,
+				centerEdgeTotalHoleDistance,
 				centerEdgeHoleLeft,
 				centerEdgeHoleRight,
 				customerName,
@@ -95,10 +95,10 @@
 		<PdfOverlay
 			bind:centerEdgeWidth
 			bind:centerEdgeHeight
-			bind:holeCount
-			bind:holeSizeMm
+			bind:centerEdgeHoleCount
+			bind:centerEdgeHoleSize
 			bind:centerEdgePitch
-			bind:totalHoleDistanceMm
+			bind:centerEdgeTotalHoleDistance
 			bind:centerEdgeHoleLeft
 			bind:centerEdgeHoleRight
 			bind:customerName
@@ -115,13 +115,13 @@
 			bind:centerEdgeWidthPx
 			bind:centerEdgeHeightPx
 			bind:holeType
-			bind:holeCount
+			bind:centerEdgeHoleCount
 			bind:centerEdgeHoleSizePx
 			bind:centerEdgeWidth
 			bind:centerEdgeHeight
-			bind:holeSizeMm
+			bind:centerEdgeHoleSize
 			bind:centerEdgePitch
-			bind:totalHoleDistanceMm
+			bind:centerEdgeTotalHoleDistance
 			bind:centerEdgeHoleLeft
 			bind:centerEdgeHoleRight
 		/>

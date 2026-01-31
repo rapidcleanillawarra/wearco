@@ -43,7 +43,7 @@
             "fontSize": 10
         },
         {
-            "id": "totalHoleDistanceMm",
+            "id": "centerEdgeTotalHoleDistance",
             "type": "number",
             "label": "Total Distance (mm)",
             "position": {
@@ -52,7 +52,7 @@
                 "width": 30,
                 "height": 12
             },
-            "bindsTo": "totalHoleDistanceMm",
+            "bindsTo": "centerEdgeTotalHoleDistance",
             "fontSize": 10
         },
         {
@@ -81,6 +81,5 @@
             "bindsTo": "centerEdgeHoleRight",
             "fontSize": 10
         }
-        
     ]
 }

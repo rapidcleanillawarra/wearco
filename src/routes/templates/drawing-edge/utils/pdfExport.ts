@@ -114,10 +114,10 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
 export function mapStateToFieldValues(stateValues: {
     centerEdgeWidth: number;
     centerEdgeHeight: number;
-    holeCount: number;
-    holeSizeMm: number;
+    centerEdgeHoleCount: number;
+    centerEdgeHoleSize: number;
     centerEdgePitch: number;
-    totalHoleDistanceMm: number;
+    centerEdgeTotalHoleDistance: number;
     centerEdgeHoleLeft: number;
     centerEdgeHoleRight: number;
     customerName: string;

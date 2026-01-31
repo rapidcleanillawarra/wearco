@@ -6,26 +6,26 @@
         centerEdgeWidthPx = $bindable(1000),
         centerEdgeHeightPx = $bindable(200),
         holeType = $bindable("circle"),
-        holeCount = $bindable(10),
+        centerEdgeHoleCount = $bindable(10),
         centerEdgeHoleSizePx = $bindable(20),
         centerEdgeWidth = $bindable(1000),
         centerEdgeHeight = $bindable(500),
-        holeSizeMm = $bindable(100),
+        centerEdgeHoleSize = $bindable(100),
         centerEdgePitch = $bindable(250),
-        totalHoleDistanceMm = $bindable(500),
+        centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(250),
         centerEdgeHoleRight = $bindable(250),
     }: {
         centerEdgeWidthPx?: number;
         centerEdgeHeightPx?: number;
         holeType?: string;
-        holeCount?: number;
+        centerEdgeHoleCount?: number;
         centerEdgeHoleSizePx?: number;
         centerEdgeWidth?: number;
         centerEdgeHeight?: number;
-        holeSizeMm?: number;
+        centerEdgeHoleSize?: number;
         centerEdgePitch?: number;
-        totalHoleDistanceMm?: number;
+        centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
         centerEdgeHoleRight?: number;
     } = $props();
@@ -49,7 +49,9 @@
     const ZOOM_STEP = 0.1;
 
     // Derived values for layout (px only)
-    let centerEdgePitchPx = $derived(centerEdgeWidthPx / (holeCount + 1));
+    let centerEdgePitchPx = $derived(
+        centerEdgeWidthPx / (centerEdgeHoleCount + 1),
+    );
 
     function handleWidthChange(event: Event) {
         const target = event.target as HTMLInputElement;
@@ -112,7 +114,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0 && value <= 99999) {
-            totalHoleDistanceMm = value;
+            centerEdgeTotalHoleDistance = value;
         }
     }
 
@@ -120,7 +122,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0 && value <= 99999) {
-            holeSizeMm = value;
+            centerEdgeHoleSize = value;
         }
     }
 
@@ -128,7 +130,7 @@
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value >= 0) {
-            holeCount = value;
+            centerEdgeHoleCount = value;
         }
     }
 
@@ -362,7 +364,7 @@
                                 type="number"
                                 min="0"
                                 max="20"
-                                value={holeCount}
+                                value={centerEdgeHoleCount}
                                 onchange={handleHoleCountChange}
                             />
                         </div>
@@ -431,7 +433,7 @@
                                 type="number"
                                 min="1"
                                 max="99999"
-                                value={totalHoleDistanceMm}
+                                value={centerEdgeTotalHoleDistance}
                                 onchange={handleTotalHoleDistanceMmChange}
                             />
                             <span>mm</span>
@@ -444,7 +446,7 @@
                                 type="number"
                                 min="1"
                                 max="99999"
-                                value={holeSizeMm}
+                                value={centerEdgeHoleSize}
                                 onchange={handleHoleSizeMmChange}
                             />
                             <span>mm</span>
@@ -588,7 +590,7 @@
                 />
 
                 <!-- Hole Spacing Dimensions -->
-                {#if holeCount > 0}
+                {#if centerEdgeHoleCount > 0}
                     <!-- Left Edge to First Hole -->
                     <g class="dimension-line">
                         <line
@@ -639,7 +641,7 @@
                 {/if}
 
                 <!-- Holes -->
-                {#each Array(holeCount) as _, i}
+                {#each Array(centerEdgeHoleCount) as _, i}
                     {@const cx = rectX + (i + 1) * centerEdgePitchPx}
                     {@const cy = rectY + centerEdgeHeightPx / 2}
 
@@ -666,7 +668,7 @@
                 {/each}
 
                 <!-- Hole Diameter Dimension (on top of first hole) -->
-                {#if holeCount > 0}
+                {#if centerEdgeHoleCount > 0}
                     {@const firstHoleCx = rectX + centerEdgePitchPx}
                     {@const firstHoleCy = rectY + centerEdgeHeightPx / 2}
                     {@const dimY = firstHoleCy - centerEdgeHoleSizePx / 2 - 15}
@@ -710,7 +712,7 @@
                             font-size="12"
                             text-anchor="middle"
                         >
-                            Ø{holeSizeMm} mm
+                            Ø{centerEdgeHoleSize} mm
                         </text>
                     </g>
                 {/if}
@@ -718,10 +720,11 @@
                 <!-- Resize handles -->
 
                 <!-- Hole Dimensions -->
-                {#if holeCount > 1}
+                {#if centerEdgeHoleCount > 1}
                     {@const firstHoleX = rectX + centerEdgePitchPx}
                     {@const secondHoleX = rectX + 2 * centerEdgePitchPx}
-                    {@const lastHoleX = rectX + holeCount * centerEdgePitchPx}
+                    {@const lastHoleX =
+                        rectX + centerEdgeHoleCount * centerEdgePitchPx}
                     {@const holeCenterY = rectY + centerEdgeHeightPx / 2}
 
                     <!-- Top Dimension Position (Pitch) -->
@@ -777,7 +780,7 @@
                     </g>
 
                     <!-- First to Last Hole (Total) - BOTTOM - Only if more than 2 holes -->
-                    {#if holeCount > 2}
+                    {#if centerEdgeHoleCount > 2}
                         <g class="dimension-line">
                             <!-- Extension lines (going down) -->
                             <line
@@ -817,7 +820,7 @@
                                 font-size="12"
                                 text-anchor="middle"
                             >
-                                {totalHoleDistanceMm} mm
+                                {centerEdgeTotalHoleDistance} mm
                             </text>
                         </g>
                     {/if}

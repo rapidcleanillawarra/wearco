@@ -8,10 +8,10 @@
     let {
         centerEdgeWidth = $bindable(1000),
         centerEdgeHeight = $bindable(500),
-        holeCount = $bindable(10),
-        holeSizeMm = $bindable(100),
+        centerEdgeHoleCount = $bindable(10),
+        centerEdgeHoleSize = $bindable(100),
         centerEdgePitch = $bindable(250),
-        totalHoleDistanceMm = $bindable(500),
+        centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(0),
         centerEdgeHoleRight = $bindable(0),
         customerName = $bindable(""),
@@ -22,10 +22,10 @@
     }: {
         centerEdgeWidth?: number;
         centerEdgeHeight?: number;
-        holeCount?: number;
-        holeSizeMm?: number;
+        centerEdgeHoleCount?: number;
+        centerEdgeHoleSize?: number;
         centerEdgePitch?: number;
-        totalHoleDistanceMm?: number;
+        centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
         centerEdgeHoleRight?: number;
         customerName?: string;
@@ -39,10 +39,10 @@
     const valueMap = $derived({
         centerEdgeWidth,
         centerEdgeHeight,
-        holeCount,
-        holeSizeMm,
+        centerEdgeHoleCount,
+        centerEdgeHoleSize,
         centerEdgePitch,
-        totalHoleDistanceMm,
+        centerEdgeTotalHoleDistance,
         centerEdgeHoleLeft,
         centerEdgeHoleRight,
         customerName,
@@ -90,17 +90,17 @@
             case "centerEdgeHeight":
                 centerEdgeHeight = Number(value);
                 break;
-            case "holeCount":
-                holeCount = Number(value);
+            case "centerEdgeHoleCount":
+                centerEdgeHoleCount = Number(value);
                 break;
-            case "holeSizeMm":
-                holeSizeMm = Number(value);
+            case "centerEdgeHoleSize":
+                centerEdgeHoleSize = Number(value);
                 break;
             case "centerEdgePitch":
                 centerEdgePitch = Number(value);
                 break;
-            case "totalHoleDistanceMm":
-                totalHoleDistanceMm = Number(value);
+            case "centerEdgeTotalHoleDistance":
+                centerEdgeTotalHoleDistance = Number(value);
                 break;
             case "centerEdgeHoleLeft":
                 centerEdgeHoleLeft = Number(value);
