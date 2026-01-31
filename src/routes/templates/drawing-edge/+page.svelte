@@ -27,7 +27,6 @@
 	// SVG-specific values (internal to drawing, not from PDF)
 	let centerEdgeWidthPx = $state(1000);
 	let centerEdgeHeightPx = $state(200);
-	let holeType = $state("circle");
 	let centerEdgeHoleSizePx = $state(20);
 
 	let isExporting = $state(false);
@@ -117,7 +116,7 @@
 		<SvgDrawing
 			bind:centerEdgeWidthPx
 			bind:centerEdgeHeightPx
-			bind:holeType
+			bind:centerEdgeHoleType
 			bind:centerEdgeHoleCount
 			bind:centerEdgeHoleSizePx
 			bind:centerEdgeWidth

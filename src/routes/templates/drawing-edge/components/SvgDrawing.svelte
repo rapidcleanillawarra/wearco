@@ -5,7 +5,7 @@
     let {
         centerEdgeWidthPx = $bindable(1000),
         centerEdgeHeightPx = $bindable(200),
-        holeType = $bindable("circle"),
+        centerEdgeHoleType = $bindable("circle"),
         centerEdgeHoleCount = $bindable(10),
         centerEdgeHoleSizePx = $bindable(20),
         centerEdgeWidth = $bindable(1000),
@@ -18,7 +18,7 @@
     }: {
         centerEdgeWidthPx?: number;
         centerEdgeHeightPx?: number;
-        holeType?: string;
+        centerEdgeHoleType?: string;
         centerEdgeHoleCount?: number;
         centerEdgeHoleSizePx?: number;
         centerEdgeWidth?: number;
@@ -351,7 +351,10 @@
                     <div class="input-row">
                         <div class="control-group">
                             <label for="hole-type">Type:</label>
-                            <select id="hole-type" bind:value={holeType}>
+                            <select
+                                id="hole-type"
+                                bind:value={centerEdgeHoleType}
+                            >
                                 <option value="circle">Circle</option>
                                 <option value="square">Square</option>
                             </select>
@@ -645,7 +648,7 @@
                     {@const cx = rectX + (i + 1) * centerEdgePitchPx}
                     {@const cy = rectY + centerEdgeHeightPx / 2}
 
-                    {#if holeType === "circle"}
+                    {#if centerEdgeHoleType === "circle"}
                         <circle
                             {cx}
                             {cy}
