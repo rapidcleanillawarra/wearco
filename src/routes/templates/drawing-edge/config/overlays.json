@@ -424,8 +424,8 @@
             "type": "number",
             "label": "Quantity",
             "position": {
-                "x": 730,
-                "y": 520,
+                "x": 300,
+                "y": 480,
                 "width": 40,
                 "height": 12
             },
@@ -437,8 +437,8 @@
             "type": "text",
             "label": "Job Number",
             "position": {
-                "x": 730,
-                "y": 535,
+                "x": 300,
+                "y": 505,
                 "width": 60,
                 "height": 12
             },
@@ -450,8 +450,8 @@
             "type": "text",
             "label": "Work Order",
             "position": {
-                "x": 730,
-                "y": 550,
+                "x": 300,
+                "y": 530,
                 "width": 60,
                 "height": 12
             },
@@ -463,8 +463,8 @@
             "type": "text",
             "label": "DWG Number",
             "position": {
-                "x": 730,
-                "y": 565,
+                "x": 300,
+                "y": 555,
                 "width": 60,
                 "height": 12
             },
@@ -476,9 +476,9 @@
             "type": "text",
             "label": "DL",
             "position": {
-                "x": 730,
-                "y": 580,
-                "width": 40,
+                "x": 420,
+                "y": 478,
+                "width": 100,
                 "height": 12
             },
             "bindsTo": "generalDl",
@@ -489,9 +489,9 @@
             "type": "text",
             "label": "Checked By",
             "position": {
-                "x": 730,
-                "y": 595,
-                "width": 60,
+                "x": 445,
+                "y": 505,
+                "width": 80,
                 "height": 12
             },
             "bindsTo": "generalCheckedBy",
@@ -502,9 +502,9 @@
             "type": "text",
             "label": "Prog By",
             "position": {
-                "x": 730,
-                "y": 610,
-                "width": 60,
+                "x": 437,
+                "y": 530,
+                "width": 90,
                 "height": 12
             },
             "bindsTo": "generalProgBy",
@@ -515,9 +515,9 @@
             "type": "text",
             "label": "Customer",
             "position": {
-                "x": 730,
-                "y": 625,
-                "width": 60,
+                "x": 584,
+                "y": 510,
+                "width": 200,
                 "height": 12
             },
             "bindsTo": "generalCustomer",
@@ -528,9 +528,9 @@
             "type": "text",
             "label": "Material",
             "position": {
-                "x": 730,
-                "y": 640,
-                "width": 60,
+                "x": 540,
+                "y": 555,
+                "width": 120,
                 "height": 12
             },
             "bindsTo": "generalMaterial",
@@ -541,9 +541,9 @@
             "type": "text",
             "label": "THK",
             "position": {
-                "x": 730,
-                "y": 655,
-                "width": 40,
+                "x": 685,
+                "y": 555,
+                "width": 125,
                 "height": 12
             },
             "bindsTo": "generalThk",
