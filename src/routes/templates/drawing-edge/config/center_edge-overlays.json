@@ -23,11 +23,11 @@
             "position": {
                 "x": 150,
                 "y": 130,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "centerEdgeHeight",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "holeCount",
@@ -36,11 +36,11 @@
             "position": {
                 "x": 150,
                 "y": 160,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "holeCount",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "holeSizeMm",
@@ -49,11 +49,11 @@
             "position": {
                 "x": 150,
                 "y": 190,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "holeSizeMm",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "centerEdgePitch",
@@ -62,11 +62,11 @@
             "position": {
                 "x": 150,
                 "y": 220,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "centerEdgePitch",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "totalHoleDistanceMm",
@@ -75,11 +75,11 @@
             "position": {
                 "x": 150,
                 "y": 250,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "totalHoleDistanceMm",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "centerEdgeHoleLeft",
@@ -87,12 +87,12 @@
             "label": "Hole Left (mm)",
             "position": {
                 "x": 150,
-                "y": 280,
-                "width": 80,
-                "height": 22
+                "y": 230,
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "centerEdgeHoleLeft",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "centerEdgeHoleRight",
@@ -101,11 +101,11 @@
             "position": {
                 "x": 150,
                 "y": 310,
-                "width": 80,
-                "height": 22
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "centerEdgeHoleRight",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "customerName",
@@ -115,10 +115,10 @@
                 "x": 350,
                 "y": 100,
                 "width": 150,
-                "height": 22
+                "height": 12
             },
             "bindsTo": "customerName",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "orderNumber",
@@ -128,10 +128,10 @@
                 "x": 350,
                 "y": 130,
                 "width": 150,
-                "height": 22
+                "height": 12
             },
             "bindsTo": "orderNumber",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "date",
@@ -141,10 +141,10 @@
                 "x": 350,
                 "y": 160,
                 "width": 150,
-                "height": 22
+                "height": 12
             },
             "bindsTo": "date",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "material",
@@ -154,10 +154,10 @@
                 "x": 350,
                 "y": 190,
                 "width": 150,
-                "height": 22
+                "height": 12
             },
             "bindsTo": "material",
-            "fontSize": 12
+            "fontSize": 10
         }
     ]
 }
