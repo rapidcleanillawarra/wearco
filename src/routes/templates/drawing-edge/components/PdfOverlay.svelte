@@ -3,6 +3,10 @@
     import { browser } from "$app/environment";
     import OverlayInput from "./OverlayInput.svelte";
     import overlayFieldsConfig from "../config/overlays.json";
+    import {
+        exportPdfWithOverlay,
+        mapStateToFieldValues,
+    } from "../utils/pdfExport";
 
     // Bindable props for all overlay values
     let {
@@ -254,14 +258,58 @@
             resizeObserver.disconnect();
         };
     });
+
+    let isExporting = $state(false);
+    let exportError = $state<string | null>(null);
+
+    async function handlePrintPdf() {
+        isExporting = true;
+        exportError = null;
+
+        try {
+            const fieldValues = mapStateToFieldValues(valueMap);
+
+            await exportPdfWithOverlay({
+                pdfUrl,
+                fieldValues,
+                filename: `edge-template-${orderNumber || "filled"}.pdf`,
+            });
+        } catch (err) {
+            console.error("Export failed:", err);
+            exportError = err instanceof Error ? err.message : "Export failed";
+        } finally {
+            isExporting = false;
+        }
+    }
 </script>
 
 <div class="pdf-overlay-container" bind:this={containerElement}>
     <div class="pdf-header">
-        <h2>Edge Template</h2>
-        <p class="hint">
-            Fill in the fields below. Values will sync with the drawing.
-        </p>
+        <div class="header-content">
+            <div>
+                <h2>Edge Template</h2>
+                <p class="hint">
+                    Fill in the fields below. Values will sync with the drawing.
+                </p>
+            </div>
+            <div class="header-actions">
+                <button
+                    class="print-pdf-btn"
+                    onclick={handlePrintPdf}
+                    disabled={isExporting}
+                >
+                    {#if isExporting}
+                        <span class="spinner-small"></span>
+                        Generating...
+                    {:else}
+                        📄 Print PDF
+                    {/if}
+                </button>
+                {#if exportError}
+                    <span class="export-error">{exportError}</span>
+                {/if}
+            </div>
+        </div>
     </div>
 
     <div class="pdf-wrapper" style="height: {originalHeight * scale}px;">
@@ -305,6 +353,60 @@
 
     .pdf-header {
         margin-bottom: 16px;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .print-pdf-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .print-pdf-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .print-pdf-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .spinner-small {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .export-error {
+        color: #ef4444;
+        font-size: 12px;
     }
 
     .pdf-header h2 {
