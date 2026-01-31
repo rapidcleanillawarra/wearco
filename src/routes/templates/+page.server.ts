@@ -1,8 +1,8 @@
-import type { PageLoad } from './$types'
+import type { PageServerLoad } from './$types'
 import { getSupabaseClient } from '$lib/supabase.server'
 import type { WearcoTemplate } from '$lib/types/template'
 
-export const load: PageLoad = async () => {
+export const load: PageServerLoad = async () => {
   const supabase = getSupabaseClient()
 
   const { data: templates, error } = await supabase
