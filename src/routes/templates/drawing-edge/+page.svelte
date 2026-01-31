@@ -12,7 +12,7 @@
 	let centerEdgeHeight = $state(500);
 	let centerEdgeHoleType = $state("circle");
 	let centerEdgeHoleCount = $state(10);
-	let centerEdgeHoleSize = $state(100);
+	let centerEdgeHoleSize = $state(10);
 	let centerEdgePitch = $state(250);
 	let centerEdgeTotalHoleDistance = $state(500);
 	let centerEdgeHoleLeft = $state(250);

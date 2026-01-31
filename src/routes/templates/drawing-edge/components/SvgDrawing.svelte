@@ -10,7 +10,7 @@
         centerEdgeHoleSizePx = $bindable(20),
         centerEdgeWidth = $bindable(1000),
         centerEdgeHeight = $bindable(500),
-        centerEdgeHoleSize = $bindable(100),
+        centerEdgeHoleSize = $bindable(10),
         centerEdgePitch = $bindable(250),
         centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(250),

@@ -57,7 +57,7 @@
         },
         {
             "id": "centerEdgeHoleType",
-            "type": "text",
+            "type": "dropdown",
             "label": "Hole Type",
             "position": {
                 "x": 45,
