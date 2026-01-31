@@ -66,6 +66,15 @@
 				orderNumber,
 				date,
 				material,
+				endEdgeWidth,
+				endEdgeHeight,
+				endEdgeHoleCount,
+				endEdgeHoleSize,
+				endEdgeHoleType,
+				endEdgePitch,
+				endEdgeTotalHoleDistance,
+				endEdgeHoleLeft,
+				endEdgeHoleRight,
 			};
 
 			const fieldValues = mapStateToFieldValues(stateValues);

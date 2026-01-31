@@ -124,6 +124,15 @@ export function mapStateToFieldValues(stateValues: {
     orderNumber: string;
     date: string;
     material: string;
+    endEdgeWidth: number;
+    endEdgeHeight: number;
+    endEdgeHoleCount: number;
+    endEdgeHoleSize: number;
+    endEdgeHoleType: string;
+    endEdgePitch: number;
+    endEdgeTotalHoleDistance: number;
+    endEdgeHoleLeft: number;
+    endEdgeHoleRight: number;
 }): FieldValues {
     const fieldValues: FieldValues = {};
 
