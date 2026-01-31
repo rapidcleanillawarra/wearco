@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import overlayFieldsConfig from '../config/center_edge-overlays.json';
+import overlayFieldsConfig from '../config/overlays.json';
 
 interface FieldValues {
     [key: string]: string | number;

@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
     import OverlayInput from "./OverlayInput.svelte";
-    import overlayFieldsConfig from "../config/center_edge-overlays.json";
+    import overlayFieldsConfig from "../config/overlays.json";
 
     // Bindable props for all overlay values
     let {
