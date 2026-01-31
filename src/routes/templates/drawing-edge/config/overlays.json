@@ -121,6 +121,71 @@
             "fontSize": 10
         },
         {
+            "id": "centerEdgePlateThicknessAndGrade",
+            "type": "text",
+            "label": "Plate Thickness & Grade",
+            "position": {
+                "x": 45,
+                "y": 200,
+                "width": 80,
+                "height": 12
+            },
+            "bindsTo": "centerEdgePlateThicknessAndGrade",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeQuantity",
+            "type": "number",
+            "label": "Quantity",
+            "position": {
+                "x": 150,
+                "y": 200,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeQuantity",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeBevelAngleAndType",
+            "type": "text",
+            "label": "Bevel Angle & Type",
+            "position": {
+                "x": 250,
+                "y": 200,
+                "width": 80,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeBevelAngleAndType",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeBevelTopAndBottom",
+            "type": "dropdown",
+            "label": "Bevel Top/Bottom",
+            "position": {
+                "x": 350,
+                "y": 200,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeBevelTopAndBottom",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeSingleOrDoubleBevel",
+            "type": "dropdown",
+            "label": "Single/Double Bevel",
+            "position": {
+                "x": 450,
+                "y": 200,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeSingleOrDoubleBevel",
+            "fontSize": 10
+        },
+        {
             "id": "endEdgeWidth",
             "type": "number",
             "label": "End Width (mm)",
@@ -235,6 +300,71 @@
                 "height": 12
             },
             "bindsTo": "endEdgeHoleRight",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgePlateThicknessAndGrade",
+            "type": "text",
+            "label": "End Plate Thickness & Grade",
+            "position": {
+                "x": 60,
+                "y": 400,
+                "width": 80,
+                "height": 12
+            },
+            "bindsTo": "endEdgePlateThicknessAndGrade",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeQuantity",
+            "type": "number",
+            "label": "End Quantity",
+            "position": {
+                "x": 150,
+                "y": 400,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeQuantity",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeBevelAngleAndType",
+            "type": "text",
+            "label": "End Bevel Angle & Type",
+            "position": {
+                "x": 250,
+                "y": 400,
+                "width": 80,
+                "height": 12
+            },
+            "bindsTo": "endEdgeBevelAngleAndType",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeBevelTopAndBottom",
+            "type": "dropdown",
+            "label": "End Bevel Top/Bottom",
+            "position": {
+                "x": 350,
+                "y": 400,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "endEdgeBevelTopAndBottom",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeSingleOrDoubleBevel",
+            "type": "dropdown",
+            "label": "End Single/Double Bevel",
+            "position": {
+                "x": 450,
+                "y": 400,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "endEdgeSingleOrDoubleBevel",
             "fontSize": 10
         }
     ]

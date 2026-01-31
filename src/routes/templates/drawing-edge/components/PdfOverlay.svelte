@@ -19,6 +19,11 @@
         centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(0),
         centerEdgeHoleRight = $bindable(0),
+        centerEdgePlateThicknessAndGrade = $bindable(""),
+        centerEdgeQuantity = $bindable(1),
+        centerEdgeBevelAngleAndType = $bindable(""),
+        centerEdgeBevelTopAndBottom = $bindable("both"),
+        centerEdgeSingleOrDoubleBevel = $bindable("single"),
         endEdgeWidth = $bindable(300),
         endEdgeHeight = $bindable(150),
         endEdgeHoleCount = $bindable(4),
@@ -28,6 +33,11 @@
         endEdgeTotalHoleDistance = $bindable(180),
         endEdgeHoleLeft = $bindable(60),
         endEdgeHoleRight = $bindable(60),
+        endEdgePlateThicknessAndGrade = $bindable(""),
+        endEdgeQuantity = $bindable(1),
+        endEdgeBevelAngleAndType = $bindable(""),
+        endEdgeBevelTopAndBottom = $bindable("both"),
+        endEdgeSingleOrDoubleBevel = $bindable("single"),
         customerName = $bindable(""),
         orderNumber = $bindable(""),
         date = $bindable(""),
@@ -43,6 +53,11 @@
         centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
         centerEdgeHoleRight?: number;
+        centerEdgePlateThicknessAndGrade?: string;
+        centerEdgeQuantity?: number;
+        centerEdgeBevelAngleAndType?: string;
+        centerEdgeBevelTopAndBottom?: string;
+        centerEdgeSingleOrDoubleBevel?: string;
         endEdgeWidth?: number;
         endEdgeHeight?: number;
         endEdgeHoleCount?: number;
@@ -52,6 +67,11 @@
         endEdgeTotalHoleDistance?: number;
         endEdgeHoleLeft?: number;
         endEdgeHoleRight?: number;
+        endEdgePlateThicknessAndGrade?: string;
+        endEdgeQuantity?: number;
+        endEdgeBevelAngleAndType?: string;
+        endEdgeBevelTopAndBottom?: string;
+        endEdgeSingleOrDoubleBevel?: string;
         customerName?: string;
         orderNumber?: string;
         date?: string;
@@ -70,6 +90,11 @@
         centerEdgeTotalHoleDistance,
         centerEdgeHoleLeft,
         centerEdgeHoleRight,
+        centerEdgePlateThicknessAndGrade,
+        centerEdgeQuantity,
+        centerEdgeBevelAngleAndType,
+        centerEdgeBevelTopAndBottom,
+        centerEdgeSingleOrDoubleBevel,
         endEdgeWidth,
         endEdgeHeight,
         endEdgeHoleCount,
@@ -79,6 +104,11 @@
         endEdgeTotalHoleDistance,
         endEdgeHoleLeft,
         endEdgeHoleRight,
+        endEdgePlateThicknessAndGrade,
+        endEdgeQuantity,
+        endEdgeBevelAngleAndType,
+        endEdgeBevelTopAndBottom,
+        endEdgeSingleOrDoubleBevel,
         customerName,
         orderNumber,
         date,
@@ -145,6 +175,21 @@
             case "centerEdgeHoleRight":
                 centerEdgeHoleRight = Number(value);
                 break;
+            case "centerEdgePlateThicknessAndGrade":
+                centerEdgePlateThicknessAndGrade = String(value);
+                break;
+            case "centerEdgeQuantity":
+                centerEdgeQuantity = Number(value);
+                break;
+            case "centerEdgeBevelAngleAndType":
+                centerEdgeBevelAngleAndType = String(value);
+                break;
+            case "centerEdgeBevelTopAndBottom":
+                centerEdgeBevelTopAndBottom = String(value);
+                break;
+            case "centerEdgeSingleOrDoubleBevel":
+                centerEdgeSingleOrDoubleBevel = String(value);
+                break;
             case "endEdgeWidth":
                 endEdgeWidth = Number(value);
                 break;
@@ -171,6 +216,21 @@
                 break;
             case "endEdgeHoleRight":
                 endEdgeHoleRight = Number(value);
+                break;
+            case "endEdgePlateThicknessAndGrade":
+                endEdgePlateThicknessAndGrade = String(value);
+                break;
+            case "endEdgeQuantity":
+                endEdgeQuantity = Number(value);
+                break;
+            case "endEdgeBevelAngleAndType":
+                endEdgeBevelAngleAndType = String(value);
+                break;
+            case "endEdgeBevelTopAndBottom":
+                endEdgeBevelTopAndBottom = String(value);
+                break;
+            case "endEdgeSingleOrDoubleBevel":
+                endEdgeSingleOrDoubleBevel = String(value);
                 break;
             case "customerName":
                 customerName = String(value);
