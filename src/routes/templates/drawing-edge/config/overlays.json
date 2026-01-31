@@ -125,7 +125,7 @@
             "type": "text",
             "label": "Plate Thickness & Grade",
             "position": {
-                "x": 45,
+                "x": 535,
                 "y": 200,
                 "width": 80,
                 "height": 12
@@ -138,7 +138,7 @@
             "type": "number",
             "label": "Quantity",
             "position": {
-                "x": 150,
+                "x": 535,
                 "y": 200,
                 "width": 30,
                 "height": 12
@@ -151,7 +151,7 @@
             "type": "text",
             "label": "Bevel Angle & Type",
             "position": {
-                "x": 250,
+                "x": 535,
                 "y": 200,
                 "width": 80,
                 "height": 12
@@ -164,7 +164,7 @@
             "type": "dropdown",
             "label": "Bevel Top/Bottom",
             "position": {
-                "x": 350,
+                "x": 535,
                 "y": 200,
                 "width": 60,
                 "height": 12
@@ -177,7 +177,7 @@
             "type": "dropdown",
             "label": "Single/Double Bevel",
             "position": {
-                "x": 450,
+                "x": 535,
                 "y": 200,
                 "width": 60,
                 "height": 12
@@ -307,7 +307,7 @@
             "type": "text",
             "label": "End Plate Thickness & Grade",
             "position": {
-                "x": 60,
+                "x": 600,
                 "y": 400,
                 "width": 80,
                 "height": 12
@@ -320,7 +320,7 @@
             "type": "number",
             "label": "End Quantity",
             "position": {
-                "x": 150,
+                "x": 600,
                 "y": 400,
                 "width": 30,
                 "height": 12
@@ -333,7 +333,7 @@
             "type": "text",
             "label": "End Bevel Angle & Type",
             "position": {
-                "x": 250,
+                "x": 600,
                 "y": 400,
                 "width": 80,
                 "height": 12
@@ -346,7 +346,7 @@
             "type": "dropdown",
             "label": "End Bevel Top/Bottom",
             "position": {
-                "x": 350,
+                "x": 600,
                 "y": 400,
                 "width": 60,
                 "height": 12
@@ -359,7 +359,7 @@
             "type": "dropdown",
             "label": "End Single/Double Bevel",
             "position": {
-                "x": 450,
+                "x": 600,
                 "y": 400,
                 "width": 60,
                 "height": 12
