@@ -38,6 +38,10 @@
         endEdgeBevelAngleAndType = $bindable(""),
         endEdgeBevelTopAndBottom = $bindable("both"),
         endEdgeSingleOrDoubleBevel = $bindable("single"),
+        topSideWidth = $bindable(200),
+        topSideBeforeCurve = $bindable(50),
+        topSideAfterCurve = $bindable(50),
+        topSideAngle = $bindable(45),
         customerName = $bindable(""),
         orderNumber = $bindable(""),
         date = $bindable(""),
@@ -72,6 +76,10 @@
         endEdgeBevelAngleAndType?: string;
         endEdgeBevelTopAndBottom?: string;
         endEdgeSingleOrDoubleBevel?: string;
+        topSideWidth?: number;
+        topSideBeforeCurve?: number;
+        topSideAfterCurve?: number;
+        topSideAngle?: number;
         customerName?: string;
         orderNumber?: string;
         date?: string;
@@ -109,6 +117,10 @@
         endEdgeBevelAngleAndType,
         endEdgeBevelTopAndBottom,
         endEdgeSingleOrDoubleBevel,
+        topSideWidth,
+        topSideBeforeCurve,
+        topSideAfterCurve,
+        topSideAngle,
         customerName,
         orderNumber,
         date,
@@ -231,6 +243,18 @@
                 break;
             case "endEdgeSingleOrDoubleBevel":
                 endEdgeSingleOrDoubleBevel = String(value);
+                break;
+            case "topSideWidth":
+                topSideWidth = Number(value);
+                break;
+            case "topSideBeforeCurve":
+                topSideBeforeCurve = Number(value);
+                break;
+            case "topSideAfterCurve":
+                topSideAfterCurve = Number(value);
+                break;
+            case "topSideAngle":
+                topSideAngle = Number(value);
                 break;
             case "customerName":
                 customerName = String(value);

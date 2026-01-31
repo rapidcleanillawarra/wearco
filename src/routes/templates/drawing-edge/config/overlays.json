@@ -366,6 +366,58 @@
             },
             "bindsTo": "endEdgeSingleOrDoubleBevel",
             "fontSize": 10
+        },
+        {
+            "id": "topSideWidth",
+            "type": "number",
+            "label": "Top Side Width",
+            "position": {
+                "x": 660,
+                "y": 130,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "topSideWidth",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideBeforeCurve",
+            "type": "number",
+            "label": "Before Curve",
+            "position": {
+                "x": 687,
+                "y": 225,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "topSideBeforeCurve",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideAfterCurve",
+            "type": "number",
+            "label": "After Curve",
+            "position": {
+                "x": 690,
+                "y": 50,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "topSideAfterCurve",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideAngle",
+            "type": "number",
+            "label": "Angle",
+            "position": {
+                "x": 730,
+                "y": 180,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "topSideAngle",
+            "fontSize": 10
         }
     ]
 }
