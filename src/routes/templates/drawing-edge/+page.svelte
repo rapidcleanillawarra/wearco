@@ -604,6 +604,56 @@
 					{/if}
 				{/each}
 
+				<!-- Hole Diameter Dimension (on first hole) -->
+				{#if holeCount > 0}
+					{@const firstHoleCx = rectX + holeSpacing}
+					{@const firstHoleCy = rectY + rectHeight / 2}
+					{@const dimX = firstHoleCx + holeSize / 2 + 15}
+
+					<g class="dimension-line">
+						<!-- Vertical dimension line -->
+						<line
+							x1={dimX}
+							y1={firstHoleCy - holeSize / 2}
+							x2={dimX}
+							y2={firstHoleCy + holeSize / 2}
+							stroke="#374151"
+							stroke-width="1.5"
+							marker-start="url(#arrow-start)"
+							marker-end="url(#arrow-end)"
+						/>
+						<!-- Extension lines -->
+						<line
+							x1={firstHoleCx + holeSize / 2 + 3}
+							y1={firstHoleCy - holeSize / 2}
+							x2={dimX + 5}
+							y2={firstHoleCy - holeSize / 2}
+							stroke="#9ca3af"
+							stroke-width="1"
+							stroke-dasharray="4 2"
+						/>
+						<line
+							x1={firstHoleCx + holeSize / 2 + 3}
+							y1={firstHoleCy + holeSize / 2}
+							x2={dimX + 5}
+							y2={firstHoleCy + holeSize / 2}
+							stroke="#9ca3af"
+							stroke-width="1"
+							stroke-dasharray="4 2"
+						/>
+						<!-- Text label -->
+						<text
+							x={dimX + 10}
+							y={firstHoleCy + 4}
+							fill="#374151"
+							font-size="12"
+							text-anchor="start"
+						>
+							Ø{holeSizeMm} mm
+						</text>
+					</g>
+				{/if}
+
 				<!-- Resize handles -->
 
 				<!-- Hole Dimensions -->
