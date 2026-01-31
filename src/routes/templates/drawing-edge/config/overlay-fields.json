@@ -1,7 +1,7 @@
 {
     "pdfPath": "/assets/edge_template.pdf",
-    "pageWidth": 595,
-    "pageHeight": 842,
+    "pageWidth": 842,
+    "pageHeight": 595,
     "fields": [
         {
             "id": "width_mm",

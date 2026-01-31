@@ -25,7 +25,12 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
 
         // Dynamically import PDF.js to avoid SSR issues
         const pdfjsLib = await import('pdfjs-dist');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        // Use local worker file via Vite's URL handling
+        const workerUrl = new URL(
+            'pdfjs-dist/build/pdf.worker.min.mjs',
+            import.meta.url
+        ).href;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
         const loadingTask = pdfjsLib.getDocument(pdfUrl2);
         const pdf = await loadingTask.promise;
@@ -46,7 +51,8 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
 
         await page.render({
             canvasContext: context,
-            viewport
+            viewport,
+            canvas: context.canvas
         }).promise;
 
         // Convert canvas to image
