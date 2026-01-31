@@ -21,38 +21,12 @@
             "type": "number",
             "label": "Height (mm)",
             "position": {
-                "x": 150,
-                "y": 130,
+                "x": 45,
+                "y": 105,
                 "width": 30,
                 "height": 12
             },
             "bindsTo": "centerEdgeHeight",
-            "fontSize": 10
-        },
-        {
-            "id": "holeCount",
-            "type": "number",
-            "label": "No. of Holes",
-            "position": {
-                "x": 150,
-                "y": 160,
-                "width": 30,
-                "height": 12
-            },
-            "bindsTo": "holeCount",
-            "fontSize": 10
-        },
-        {
-            "id": "holeSizeMm",
-            "type": "number",
-            "label": "Hole Ø (mm)",
-            "position": {
-                "x": 150,
-                "y": 190,
-                "width": 30,
-                "height": 12
-            },
-            "bindsTo": "holeSizeMm",
             "fontSize": 10
         },
         {
@@ -73,8 +47,8 @@
             "type": "number",
             "label": "Total Distance (mm)",
             "position": {
-                "x": 150,
-                "y": 250,
+                "x": 350,
+                "y": 50,
                 "width": 30,
                 "height": 12
             },
@@ -86,8 +60,8 @@
             "type": "number",
             "label": "Hole Left (mm)",
             "position": {
-                "x": 150,
-                "y": 230,
+                "x": 100,
+                "y": 50,
                 "width": 30,
                 "height": 12
             },
@@ -99,8 +73,8 @@
             "type": "number",
             "label": "Hole Right (mm)",
             "position": {
-                "x": 150,
-                "y": 310,
+                "x": 600,
+                "y": 50,
                 "width": 30,
                 "height": 12
             },
