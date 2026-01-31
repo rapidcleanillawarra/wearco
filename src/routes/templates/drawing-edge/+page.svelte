@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Rectangle properties (px - source of truth for SVG rendering)
-	let rectWidth = $state(200);
-	let rectHeight = $state(100);
+	let rectWidth = $state(1000);
+	let rectHeight = $state(200);
 	let rectX = $state(50);
 	let rectY = $state(50);
 	let isDragging = $state(false);
@@ -11,7 +11,7 @@
 
 	// Hole properties
 	let holeType = $state("circle"); // 'circle' | 'square'
-	let holeCount = $state(2);
+	let holeCount = $state(10);
 	let holeSize = $state(20); // Diameter for circle, side length for square (px)
 
 	// MM labels (purely cosmetic - do not affect SVG rendering)
