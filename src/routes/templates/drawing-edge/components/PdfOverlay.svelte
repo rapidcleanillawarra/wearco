@@ -9,7 +9,7 @@
         centerEdgeWidth = $bindable(1000),
         centerEdgeHeight = $bindable(500),
         centerEdgeHoleCount = $bindable(10),
-        centerEdgeHoleSize = $bindable(100),
+        centerEdgeHoleSize = $bindable(10),
         centerEdgeHoleType = $bindable("circle"),
         centerEdgePitch = $bindable(250),
         centerEdgeTotalHoleDistance = $bindable(500),

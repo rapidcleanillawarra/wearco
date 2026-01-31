@@ -34,8 +34,8 @@
             "type": "number",
             "label": "Hole Count",
             "position": {
-                "x": 45,
-                "y": 125,
+                "x": 535,
+                "y": 315,
                 "width": 30,
                 "height": 12
             },
@@ -47,8 +47,8 @@
             "type": "number",
             "label": "Hole Size (mm)",
             "position": {
-                "x": 45,
-                "y": 145,
+                "x": 120,
+                "y": 160,
                 "width": 30,
                 "height": 12
             },
