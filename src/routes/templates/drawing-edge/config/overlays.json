@@ -126,8 +126,8 @@
             "label": "Plate Thickness & Grade",
             "position": {
                 "x": 535,
-                "y": 200,
-                "width": 80,
+                "y": 260,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "centerEdgePlateThicknessAndGrade",
@@ -139,7 +139,7 @@
             "label": "Quantity",
             "position": {
                 "x": 535,
-                "y": 200,
+                "y": 285,
                 "width": 30,
                 "height": 12
             },
@@ -152,8 +152,8 @@
             "label": "Bevel Angle & Type",
             "position": {
                 "x": 535,
-                "y": 200,
-                "width": 80,
+                "y": 375,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "centerEdgeBevelAngleAndType",
@@ -165,8 +165,8 @@
             "label": "Bevel Top/Bottom",
             "position": {
                 "x": 535,
-                "y": 200,
-                "width": 60,
+                "y": 400,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "centerEdgeBevelTopAndBottom",
@@ -178,8 +178,8 @@
             "label": "Single/Double Bevel",
             "position": {
                 "x": 535,
-                "y": 200,
-                "width": 60,
+                "y": 430,
+                "width": 30,
                 "height": 12
             },
             "bindsTo": "centerEdgeSingleOrDoubleBevel",
