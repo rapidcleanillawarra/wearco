@@ -4,7 +4,7 @@
     "pageHeight": 595,
     "fields": [
         {
-            "id": "width_mm",
+            "id": "centerEdgeWidth",
             "type": "number",
             "label": "Width (mm)",
             "position": {
@@ -17,7 +17,7 @@
             "fontSize": 10
         },
         {
-            "id": "height_mm",
+            "id": "centerEdgeHeight",
             "type": "number",
             "label": "Height (mm)",
             "position": {
@@ -30,7 +30,7 @@
             "fontSize": 12
         },
         {
-            "id": "hole_count",
+            "id": "holeCount",
             "type": "number",
             "label": "No. of Holes",
             "position": {
@@ -43,7 +43,7 @@
             "fontSize": 12
         },
         {
-            "id": "hole_size_mm",
+            "id": "holeSizeMm",
             "type": "number",
             "label": "Hole Ø (mm)",
             "position": {
@@ -56,7 +56,7 @@
             "fontSize": 12
         },
         {
-            "id": "hole_spacing_mm",
+            "id": "centerEdgePitch",
             "type": "number",
             "label": "Pitch (mm)",
             "position": {
@@ -69,7 +69,7 @@
             "fontSize": 12
         },
         {
-            "id": "total_hole_distance_mm",
+            "id": "totalHoleDistanceMm",
             "type": "number",
             "label": "Total Distance (mm)",
             "position": {
@@ -82,7 +82,7 @@
             "fontSize": 12
         },
         {
-            "id": "hole_left_mm",
+            "id": "centerEdgeHoleLeft",
             "type": "number",
             "label": "Hole Left (mm)",
             "position": {
@@ -95,7 +95,7 @@
             "fontSize": 12
         },
         {
-            "id": "hole_right_mm",
+            "id": "centerEdgeHoleRight",
             "type": "number",
             "label": "Hole Right (mm)",
             "position": {
@@ -108,7 +108,7 @@
             "fontSize": 12
         },
         {
-            "id": "customer_name",
+            "id": "customerName",
             "type": "text",
             "label": "Customer Name",
             "position": {
@@ -121,7 +121,7 @@
             "fontSize": 12
         },
         {
-            "id": "order_number",
+            "id": "orderNumber",
             "type": "text",
             "label": "Order No.",
             "position": {
