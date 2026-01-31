@@ -8,13 +8,13 @@
             "type": "number",
             "label": "Width (mm)",
             "position": {
-                "x": 150,
-                "y": 100,
-                "width": 80,
-                "height": 22
+                "x": 375,
+                "y": 30,
+                "width": 30,
+                "height": 12
             },
             "bindsTo": "widthMm",
-            "fontSize": 12
+            "fontSize": 10
         },
         {
             "id": "height_mm",
