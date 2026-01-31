@@ -353,7 +353,7 @@
 					<h3>MM Labels</h3>
 					<div class="input-row">
 						<div class="control-group">
-							<label for="hole-spacing-mm">Spacing:</label>
+							<label for="hole-spacing-mm">Pitch:</label>
 							<input
 								id="hole-spacing-mm"
 								type="number"
@@ -604,50 +604,50 @@
 					{/if}
 				{/each}
 
-				<!-- Hole Diameter Dimension (on first hole) -->
+				<!-- Hole Diameter Dimension (on top of first hole) -->
 				{#if holeCount > 0}
 					{@const firstHoleCx = rectX + holeSpacing}
 					{@const firstHoleCy = rectY + rectHeight / 2}
-					{@const dimX = firstHoleCx + holeSize / 2 + 15}
+					{@const dimY = firstHoleCy - holeSize / 2 - 15}
 
 					<g class="dimension-line">
-						<!-- Vertical dimension line -->
+						<!-- Horizontal dimension line (showing diameter) -->
 						<line
-							x1={dimX}
-							y1={firstHoleCy - holeSize / 2}
-							x2={dimX}
-							y2={firstHoleCy + holeSize / 2}
+							x1={firstHoleCx - holeSize / 2}
+							y1={dimY}
+							x2={firstHoleCx + holeSize / 2}
+							y2={dimY}
 							stroke="#374151"
 							stroke-width="1.5"
 							marker-start="url(#arrow-start)"
 							marker-end="url(#arrow-end)"
 						/>
-						<!-- Extension lines -->
+						<!-- Extension lines (going up) -->
 						<line
-							x1={firstHoleCx + holeSize / 2 + 3}
-							y1={firstHoleCy - holeSize / 2}
-							x2={dimX + 5}
-							y2={firstHoleCy - holeSize / 2}
+							x1={firstHoleCx - holeSize / 2}
+							y1={firstHoleCy - holeSize / 2 - 3}
+							x2={firstHoleCx - holeSize / 2}
+							y2={dimY - 5}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
 						/>
 						<line
-							x1={firstHoleCx + holeSize / 2 + 3}
-							y1={firstHoleCy + holeSize / 2}
-							x2={dimX + 5}
-							y2={firstHoleCy + holeSize / 2}
+							x1={firstHoleCx + holeSize / 2}
+							y1={firstHoleCy - holeSize / 2 - 3}
+							x2={firstHoleCx + holeSize / 2}
+							y2={dimY - 5}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
 						/>
 						<!-- Text label -->
 						<text
-							x={dimX + 10}
-							y={firstHoleCy + 4}
+							x={firstHoleCx}
+							y={dimY - 8}
 							fill="#374151"
 							font-size="12"
-							text-anchor="start"
+							text-anchor="middle"
 						>
 							Ø{holeSizeMm} mm
 						</text>
@@ -669,23 +669,23 @@
 					<!-- Bottom Dimension Position (Total) -->
 					{@const dimY_bottom = holeCenterY + holeSize / 2 + 20}
 
-					<!-- First to Second Hole (Pitch) - TOP -->
+					<!-- First to Second Hole (Pitch) - BOTTOM -->
 					<g class="dimension-line">
-						<!-- Extension lines (going up) -->
+						<!-- Extension lines (going down) -->
 						<line
 							x1={firstHoleX}
-							y1={holeCenterY - holeSize / 2 - 5}
+							y1={holeCenterY + holeSize / 2 + 5}
 							x2={firstHoleX}
-							y2={dimY_top - 10}
+							y2={dimY_bottom + 10}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
 						/>
 						<line
 							x1={secondHoleX}
-							y1={holeCenterY - holeSize / 2 - 5}
+							y1={holeCenterY + holeSize / 2 + 5}
 							x2={secondHoleX}
-							y2={dimY_top - 10}
+							y2={dimY_bottom + 10}
 							stroke="#9ca3af"
 							stroke-width="1"
 							stroke-dasharray="4 2"
@@ -694,9 +694,9 @@
 						<!-- Dimension line -->
 						<line
 							x1={firstHoleX}
-							y1={dimY_top}
+							y1={dimY_bottom}
 							x2={secondHoleX}
-							y2={dimY_top}
+							y2={dimY_bottom}
 							stroke="#374151"
 							stroke-width="1.5"
 							marker-start="url(#arrow-start)"
@@ -704,7 +704,7 @@
 						/>
 						<text
 							x={firstHoleX + (secondHoleX - firstHoleX) / 2}
-							y={dimY_top - 10}
+							y={dimY_bottom + 15}
 							fill="#374151"
 							font-size="12"
 							text-anchor="middle"
