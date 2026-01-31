@@ -119,7 +119,14 @@
 
             // Dynamically import pdfjs-dist only on client side
             const pdfjsLib = await import("pdfjs-dist");
-            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+            // Use local worker file via Vite's URL handling
+            const workerUrl = new URL(
+                "pdfjs-dist/build/pdf.worker.min.mjs",
+                import.meta.url,
+            ).href;
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
             const loadingTask = pdfjsLib.getDocument(pdfUrl);
             const pdf = await loadingTask.promise;
@@ -146,6 +153,7 @@
             await page.render({
                 canvasContext: context,
                 viewport: scaledViewport,
+                canvas: context.canvas,
             }).promise;
 
             pdfLoaded = true;
