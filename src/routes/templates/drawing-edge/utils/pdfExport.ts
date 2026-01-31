@@ -60,7 +60,7 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
 
         // Create jsPDF document (A4 size by default)
         const pdfDoc = new jsPDF({
-            orientation: 'portrait',
+            orientation: 'landscape',
             unit: 'pt',
             format: [overlayFieldsConfig.pageWidth, overlayFieldsConfig.pageHeight]
         });
