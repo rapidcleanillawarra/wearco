@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Rectangle properties
+	// Rectangle properties (px - source of truth for SVG rendering)
 	let rectWidth = $state(200);
 	let rectHeight = $state(100);
 	let rectX = $state(50);
@@ -12,7 +12,14 @@
 	// Hole properties
 	let holeType = $state("circle"); // 'circle' | 'square'
 	let holeCount = $state(2);
-	let holeSize = $state(20); // Diameter for circle, side length for square
+	let holeSize = $state(20); // Diameter for circle, side length for square (px)
+
+	// MM labels (purely cosmetic - do not affect SVG rendering)
+	let widthMm = $state(1000);
+	let heightMm = $state(500);
+	let holeSizeMm = $state(100);
+	let holeSpacingMm = $state(250);
+	let totalHoleDistanceMm = $state(500);
 
 	// SVG canvas dimensions
 	let svgWidth = $state(600);
@@ -24,29 +31,8 @@
 	const MAX_ZOOM = 5;
 	const ZOOM_STEP = 0.1;
 
-	// Conversion factor: pixels to mm (approximately 3.78 pixels per mm at 96 DPI)
-	// Using 1:1 for simplicity as per original
-	const PIXELS_TO_MM = 0.2;
-
-	// Computed mm values
-	$effect(() => {
-		// This effect runs when rectWidth or rectHeight changes
-	});
-
-	// Derived values for layout
+	// Derived values for layout (px only)
 	let holeSpacing = $derived(rectWidth / (holeCount + 1));
-
-	function getMm(pixels: number): number {
-		return Math.round(pixels / PIXELS_TO_MM);
-	}
-
-	function getWidthMm(): number {
-		return getMm(rectWidth);
-	}
-
-	function getHeightMm(): number {
-		return getMm(rectHeight);
-	}
 
 	function handleWidthChange(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -64,19 +50,36 @@
 		}
 	}
 
+	// MM label handlers (purely cosmetic - do not affect SVG)
 	function handleWidthMmChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const value = parseInt(target.value);
-		if (!isNaN(value) && value > 0 && value <= 9999) {
-			rectWidth = Math.round(value * PIXELS_TO_MM);
+		if (!isNaN(value) && value > 0 && value <= 99999) {
+			widthMm = value;
 		}
 	}
 
 	function handleHeightMmChange(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const value = parseInt(target.value);
-		if (!isNaN(value) && value > 0 && value <= 9999) {
-			rectHeight = Math.round(value * PIXELS_TO_MM);
+		if (!isNaN(value) && value > 0 && value <= 99999) {
+			heightMm = value;
+		}
+	}
+
+	function handleHoleSpacingMmChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value);
+		if (!isNaN(value) && value > 0 && value <= 99999) {
+			holeSpacingMm = value;
+		}
+	}
+
+	function handleTotalHoleDistanceMmChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value);
+		if (!isNaN(value) && value > 0 && value <= 99999) {
+			totalHoleDistanceMm = value;
 		}
 	}
 
@@ -279,7 +282,7 @@
 								type="number"
 								min="1"
 								max="9999"
-								value={getWidthMm()}
+								value={widthMm}
 								onchange={handleWidthMmChange}
 							/>
 							<span>mm</span>
@@ -292,7 +295,7 @@
 								type="number"
 								min="1"
 								max="9999"
-								value={getHeightMm()}
+								value={heightMm}
 								onchange={handleHeightMmChange}
 							/>
 							<span>mm</span>
@@ -431,7 +434,7 @@
 						font-size="12"
 						text-anchor="middle"
 					>
-						{getWidthMm()} mm
+						{widthMm} mm
 					</text>
 				</g>
 
@@ -456,7 +459,7 @@
 						transform="rotate(-90, {rectX - 35}, {rectY +
 							rectHeight / 2})"
 					>
-						{getHeightMm()} mm
+						{heightMm} mm
 					</text>
 				</g>
 
@@ -494,7 +497,7 @@
 							font-size="12"
 							text-anchor="middle"
 						>
-							{getMm(holeSpacing)} mm
+							{holeSpacingMm} mm
 						</text>
 					</g>
 
@@ -517,7 +520,7 @@
 							font-size="12"
 							text-anchor="middle"
 						>
-							{getMm(holeSpacing)} mm
+							{holeSpacingMm} mm
 						</text>
 					</g>
 				{/if}
@@ -604,7 +607,7 @@
 							font-size="12"
 							text-anchor="middle"
 						>
-							{getMm(holeSpacing)} mm
+							{holeSpacingMm} mm
 						</text>
 					</g>
 
@@ -649,7 +652,7 @@
 								font-size="12"
 								text-anchor="middle"
 							>
-								{getMm(lastHoleX - firstHoleX)} mm
+								{totalHoleDistanceMm} mm
 							</text>
 						</g>
 					{/if}
@@ -677,7 +680,7 @@
 		</p>
 		<p>
 			<strong>Size:</strong>
-			{rectWidth} × {rectHeight} pixels ({getWidthMm()} × {getHeightMm()} mm)
+			{rectWidth} × {rectHeight} pixels ({widthMm} × {heightMm} mm)
 		</p>
 		<p><strong>Zoom:</strong> {Math.round(zoomLevel * 100)}%</p>
 		<p>
