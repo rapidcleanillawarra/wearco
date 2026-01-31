@@ -343,9 +343,9 @@
                 <!-- Width Dimension -->
                 <g class="dimension-line">
                     <line
-                        x1={rectX}
+                        x1={rectX + 5}
                         y1={rectY - 20}
-                        x2={rectX + centerEdgeWidthPx}
+                        x2={rectX + centerEdgeWidthPx - 5}
                         y2={rectY - 20}
                         stroke="#374151"
                         stroke-width="1.5"
@@ -367,9 +367,9 @@
                 <g class="dimension-line">
                     <line
                         x1={rectX - 20}
-                        y1={rectY}
+                        y1={rectY + 5}
                         x2={rectX - 20}
-                        y2={rectY + centerEdgeHeightPx}
+                        y2={rectY + centerEdgeHeightPx - 5}
                         stroke="#374151"
                         stroke-width="1.5"
                         marker-start="url(#arrow-start)"
@@ -406,9 +406,9 @@
                     <!-- Left Edge to First Hole -->
                     <g class="dimension-line">
                         <line
-                            x1={rectX}
+                            x1={rectX + 5}
                             y1={rectY + centerEdgeHeightPx / 2}
-                            x2={rectX + centerEdgePitchPx}
+                            x2={rectX + centerEdgePitchPx - 5}
                             y2={rectY + centerEdgeHeightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
@@ -429,9 +429,12 @@
                     <!-- Last Hole to Right Edge -->
                     <g class="dimension-line">
                         <line
-                            x1={rectX + centerEdgeWidthPx - centerEdgePitchPx}
+                            x1={rectX +
+                                centerEdgeWidthPx -
+                                centerEdgePitchPx +
+                                5}
                             y1={rectY + centerEdgeHeightPx / 2}
-                            x2={rectX + centerEdgeWidthPx}
+                            x2={rectX + centerEdgeWidthPx - 5}
                             y2={rectY + centerEdgeHeightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
@@ -488,9 +491,9 @@
                     <g class="dimension-line">
                         <!-- Horizontal dimension line (showing diameter) -->
                         <line
-                            x1={firstHoleCx - centerEdgeHoleSizePx / 2}
+                            x1={firstHoleCx - centerEdgeHoleSizePx / 2 + 5}
                             y1={dimY}
-                            x2={firstHoleCx + centerEdgeHoleSizePx / 2}
+                            x2={firstHoleCx + centerEdgeHoleSizePx / 2 - 5}
                             y2={dimY}
                             stroke="#374151"
                             stroke-width="1.5"
@@ -571,9 +574,9 @@
 
                         <!-- Dimension line -->
                         <line
-                            x1={firstHoleX}
+                            x1={firstHoleX + 5}
                             y1={dimY_bottom}
-                            x2={secondHoleX}
+                            x2={secondHoleX - 5}
                             y2={dimY_bottom}
                             stroke="#374151"
                             stroke-width="1.5"
@@ -616,9 +619,9 @@
 
                             <!-- Dimension line -->
                             <line
-                                x1={firstHoleX}
+                                x1={firstHoleX + 5}
                                 y1={dimY_bottom}
-                                x2={lastHoleX}
+                                x2={lastHoleX - 5}
                                 y2={dimY_bottom}
                                 stroke="#374151"
                                 stroke-width="1.5"
@@ -739,5 +742,4 @@
     .export-btn:hover {
         background-color: #4338ca;
     }
-
 </style>
