@@ -1,26 +1,20 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
+
 declare global {
-	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-	}
+  namespace App {
+    // interface Error {}
+    interface Locals {
+      supabase: SupabaseClient
+      getSession: () => Promise<Session | null>
+    }
+    interface PageData {
+      session: Session | null
+    }
+    // interface PageState {}
+    // interface Platform {}
+  }
 }
 
-export interface WearcoTemplate {
-  id: string
-  template_name: string
-  template_code: string | null
-  customer: string | null
-  category: string
-  dimension_schema: Record<string, any>
-  template_data: Record<string, any>
-  created_by: string | null
-  created_at: string
-  updated_at: string
-}
-
-export {};
+export { }

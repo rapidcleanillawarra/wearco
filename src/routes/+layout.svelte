@@ -2,13 +2,19 @@
 	import favicon from "$lib/assets/favicon.svg";
 	import { page } from "$app/stores";
 
-	let { children } = $props();
+	let { children, data } = $props<{ data?: { pathname?: string } }>();
 
 	// Navigation items
 	const navItems = [
+		{ name: "Dashboard", href: "/dashboard" },
 		{ name: "Templates", href: "/templates" },
 		{ name: "Customers", href: "/customers" },
 	];
+
+	// Hide header on login page
+	const isLoginPage = $derived(
+		data?.pathname === "/" || $page.url.pathname === "/",
+	);
 </script>
 
 <svelte:head>
@@ -26,31 +32,35 @@
 </svelte:head>
 
 <div class="app-layout">
-	<header class="global-header">
-		<div class="header-inner">
-			<!-- Logo -->
-			<a href="/" class="logo-link">
-				<img
-					src="https://wearco.com.au/wp-content/uploads/2024/08/logo-1.png"
-					alt="Wearco Logo"
-					class="logo-img"
-				/>
-			</a>
+	{#if !isLoginPage}
+		<header class="global-header">
+			<div class="header-inner">
+				<!-- Logo -->
+				<a href="/dashboard" class="logo-link">
+					<img
+						src="https://wearco.com.au/wp-content/uploads/2024/08/logo-1.png"
+						alt="Wearco Logo"
+						class="logo-img"
+					/>
+				</a>
 
-			<!-- Navigation -->
-			<nav class="main-nav">
-				{#each navItems as item}
-					<a
-						href={item.href}
-						class="nav-link"
-						class:active={$page.url.pathname.startsWith(item.href)}
-					>
-						{item.name}
-					</a>
-				{/each}
-			</nav>
-		</div>
-	</header>
+				<!-- Navigation -->
+				<nav class="main-nav">
+					{#each navItems as item}
+						<a
+							href={item.href}
+							class="nav-link"
+							class:active={$page.url.pathname.startsWith(
+								item.href,
+							)}
+						>
+							{item.name}
+						</a>
+					{/each}
+				</nav>
+			</div>
+		</header>
+	{/if}
 
 	<main class="main-content">
 		{@render children()}
