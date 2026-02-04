@@ -2,7 +2,13 @@
 	import favicon from "$lib/assets/favicon.svg";
 	import { page } from "$app/stores";
 
-	let { children, data } = $props<{ data?: { pathname?: string } }>();
+	import { enhance } from "$app/forms";
+	import type { Session } from "@supabase/supabase-js";
+
+	let { children, data } = $props<{
+		data: { session: Session | null; pathname: string };
+		children: any;
+	}>();
 
 	// Navigation items
 	const navItems = [
@@ -58,6 +64,29 @@
 						</a>
 					{/each}
 				</nav>
+
+				<!-- User Actions -->
+				{#if data.session}
+					<div class="user-actions">
+						<a
+							href="/profile"
+							class="nav-link"
+							class:active={$page.url.pathname === "/profile"}
+						>
+							Profile
+						</a>
+						<form
+							action="/auth/logout"
+							method="POST"
+							use:enhance
+							class="logout-form"
+						>
+							<button type="submit" class="logout-btn">
+								Logout
+							</button>
+						</form>
+					</div>
+				{/if}
 			</div>
 		</header>
 	{/if}
@@ -194,5 +223,35 @@
 			padding: 0.5rem 0.85rem;
 			font-size: 0.85rem;
 		}
+
+		.user-actions {
+			gap: 0.5rem;
+		}
+	}
+
+	/* User Actions */
+	.user-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-left: auto;
+	}
+
+	.logout-btn {
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: var(--color-white);
+		padding: 0.65rem 1.25rem;
+		border-radius: 8px;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: 0.95rem;
+		font-weight: 500;
+		transition: all 0.2s ease;
+	}
+
+	.logout-btn:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: var(--color-white);
 	}
 </style>
