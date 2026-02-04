@@ -16,29 +16,53 @@
         errorMessage = "";
         successMessage = "";
 
+        console.log("🔐 Form submitted", { email, isSignUp });
+
         try {
             if (isSignUp) {
+                console.log("📝 Attempting sign up...");
                 const { data, error } = await signUp(email, password);
+                console.log("📝 Sign up result:", { data, error });
+
                 if (error) {
+                    console.error("❌ Sign up error:", error);
                     errorMessage = error.message;
                 } else if (data.user) {
+                    console.log("✅ Sign up successful:", data.user);
                     successMessage =
                         "Account created! Please check your email to verify your account.";
                     email = "";
                     password = "";
                 }
             } else {
+                console.log("🔑 Attempting sign in...");
                 const { data, error } = await signIn(email, password);
+                console.log("🔑 Sign in result - full data object:", data);
+                console.log("🔑 Sign in result - error:", error);
+                console.log("🔑 data.session:", data?.session);
+                console.log("🔑 data.user:", data?.user);
+
                 if (error) {
+                    console.error("❌ Sign in error:", error);
                     errorMessage = error.message;
-                } else if (data.session) {
-                    goto("/dashboard");
+                } else if (data?.session || data?.user) {
+                    console.log(
+                        "✅ Sign in successful, redirecting to /dashboard...",
+                    );
+                    // Use window.location for full page reload to sync cookies with server
+                    window.location.href = "/dashboard";
+                } else {
+                    console.warn(
+                        "⚠️ No session or user in response - check data structure",
+                    );
                 }
             }
         } catch (err) {
+            console.error("💥 Unexpected error:", err);
             errorMessage = "An unexpected error occurred. Please try again.";
         } finally {
             loading = false;
+            console.log("🏁 Form submission complete");
         }
     }
 

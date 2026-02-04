@@ -9,6 +9,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 const protectedRoutes = ['/dashboard', '/templates', '/customers']
 
 export const handle: Handle = async ({ event, resolve }) => {
+    console.log('🔒 [hooks] Processing request:', event.url.pathname)
+    console.log('🔒 [hooks] All cookies:', event.cookies.getAll().map(c => c.name))
+
     // Create Supabase client with cookies
     event.locals.supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
         cookies: {
@@ -23,11 +26,17 @@ export const handle: Handle = async ({ event, resolve }) => {
         },
     })
 
-    // Get session helper
+    // Get session helper - use getUser() for proper JWT validation
     event.locals.getSession = async () => {
-        const {
-            data: { session },
-        } = await event.locals.supabase.auth.getSession()
+        const { data: { user }, error } = await event.locals.supabase.auth.getUser()
+        console.log('🔒 [hooks] getUser result:', { user: user?.email, error: error?.message })
+
+        if (error || !user) {
+            return null
+        }
+
+        // Also get the session for the full session object
+        const { data: { session } } = await event.locals.supabase.auth.getSession()
         return session
     }
 
@@ -36,9 +45,14 @@ export const handle: Handle = async ({ event, resolve }) => {
         event.url.pathname.startsWith(route)
     )
 
+    console.log('🔒 [hooks] Is protected route:', isProtectedRoute)
+
     if (isProtectedRoute) {
         const session = await event.locals.getSession()
+        console.log('🔒 [hooks] Session exists:', !!session)
+
         if (!session) {
+            console.log('🔒 [hooks] No session, redirecting to /')
             throw redirect(303, '/')
         }
     }
