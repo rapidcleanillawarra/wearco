@@ -5,21 +5,49 @@
 	import edgePdf from "$lib/assets/edge.pdf";
 
 	// Props
+	import { enhance } from "$app/forms";
+
+	// Props
 	let { data } = $props();
 	let template = $derived(data.template);
 	let overlayConfig = $derived(template.template_data);
+	let svgDiagrams = $derived(data.svgDiagrams || []);
+
+	// Helper to find diagram data
+	function getDiagramData(name: string, defaultData: any) {
+		if (!data.svgDiagrams) return defaultData;
+		const diagram = data.svgDiagrams.find((d: any) => d.name === name);
+		return diagram ? { ...defaultData, ...diagram.data } : defaultData;
+	}
 
 	// Shared state for all editable values (source of truth)
-	let centerEdgeWidth = $state(1000);
+	// Initialize from DB if available
+	let centerDefaults = {
+		width: 1000,
+		height: 500,
+		holeType: "circle",
+		holeCount: 10,
+		holeSize: 10,
+		pitch: 250,
+		totalHoleDistance: 500,
+		holeLeft: 250,
+		holeRight: 250,
+		widthPx: 1000,
+		heightPx: 200,
+		holeSizePx: 20,
+	};
 
-	let centerEdgeHeight = $state(500);
-	let centerEdgeHoleType = $state("circle");
-	let centerEdgeHoleCount = $state(10);
-	let centerEdgeHoleSize = $state(10);
-	let centerEdgePitch = $state(250);
-	let centerEdgeTotalHoleDistance = $state(500);
-	let centerEdgeHoleLeft = $state(250);
-	let centerEdgeHoleRight = $state(250);
+	let savedCenter = getDiagramData("Center Edge", centerDefaults);
+
+	let centerEdgeWidth = $state(savedCenter.width);
+	let centerEdgeHeight = $state(savedCenter.height);
+	let centerEdgeHoleType = $state(savedCenter.holeType);
+	let centerEdgeHoleCount = $state(savedCenter.holeCount);
+	let centerEdgeHoleSize = $state(savedCenter.holeSize);
+	let centerEdgePitch = $state(savedCenter.pitch);
+	let centerEdgeTotalHoleDistance = $state(savedCenter.totalHoleDistance);
+	let centerEdgeHoleLeft = $state(savedCenter.holeLeft);
+	let centerEdgeHoleRight = $state(savedCenter.holeRight);
 
 	// Additional PDF overlay fields
 	let customerName = $state("");
@@ -28,23 +56,81 @@
 	let material = $state("");
 
 	// SVG-specific values (internal to drawing, not from PDF)
-	let centerEdgeWidthPx = $state(1000);
-	let centerEdgeHeightPx = $state(200);
-	let centerEdgeHoleSizePx = $state(20);
+	let centerEdgeWidthPx = $state(savedCenter.widthPx);
+	let centerEdgeHeightPx = $state(savedCenter.heightPx);
+	let centerEdgeHoleSizePx = $state(savedCenter.holeSizePx);
 
 	// End Edge state values
-	let endEdgeWidthPx = $state(300);
-	let endEdgeHeightPx = $state(100);
-	let endEdgeHoleType = $state("circle");
-	let endEdgeHoleCount = $state(4);
-	let endEdgeHoleSizePx = $state(20);
-	let endEdgeWidth = $state(300);
-	let endEdgeHeight = $state(150);
-	let endEdgeHoleSize = $state(10);
-	let endEdgePitch = $state(60);
-	let endEdgeTotalHoleDistance = $state(180);
-	let endEdgeHoleLeft = $state(60);
-	let endEdgeHoleRight = $state(60);
+	let endDefaults = {
+		width: 300,
+		height: 150,
+		holeType: "circle",
+		holeCount: 4,
+		holeSize: 10,
+		pitch: 60,
+		totalHoleDistance: 180,
+		holeLeft: 60,
+		holeRight: 60,
+		widthPx: 300,
+		heightPx: 100,
+		holeSizePx: 20,
+	};
+
+	let savedEnd = getDiagramData("End Edge", endDefaults);
+
+	let endEdgeWidthPx = $state(savedEnd.widthPx);
+	let endEdgeHeightPx = $state(savedEnd.heightPx);
+	let endEdgeHoleType = $state(savedEnd.holeType);
+	let endEdgeHoleCount = $state(savedEnd.holeCount);
+	let endEdgeHoleSizePx = $state(savedEnd.holeSizePx);
+	let endEdgeWidth = $state(savedEnd.width);
+	let endEdgeHeight = $state(savedEnd.height);
+	let endEdgeHoleSize = $state(savedEnd.holeSize);
+	let endEdgePitch = $state(savedEnd.pitch);
+	let endEdgeTotalHoleDistance = $state(savedEnd.totalHoleDistance);
+	let endEdgeHoleLeft = $state(savedEnd.holeLeft);
+	let endEdgeHoleRight = $state(savedEnd.holeRight);
+
+	let isSaving = $state(false);
+
+	function prepareSaveData() {
+		return JSON.stringify([
+			{
+				name: "Center Edge",
+				data: {
+					width: centerEdgeWidth,
+					height: centerEdgeHeight,
+					holeType: centerEdgeHoleType,
+					holeCount: centerEdgeHoleCount,
+					holeSize: centerEdgeHoleSize,
+					pitch: centerEdgePitch,
+					totalHoleDistance: centerEdgeTotalHoleDistance,
+					holeLeft: centerEdgeHoleLeft,
+					holeRight: centerEdgeHoleRight,
+					widthPx: centerEdgeWidthPx,
+					heightPx: centerEdgeHeightPx,
+					holeSizePx: centerEdgeHoleSizePx,
+				},
+			},
+			{
+				name: "End Edge",
+				data: {
+					width: endEdgeWidth,
+					height: endEdgeHeight,
+					holeType: endEdgeHoleType,
+					holeCount: endEdgeHoleCount,
+					holeSize: endEdgeHoleSize,
+					pitch: endEdgePitch,
+					totalHoleDistance: endEdgeTotalHoleDistance,
+					holeLeft: endEdgeHoleLeft,
+					holeRight: endEdgeHoleRight,
+					widthPx: endEdgeWidthPx,
+					heightPx: endEdgeHeightPx,
+					holeSizePx: endEdgeHoleSizePx,
+				},
+			},
+		]);
+	}
 </script>
 
 <div class="drawing-page-container">
@@ -57,20 +143,66 @@
 					Configure your edge drawing parameters and export to PDF
 				</p>
 			</div>
-			<a href="/templates" class="back-btn">
-				<svg
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
+			<div class="header-actions">
+				<form
+					method="POST"
+					action="?/save"
+					use:enhance={() => {
+						isSaving = true;
+						return async ({ update }) => {
+							await update();
+							isSaving = false;
+						};
+					}}
 				>
-					<path d="M19 12H5" />
-					<path d="M12 19l-7-7 7-7" />
-				</svg>
-				Back to Templates
-			</a>
+					<input
+						type="hidden"
+						name="templateId"
+						value={template.id}
+					/>
+					<input
+						type="hidden"
+						name="diagrams"
+						value={prepareSaveData()}
+					/>
+					<button class="save-btn" disabled={isSaving}>
+						{#if isSaving}
+							Saving...
+						{:else}
+							<svg
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path
+									d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+								></path>
+								<polyline points="17 21 17 13 7 13 7 21"
+								></polyline>
+								<polyline points="7 3 7 8 15 8"></polyline>
+							</svg>
+							Save Diagrams
+						{/if}
+					</button>
+				</form>
+				<a href="/templates" class="back-btn">
+					<svg
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path d="M19 12H5" />
+						<path d="M12 19l-7-7 7-7" />
+					</svg>
+					Back to Templates
+				</a>
+			</div>
 		</div>
 	</header>
 
@@ -248,6 +380,36 @@
 	.back-btn:hover {
 		color: var(--color-white);
 		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.save-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--color-gold);
+		color: var(--color-black);
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.save-btn:hover:not(:disabled) {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(250, 194, 17, 0.3);
+	}
+
+	.save-btn:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
 	}
 
 	/* Editor Layout */
