@@ -21,6 +21,8 @@
 	const isLoginPage = $derived(
 		data?.pathname === "/" || $page.url.pathname === "/",
 	);
+
+	let isMenuOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -50,8 +52,8 @@
 					/>
 				</a>
 
-				<!-- Navigation -->
-				<nav class="main-nav">
+				<!-- Desktop Navigation -->
+				<nav class="main-nav desktop-only">
 					{#each navItems as item}
 						<a
 							href={item.href}
@@ -65,9 +67,9 @@
 					{/each}
 				</nav>
 
-				<!-- User Actions -->
+				<!-- Desktop User Actions -->
 				{#if data.session}
-					<div class="user-actions">
+					<div class="user-actions desktop-only">
 						<a
 							href="/profile"
 							class="nav-link"
@@ -86,7 +88,65 @@
 						</form>
 					</div>
 				{/if}
+
+				<!-- Mobile Menu Toggle -->
+				<button
+					class="mobile-menu-toggle"
+					aria-label="Toggle menu"
+					onclick={() => (isMenuOpen = !isMenuOpen)}
+					class:open={isMenuOpen}
+				>
+					<span class="hamburger-line"></span>
+					<span class="hamburger-line"></span>
+					<span class="hamburger-line"></span>
+				</button>
 			</div>
+
+			<!-- Mobile Navigation Menu -->
+			{#if isMenuOpen}
+				<div class="mobile-menu">
+					<nav class="mobile-nav">
+						{#each navItems as item}
+							<a
+								href={item.href}
+								class="mobile-nav-link"
+								class:active={$page.url.pathname.startsWith(
+									item.href,
+								)}
+								onclick={() => (isMenuOpen = false)}
+							>
+								{item.name}
+							</a>
+						{/each}
+
+						{#if data.session}
+							<div class="mobile-user-actions">
+								<a
+									href="/profile"
+									class="mobile-nav-link"
+									class:active={$page.url.pathname ===
+										"/profile"}
+									onclick={() => (isMenuOpen = false)}
+								>
+									Profile
+								</a>
+								<form
+									action="/auth/logout"
+									method="POST"
+									class="logout-form full-width"
+								>
+									<button
+										type="submit"
+										class="logout-btn full-width"
+									>
+										Logout
+									</button>
+								</form>
+							</div>
+						{/if}
+					</nav>
+				</div>
+			{/if}
 		</header>
 	{/if}
 
@@ -155,6 +215,7 @@
 		align-items: center;
 		text-decoration: none;
 		transition: opacity 0.3s ease;
+		z-index: 1001; /* Ensure logo is above mobile menu */
 	}
 
 	.logo-link:hover {
@@ -202,32 +263,6 @@
 		box-shadow: 0 6px 16px rgba(250, 194, 17, 0.4);
 	}
 
-	/* Main Content */
-	.main-content {
-		flex: 1;
-	}
-
-	/* Responsive */
-	@media (max-width: 768px) {
-		.header-inner {
-			padding: 0 1rem;
-			height: 60px;
-		}
-
-		.logo-img {
-			height: 35px;
-		}
-
-		.nav-link {
-			padding: 0.5rem 0.85rem;
-			font-size: 0.85rem;
-		}
-
-		.user-actions {
-			gap: 0.5rem;
-		}
-	}
-
 	/* User Actions */
 	.user-actions {
 		display: flex;
@@ -252,5 +287,136 @@
 	.logout-btn:hover {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: var(--color-white);
+	}
+
+	/* Mobile Menu Toggle */
+	.mobile-menu-toggle {
+		display: none;
+		flex-direction: column;
+		justify-content: space-between;
+		width: 30px;
+		height: 20px;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		z-index: 1002;
+	}
+
+	.hamburger-line {
+		width: 100%;
+		height: 2px;
+		background-color: var(--color-white);
+		border-radius: 2px;
+		transition: all 0.3s ease;
+	}
+
+	/* Mobile Menu Overlay */
+	.mobile-menu {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background-color: var(--color-black);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1.5rem;
+		animation: slideDown 0.3s ease forwards;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.mobile-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.mobile-nav-link {
+		color: var(--color-white);
+		text-decoration: none;
+		font-size: 1.1rem;
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.2s;
+	}
+
+	.mobile-nav-link:hover,
+	.mobile-nav-link.active {
+		background-color: rgba(255, 255, 255, 0.1);
+		border-color: var(--color-gold);
+		color: var(--color-gold);
+	}
+
+	.mobile-user-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		margin-top: 0.5rem;
+	}
+
+	.logout-btn.full-width {
+		width: 100%;
+		text-align: center;
+		padding: 0.75rem;
+		border: 1px solid var(--color-gold);
+		color: var(--color-gold);
+	}
+
+	.logout-btn.full-width:hover {
+		background-color: var(--color-gold);
+		color: var(--color-black);
+	}
+
+	/* Responsive */
+	@media (max-width: 768px) {
+		.header-inner {
+			padding: 0 1rem;
+			height: 60px;
+		}
+
+		.logo-img {
+			height: 35px;
+		}
+
+		/* Hide Desktop Elements */
+		.desktop-only {
+			display: none !important;
+		}
+
+		/* Show Mobile Elements */
+		.mobile-menu-toggle {
+			display: flex;
+		}
+
+		/* Hamburger Animation */
+		.mobile-menu-toggle.open .hamburger-line:nth-child(1) {
+			transform: translateY(9px) rotate(45deg);
+		}
+
+		.mobile-menu-toggle.open .hamburger-line:nth-child(2) {
+			opacity: 0;
+		}
+
+		.mobile-menu-toggle.open .hamburger-line:nth-child(3) {
+			transform: translateY(-9px) rotate(-45deg);
+		}
+	}
+
+	/* Main Content */
+	.main-content {
+		flex: 1;
 	}
 </style>
