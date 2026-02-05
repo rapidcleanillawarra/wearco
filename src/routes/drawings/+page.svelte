@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { WearcoDrawing } from "$lib/types/template";
+	import type { WearcoDrawing, WearcoTemplate } from "$lib/types/template";
 
-	let { data } = $props<{ data: { drawings?: WearcoDrawing[]; error?: string } }>();
+	let { data } = $props<{ data: { drawings?: WearcoDrawing[]; templates?: WearcoTemplate[]; error?: string } }>();
 
 	// Safe access to drawings from wearco_drawings (merged layout + page data)
 	const drawings = $derived(data?.drawings ?? []);
+	const templates = $derived(data?.templates ?? []);
 	const loadError = $derived(data?.error);
 
 	// View mode state
@@ -12,40 +13,26 @@
 
 	// Modal state
 	let showModal = $state(false);
-	let selectedDrawingType: string | null = $state(null);
+	let selectedTemplateId: string | null = $state(null);
 
+	// Helper function to get template icon
+	function getTemplateIcon(template: WearcoTemplate): string {
+		return template.image_display || "📐";
+	}
 
-	// Drawing types for the modal
-	const drawingTypes = [
-		{
-			id: "center-edge",
-			name: "Center Edge Drawing",
-			description: "Symmetrical hole pattern centered on the edge",
-			icon: "📐",
-			gradient: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)",
-		},
-		{
-			id: "end-edge",
-			name: "End Edge Drawing",
-			description: "Hole pattern aligned to edge endpoints",
-			icon: "📏",
-			gradient: "linear-gradient(135deg, #2a2a2a 0%, #444 100%)",
-		},
-		{
-			id: "custom-layout",
-			name: "Custom Layout",
-			description: "Create a fully customized drawing layout",
-			icon: "🔧",
-			gradient: "linear-gradient(135deg, #1f1f1f 0%, #3a3a3a 100%)",
-		},
-		{
-			id: "perforation-grid",
-			name: "Perforation Grid",
-			description: "Grid-based perforation pattern design",
-			icon: "⚙️",
-			gradient: "linear-gradient(135deg, #252525 0%, #404040 100%)",
-		},
-	];
+	// Helper function to get gradient based on category
+	function getTemplateGradient(category: string | null): string {
+		const gradients: Record<string, string> = {
+			Edge: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)",
+			Center: "linear-gradient(135deg, #2a2a2a 0%, #444 100%)",
+			Perforation: "linear-gradient(135deg, #252525 0%, #404040 100%)",
+			Custom: "linear-gradient(135deg, #1f1f1f 0%, #3a3a3a 100%)",
+		};
+		return (
+			gradients[category || ""] ||
+			"linear-gradient(135deg, #1f1f1f 0%, #3a3a3a 100%)"
+		);
+	}
 
 	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleDateString("en-US", {
@@ -57,30 +44,22 @@
 
 	function openModal() {
 		showModal = true;
-		selectedDrawingType = null;
+		selectedTemplateId = null;
 	}
 
 	function closeModal() {
 		showModal = false;
-		selectedDrawingType = null;
+		selectedTemplateId = null;
 	}
 
-	function selectDrawingType(typeId: string) {
-		selectedDrawingType = typeId;
+	function selectTemplate(templateId: string) {
+		selectedTemplateId = templateId;
 	}
 
 	function createDrawing() {
-		if (selectedDrawingType) {
-			// Navigate to the appropriate drawing editor
-			if (
-				selectedDrawingType === "center-edge" ||
-				selectedDrawingType === "end-edge"
-			) {
-				window.location.href = `/drawings/drawing-edge`;
-			} else {
-				// For other types, we can add more navigation later
-				window.location.href = `/drawings/drawing-edge`;
-			}
+		if (selectedTemplateId) {
+			// Navigate to the drawing editor with template_id
+			window.location.href = `/drawings/drawing-edge?template_id=${selectedTemplateId}`;
 		}
 	}
 
@@ -449,41 +428,48 @@
 			</div>
 
 			<div class="modal-body">
-				<div class="drawing-types-grid">
-					{#each drawingTypes as type, index}
-						<button
-							class="drawing-type-card"
-							class:selected={selectedDrawingType === type.id}
-							onclick={() => selectDrawingType(type.id)}
-							style="--animation-delay: {index * 0.1}s"
-						>
-							<div
-								class="type-icon-wrapper"
-								style="background: {type.gradient}"
+				{#if templates.length === 0}
+					<div class="empty-templates">
+						<span class="empty-icon">📋</span>
+						<p>No templates available. Please add templates in the database.</p>
+					</div>
+				{:else}
+					<div class="drawing-types-grid">
+						{#each templates as template, index}
+							<button
+								class="drawing-type-card"
+								class:selected={selectedTemplateId === template.id}
+								onclick={() => selectTemplate(template.id)}
+								style="--animation-delay: {index * 0.1}s"
 							>
-								<span class="type-icon">{type.icon}</span>
-							</div>
-							<div class="type-info">
-								<h3 class="type-name">{type.name}</h3>
-								<p class="type-description">
-									{type.description}
-								</p>
-							</div>
-							<div class="type-check">
-								<svg
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="3"
+								<div
+									class="type-icon-wrapper"
+									style="background: {getTemplateGradient(template.category)}"
 								>
-									<polyline points="20 6 9 17 4 12" />
-								</svg>
-							</div>
-						</button>
-					{/each}
-				</div>
+									<span class="type-icon">{getTemplateIcon(template)}</span>
+								</div>
+								<div class="type-info">
+									<h3 class="type-name">{template.template_name}</h3>
+									<p class="type-description">
+										{template.description || 'No description available'}
+									</p>
+								</div>
+								<div class="type-check">
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="3"
+									>
+										<polyline points="20 6 9 17 4 12" />
+									</svg>
+								</div>
+							</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
 
 			<div class="modal-footer">
@@ -491,7 +477,7 @@
 				<button
 					class="create-btn"
 					onclick={createDrawing}
-					disabled={!selectedDrawingType}
+					disabled={!selectedTemplateId}
 				>
 					<span>Create Drawing</span>
 					<svg
@@ -1093,6 +1079,24 @@
 	.modal-body {
 		padding: 1.5rem 2rem;
 		overflow-y: auto;
+	}
+
+	.empty-templates {
+		text-align: center;
+		padding: 3rem 2rem;
+		color: var(--color-gray);
+	}
+
+	.empty-templates .empty-icon {
+		font-size: 3rem;
+		display: block;
+		margin-bottom: 1rem;
+		opacity: 0.5;
+	}
+
+	.empty-templates p {
+		font-size: 1rem;
+		margin: 0;
 	}
 
 	.drawing-types-grid {

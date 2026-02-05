@@ -1,14 +1,14 @@
 export interface WearcoTemplate {
   id: string
   template_name: string
-  template_code: string | null
-  customer: string | null
-  category: string
-  dimension_schema: Record<string, any>
-  template_data: Record<string, any>
+  category: string | null
+  template_data: Record<string, any> | null
   created_by: string | null
   created_at: string
   updated_at: string
+  visual_document: string | null
+  image_display: string | null
+  description: string | null
 }
 
 export interface WearcoDrawing {
