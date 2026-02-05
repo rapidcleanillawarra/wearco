@@ -15,6 +15,8 @@
         centerEdgeTotalHoleDistance = $bindable(500),
         centerEdgeHoleLeft = $bindable(250),
         centerEdgeHoleRight = $bindable(250),
+        rectX = $bindable(50),
+        rectY = $bindable(50),
     }: {
         centerEdgeWidthPx?: number;
         centerEdgeHeightPx?: number;
@@ -28,11 +30,11 @@
         centerEdgeTotalHoleDistance?: number;
         centerEdgeHoleLeft?: number;
         centerEdgeHoleRight?: number;
+        rectX?: number;
+        rectY?: number;
     } = $props();
 
     // Internal state for positioning and interaction
-    let rectX = $state(50);
-    let rectY = $state(50);
     let isDragging = $state(false);
     let isResizing = $state(false);
     let dragStart = $state({ x: 0, y: 0 });

@@ -1,38 +1,40 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
-    // Props for editable drawing values (bindable for two-way sync)
+    // Props
     let {
-        endEdgeWidthPx = $bindable(300),
-        endEdgeHeightPx = $bindable(100),
-        endEdgeHoleType = $bindable("circle"),
-        endEdgeHoleCount = $bindable(4),
-        endEdgeHoleSizePx = $bindable(20),
-        endEdgeWidth = $bindable(300),
-        endEdgeHeight = $bindable(150),
-        endEdgeHoleSize = $bindable(10),
-        endEdgePitch = $bindable(60),
-        endEdgeTotalHoleDistance = $bindable(180),
-        endEdgeHoleLeft = $bindable(60),
-        endEdgeHoleRight = $bindable(60),
-        rectX = $bindable(50),
-        rectY = $bindable(50),
+        config,
+        data = $bindable(),
     }: {
-        endEdgeWidthPx?: number;
-        endEdgeHeightPx?: number;
-        endEdgeHoleType?: string;
-        endEdgeHoleCount?: number;
-        endEdgeHoleSizePx?: number;
-        endEdgeWidth?: number;
-        endEdgeHeight?: number;
-        endEdgeHoleSize?: number;
-        endEdgePitch?: number;
-        endEdgeTotalHoleDistance?: number;
-        endEdgeHoleLeft?: number;
-        endEdgeHoleRight?: number;
-        rectX?: number;
-        rectY?: number;
+        config: any;
+        data: any;
     } = $props();
+
+    // Map internal variable names to the external data via config.params
+    // We use getters/setters (runes) to proxy the access
+    // Note: In Svelte 5, we can just use the data object directly in the template if we want,
+    // but having local derived values might be cleaner for the logic.
+    // However, for two-way binding of controls, we need direct access.
+
+    // Derived helpers for read access
+    let widthPx = $derived(data[config.params.widthPx] || 1000);
+    let heightPx = $derived(data[config.params.heightPx] || 200);
+    let holeType = $derived(data[config.params.holeType] || "circle");
+    let holeCount = $derived(data[config.params.holeCount] || 10);
+    let holeSizePx = $derived(data[config.params.holeSizePx] || 20);
+    let width = $derived(data[config.params.width] || 1000);
+    let height = $derived(data[config.params.height] || 500);
+    let holeSize = $derived(data[config.params.holeSize] || 10);
+    let pitch = $derived(data[config.params.pitch] || 250);
+    let totalHoleDistance = $derived(
+        data[config.params.totalHoleDistance] || 500,
+    );
+    let holeLeft = $derived(data[config.params.holeLeft] || 250);
+    let holeRight = $derived(data[config.params.holeRight] || 250);
+
+    // Position state - separate from dimensions
+    let rectX = $derived(data[config.params.rectX] || 50);
+    let rectY = $derived(data[config.params.rectY] || 50);
 
     // Internal state for positioning and interaction
     let isDragging = $state(false);
@@ -41,7 +43,8 @@
     let resizeStart = $state({ width: 0, height: 0 });
 
     // SVG canvas dimensions
-    let svgWidth = $state(600);
+    let containerWidth = $state(600);
+    let svgWidth = $derived(Math.max(containerWidth, widthPx + 100));
     const svgHeight = 400;
 
     // Zoom functionality
@@ -51,94 +54,30 @@
     const ZOOM_STEP = 0.1;
 
     // Derived values for layout (px only)
-    let endEdgePitchPx = $derived(endEdgeWidthPx / (endEdgeHoleCount + 1));
+    let pitchPx = $derived(widthPx / (holeCount + 1));
 
-    function handleWidthChange(event: Event) {
+    // -- Handlers --
+
+    // Generic updater helper
+    function updateField(fieldKey: string, value: any) {
+        if (!config.params[fieldKey]) return;
+        data[config.params.fieldKey] = value; // Access by key name
+    }
+    // Better yet, just update data directly:
+
+    function handleWidthPxChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0) {
-            endEdgeWidthPx = value;
+            data[config.params.widthPx] = value;
         }
     }
 
-    function handleHeightChange(event: Event) {
+    function handleHeightPxChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value);
         if (!isNaN(value) && value > 0) {
-            endEdgeHeightPx = value;
-        }
-    }
-
-    // MM label handlers (purely cosmetic - do not affect SVG)
-    function handleWidthMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0 && value <= 99999) {
-            endEdgeWidth = value;
-        }
-    }
-
-    function handleHeightMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0 && value <= 99999) {
-            endEdgeHeight = value;
-        }
-    }
-
-    function handleHolePitchMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0 && value <= 99999) {
-            endEdgePitch = value;
-        }
-    }
-
-    function handleHoleLeftMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value >= 0 && value <= 99999) {
-            endEdgeHoleLeft = value;
-        }
-    }
-
-    function handleHoleRightMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value >= 0 && value <= 99999) {
-            endEdgeHoleRight = value;
-        }
-    }
-
-    function handleTotalHoleDistanceMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0 && value <= 99999) {
-            endEdgeTotalHoleDistance = value;
-        }
-    }
-
-    function handleHoleSizeMmChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0 && value <= 99999) {
-            endEdgeHoleSize = value;
-        }
-    }
-
-    function handleHoleCountChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value >= 0) {
-            endEdgeHoleCount = value;
-        }
-    }
-
-    function handleHoleSizeChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value);
-        if (!isNaN(value) && value > 0) {
-            endEdgeHoleSizePx = value;
+            data[config.params.heightPx] = value;
         }
     }
 
@@ -187,8 +126,12 @@
         const newY = mouseY - dragStart.y;
 
         // Keep rectangle within bounds
-        rectX = Math.max(0, Math.min(newX, svgWidth - endEdgeWidthPx));
-        rectY = Math.max(0, Math.min(newY, svgHeight - endEdgeHeightPx));
+        const newRectX = Math.max(0, Math.min(newX, svgWidth - widthPx));
+        const newRectY = Math.max(0, Math.min(newY, svgHeight - heightPx));
+
+        // Update data
+        data[config.params.rectX] = newRectX;
+        data[config.params.rectY] = newRectY;
     }
 
     function handleMouseUp() {
@@ -199,7 +142,7 @@
     function handleResizeMouseDown(event: MouseEvent) {
         event.stopPropagation(); // Prevent triggering drag
         isResizing = true;
-        resizeStart = { width: endEdgeWidthPx, height: endEdgeHeightPx };
+        resizeStart = { width: widthPx, height: heightPx };
         const svg = (event.currentTarget as Element).closest(
             "svg",
         ) as SVGSVGElement;
@@ -226,27 +169,24 @@
         const newWidth = Math.max(10, resizeStart.width + deltaX);
         const newHeight = Math.max(10, resizeStart.height + deltaY);
 
-        endEdgeWidthPx = newWidth;
-        endEdgeHeightPx = newHeight;
+        data[config.params.widthPx] = newWidth;
+        data[config.params.heightPx] = newHeight;
     }
 
+    // Export function - simplified to use class query
     function exportSvg() {
         const svg = document.querySelector(
-            ".svg-canvas-end-edge",
+            `.svg-canvas-${config.id}`,
         ) as SVGSVGElement;
         if (!svg) return;
 
-        // Clone the SVG to clean it up for export
         const clone = svg.cloneNode(true) as SVGSVGElement;
-
-        // Remove UI elements like resize handles from the export
         const handles = clone.querySelectorAll(".resize-handle");
         handles.forEach((h) => h.remove());
 
         const serializer = new XMLSerializer();
         let source = serializer.serializeToString(clone);
 
-        // Add name spaces if missing
         if (
             !source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)
         ) {
@@ -266,17 +206,14 @@
             );
         }
 
-        // Add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-
         const blob = new Blob([source], {
             type: "image/svg+xml;charset=utf-8",
         });
         const url = URL.createObjectURL(blob);
-
         const link = document.createElement("a");
         link.href = url;
-        link.download = "end-edge-drawing.svg";
+        link.download = `${config.id}.svg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -289,23 +226,23 @@
         <div class="editor-controls">
             <div class="dimension-controls">
                 <div class="control-group">
-                    <label for="end-width-control">W:</label>
+                    <label for="{config.id}-width-control">W:</label>
                     <input
-                        id="end-width-control"
+                        id="{config.id}-width-control"
                         type="number"
-                        value={endEdgeWidthPx}
-                        oninput={handleWidthChange}
+                        value={widthPx}
+                        oninput={handleWidthPxChange}
                         min="10"
                         class="dim-input"
                     />
                 </div>
                 <div class="control-group">
-                    <label for="end-height-control">H:</label>
+                    <label for="{config.id}-height-control">H:</label>
                     <input
-                        id="end-height-control"
+                        id="{config.id}-height-control"
                         type="number"
-                        value={endEdgeHeightPx}
-                        oninput={handleHeightChange}
+                        value={heightPx}
+                        oninput={handleHeightPxChange}
                         min="10"
                         class="dim-input"
                     />
@@ -381,8 +318,8 @@
         </div>
     </div>
 
-    <!-- Bind container clientWidth to svgWidth state -->
-    <div class="svg-container" bind:clientWidth={svgWidth}>
+    <!-- Bind container clientWidth to containerWidth state -->
+    <div class="svg-container" bind:clientWidth={containerWidth}>
         <div
             class="svg-wrapper"
             style="transform: scale({zoomLevel}); transform-origin: top left; width: 100%; height: 100%;"
@@ -392,7 +329,7 @@
                 width={svgWidth}
                 height={svgHeight}
                 viewBox="0 0 {svgWidth} {svgHeight}"
-                class="svg-canvas svg-canvas-end-edge"
+                class="svg-canvas svg-canvas-{config.id}"
                 onmousedown={handleMouseDown}
                 onmousemove={(e) => {
                     handleMouseMove(e);
@@ -402,12 +339,12 @@
                 onmouseleave={handleMouseUp}
                 onwheel={handleWheelZoom}
                 role="application"
-                aria-label="End Edge Drawing canvas"
+                aria-label="{config.title} canvas"
             >
                 <!-- Grid background for better positioning -->
                 <defs>
                     <marker
-                        id="end-arrow-start"
+                        id="arrow-start-{config.id}"
                         viewBox="0 0 10 10"
                         refX="5"
                         refY="5"
@@ -418,7 +355,7 @@
                         <path d="M 10 0 L 0 5 L 10 10 z" fill="#374151" />
                     </marker>
                     <marker
-                        id="end-arrow-end"
+                        id="arrow-end-{config.id}"
                         viewBox="0 0 10 10"
                         refX="5"
                         refY="5"
@@ -435,21 +372,21 @@
                     <line
                         x1={rectX + 5}
                         y1={rectY - 20}
-                        x2={rectX + endEdgeWidthPx - 5}
+                        x2={rectX + widthPx - 5}
                         y2={rectY - 20}
                         stroke="#374151"
                         stroke-width="1.5"
-                        marker-start="url(#end-arrow-start)"
-                        marker-end="url(#end-arrow-end)"
+                        marker-start="url(#arrow-start-{config.id})"
+                        marker-end="url(#arrow-end-{config.id})"
                     />
                     <text
-                        x={rectX + endEdgeWidthPx / 2}
+                        x={rectX + widthPx / 2}
                         y={rectY - 30}
                         fill="#374151"
                         font-size="12"
                         text-anchor="middle"
                     >
-                        {endEdgeWidth} mm
+                        {width} mm
                     </text>
                 </g>
 
@@ -459,22 +396,22 @@
                         x1={rectX - 20}
                         y1={rectY + 5}
                         x2={rectX - 20}
-                        y2={rectY + endEdgeHeightPx - 5}
+                        y2={rectY + heightPx - 5}
                         stroke="#374151"
                         stroke-width="1.5"
-                        marker-start="url(#end-arrow-start)"
-                        marker-end="url(#end-arrow-end)"
+                        marker-start="url(#arrow-start-{config.id})"
+                        marker-end="url(#arrow-end-{config.id})"
                     />
                     <text
                         x={rectX - 35}
-                        y={rectY + endEdgeHeightPx / 2}
+                        y={rectY + heightPx / 2}
                         fill="#374151"
                         font-size="12"
                         text-anchor="middle"
                         transform="rotate(-90, {rectX - 35}, {rectY +
-                            endEdgeHeightPx / 2})"
+                            heightPx / 2})"
                     >
-                        {endEdgeHeight} mm
+                        {height} mm
                     </text>
                 </g>
 
@@ -482,8 +419,8 @@
                 <rect
                     x={rectX}
                     y={rectY}
-                    width={endEdgeWidthPx}
-                    height={endEdgeHeightPx}
+                    width={widthPx}
+                    height={heightPx}
                     fill="white"
                     stroke="#1e1b4b"
                     stroke-width="2"
@@ -492,74 +429,74 @@
                 />
 
                 <!-- Hole Spacing Dimensions -->
-                {#if endEdgeHoleCount > 0}
+                {#if holeCount > 0}
                     <!-- Left Edge to First Hole -->
                     <g class="dimension-line">
                         <line
                             x1={rectX + 5}
-                            y1={rectY + endEdgeHeightPx / 2}
-                            x2={rectX + endEdgePitchPx - 5}
-                            y2={rectY + endEdgeHeightPx / 2}
+                            y1={rectY + heightPx / 2}
+                            x2={rectX + pitchPx - 5}
+                            y2={rectY + heightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
-                            marker-start="url(#end-arrow-start)"
-                            marker-end="url(#end-arrow-end)"
+                            marker-start="url(#arrow-start-{config.id})"
+                            marker-end="url(#arrow-end-{config.id})"
                         />
                         <text
-                            x={rectX + endEdgePitchPx / 2}
-                            y={rectY + endEdgeHeightPx / 2 - 10}
+                            x={rectX + pitchPx / 2}
+                            y={rectY + heightPx / 2 - 10}
                             fill="#374151"
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {endEdgeHoleLeft} mm
+                            {holeLeft} mm
                         </text>
                     </g>
 
                     <!-- Last Hole to Right Edge -->
                     <g class="dimension-line">
                         <line
-                            x1={rectX + endEdgeWidthPx - endEdgePitchPx + 5}
-                            y1={rectY + endEdgeHeightPx / 2}
-                            x2={rectX + endEdgeWidthPx - 5}
-                            y2={rectY + endEdgeHeightPx / 2}
+                            x1={rectX + widthPx - pitchPx + 5}
+                            y1={rectY + heightPx / 2}
+                            x2={rectX + widthPx - 5}
+                            y2={rectY + heightPx / 2}
                             stroke="#374151"
                             stroke-width="1.5"
-                            marker-start="url(#end-arrow-start)"
-                            marker-end="url(#end-arrow-end)"
+                            marker-start="url(#arrow-start-{config.id})"
+                            marker-end="url(#arrow-end-{config.id})"
                         />
                         <text
-                            x={rectX + endEdgeWidthPx - endEdgePitchPx / 2}
-                            y={rectY + endEdgeHeightPx / 2 - 10}
+                            x={rectX + widthPx - pitchPx / 2}
+                            y={rectY + heightPx / 2 - 10}
                             fill="#374151"
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {endEdgeHoleRight} mm
+                            {holeRight} mm
                         </text>
                     </g>
                 {/if}
 
                 <!-- Holes -->
-                {#each Array(endEdgeHoleCount) as _, i}
-                    {@const cx = rectX + (i + 1) * endEdgePitchPx}
-                    {@const cy = rectY + endEdgeHeightPx / 2}
+                {#each Array(holeCount) as _, i}
+                    {@const cx = rectX + (i + 1) * pitchPx}
+                    {@const cy = rectY + heightPx / 2}
 
-                    {#if endEdgeHoleType === "circle"}
+                    {#if holeType === "circle"}
                         <circle
                             {cx}
                             {cy}
-                            r={endEdgeHoleSizePx / 2}
+                            r={holeSizePx / 2}
                             fill="white"
                             stroke="#1e1b4b"
                             stroke-width="1.5"
                         />
                     {:else}
                         <rect
-                            x={cx - endEdgeHoleSizePx / 2}
-                            y={cy - endEdgeHoleSizePx / 2}
-                            width={endEdgeHoleSizePx}
-                            height={endEdgeHoleSizePx}
+                            x={cx - holeSizePx / 2}
+                            y={cy - holeSizePx / 2}
+                            width={holeSizePx}
+                            height={holeSizePx}
                             fill="white"
                             stroke="#1e1b4b"
                             stroke-width="1.5"
@@ -568,37 +505,37 @@
                 {/each}
 
                 <!-- Hole Diameter Dimension (on top of first hole) -->
-                {#if endEdgeHoleCount > 0}
-                    {@const firstHoleCx = rectX + endEdgePitchPx}
-                    {@const firstHoleCy = rectY + endEdgeHeightPx / 2}
-                    {@const dimY = firstHoleCy - endEdgeHoleSizePx / 2 - 15}
+                {#if holeCount > 0}
+                    {@const firstHoleCx = rectX + pitchPx}
+                    {@const firstHoleCy = rectY + heightPx / 2}
+                    {@const dimY = firstHoleCy - holeSizePx / 2 - 15}
 
                     <g class="dimension-line">
                         <!-- Horizontal dimension line (showing diameter) -->
                         <line
-                            x1={firstHoleCx - endEdgeHoleSizePx / 2 + 5}
+                            x1={firstHoleCx - holeSizePx / 2 + 5}
                             y1={dimY}
-                            x2={firstHoleCx + endEdgeHoleSizePx / 2 - 5}
+                            x2={firstHoleCx + holeSizePx / 2 - 5}
                             y2={dimY}
                             stroke="#374151"
                             stroke-width="1.5"
-                            marker-start="url(#end-arrow-start)"
-                            marker-end="url(#end-arrow-end)"
+                            marker-start="url(#arrow-start-{config.id})"
+                            marker-end="url(#arrow-end-{config.id})"
                         />
                         <!-- Extension lines (going up) -->
                         <line
-                            x1={firstHoleCx - endEdgeHoleSizePx / 2}
-                            y1={firstHoleCy - endEdgeHoleSizePx / 2 - 3}
-                            x2={firstHoleCx - endEdgeHoleSizePx / 2}
+                            x1={firstHoleCx - holeSizePx / 2}
+                            y1={firstHoleCy - holeSizePx / 2 - 3}
+                            x2={firstHoleCx - holeSizePx / 2}
                             y2={dimY - 5}
                             stroke="#9ca3af"
                             stroke-width="1"
                             stroke-dasharray="4 2"
                         />
                         <line
-                            x1={firstHoleCx + endEdgeHoleSizePx / 2}
-                            y1={firstHoleCy - endEdgeHoleSizePx / 2 - 3}
-                            x2={firstHoleCx + endEdgeHoleSizePx / 2}
+                            x1={firstHoleCx + holeSizePx / 2}
+                            y1={firstHoleCy - holeSizePx / 2 - 3}
+                            x2={firstHoleCx + holeSizePx / 2}
                             y2={dimY - 5}
                             stroke="#9ca3af"
                             stroke-width="1"
@@ -612,27 +549,33 @@
                             font-size="12"
                             text-anchor="middle"
                         >
-                            Ø{endEdgeHoleSize} mm
+                            Ø{holeSize} mm
                         </text>
                     </g>
                 {/if}
 
                 <!-- Resize handles -->
+                <circle
+                    cx={rectX + widthPx}
+                    cy={rectY + heightPx}
+                    r="6"
+                    fill="#ef4444"
+                    class="resize-handle"
+                    onmousedown={handleResizeMouseDown}
+                    role="button"
+                    tabindex="0"
+                    aria-label="Resize handle"
+                />
 
                 <!-- Hole Dimensions -->
-                {#if endEdgeHoleCount > 1}
-                    {@const firstHoleX = rectX + endEdgePitchPx}
-                    {@const secondHoleX = rectX + 2 * endEdgePitchPx}
-                    {@const lastHoleX =
-                        rectX + endEdgeHoleCount * endEdgePitchPx}
-                    {@const holeCenterY = rectY + endEdgeHeightPx / 2}
-
-                    <!-- Top Dimension Position (Pitch) -->
-                    {@const dimY_top = holeCenterY - endEdgeHoleSizePx / 2 - 20}
+                {#if holeCount > 1}
+                    {@const firstHoleX = rectX + pitchPx}
+                    {@const secondHoleX = rectX + 2 * pitchPx}
+                    {@const lastHoleX = rectX + holeCount * pitchPx}
+                    {@const holeCenterY = rectY + heightPx / 2}
 
                     <!-- Bottom Dimension Position (Total) -->
-                    {@const dimY_bottom =
-                        holeCenterY + endEdgeHoleSizePx / 2 + 20}
+                    {@const dimY_bottom = holeCenterY + holeSizePx / 2 + 20}
 
                     <!-- Total Distance Dimension Position (Lower) -->
                     {@const dimY_total = dimY_bottom + 30}
@@ -642,7 +585,7 @@
                         <!-- Extension lines (going down) -->
                         <line
                             x1={firstHoleX}
-                            y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
+                            y1={holeCenterY + holeSizePx / 2 + 5}
                             x2={firstHoleX}
                             y2={dimY_bottom + 10}
                             stroke="#9ca3af"
@@ -651,7 +594,7 @@
                         />
                         <line
                             x1={secondHoleX}
-                            y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
+                            y1={holeCenterY + holeSizePx / 2 + 5}
                             x2={secondHoleX}
                             y2={dimY_bottom + 10}
                             stroke="#9ca3af"
@@ -667,8 +610,8 @@
                             y2={dimY_bottom}
                             stroke="#374151"
                             stroke-width="1.5"
-                            marker-start="url(#end-arrow-start)"
-                            marker-end="url(#end-arrow-end)"
+                            marker-start="url(#arrow-start-{config.id})"
+                            marker-end="url(#arrow-end-{config.id})"
                         />
                         <text
                             x={firstHoleX + (secondHoleX - firstHoleX) / 2}
@@ -677,17 +620,17 @@
                             font-size="12"
                             text-anchor="middle"
                         >
-                            {endEdgePitch} mm
+                            {pitch} mm
                         </text>
                     </g>
 
                     <!-- First to Last Hole (Total) - BOTTOM - Only if more than 2 holes -->
-                    {#if endEdgeHoleCount > 2}
+                    {#if holeCount > 2}
                         <g class="dimension-line">
                             <!-- Extension lines (going down) -->
                             <line
                                 x1={firstHoleX}
-                                y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
+                                y1={holeCenterY + holeSizePx / 2 + 5}
                                 x2={firstHoleX}
                                 y2={dimY_total + 10}
                                 stroke="#9ca3af"
@@ -696,7 +639,7 @@
                             />
                             <line
                                 x1={lastHoleX}
-                                y1={holeCenterY + endEdgeHoleSizePx / 2 + 5}
+                                y1={holeCenterY + holeSizePx / 2 + 5}
                                 x2={lastHoleX}
                                 y2={dimY_total + 10}
                                 stroke="#9ca3af"
@@ -712,8 +655,8 @@
                                 y2={dimY_total}
                                 stroke="#374151"
                                 stroke-width="1.5"
-                                marker-start="url(#end-arrow-start)"
-                                marker-end="url(#end-arrow-end)"
+                                marker-start="url(#arrow-start-{config.id})"
+                                marker-end="url(#arrow-end-{config.id})"
                             />
                             <text
                                 x={firstHoleX + (lastHoleX - firstHoleX) / 2}
@@ -722,22 +665,11 @@
                                 font-size="12"
                                 text-anchor="middle"
                             >
-                                {endEdgeTotalHoleDistance} mm
+                                {totalHoleDistance} mm
                             </text>
                         </g>
                     {/if}
                 {/if}
-                <circle
-                    cx={rectX + endEdgeWidthPx}
-                    cy={rectY + endEdgeHeightPx}
-                    r="6"
-                    fill="#ef4444"
-                    class="resize-handle"
-                    onmousedown={handleResizeMouseDown}
-                    role="button"
-                    tabindex="0"
-                    aria-label="Resize handle"
-                />
             </svg>
         </div>
     </div>
@@ -801,37 +733,37 @@
         color: var(--color-white);
     }
 
-    .icon-btn:active {
-        transform: scale(0.95);
-    }
-
     .reset-btn {
-        margin-left: 0.25rem;
         border-left: 1px solid rgba(255, 255, 255, 0.1);
         padding-left: 0.5rem;
-        border-radius: 0 6px 6px 0;
+        margin-left: 0.25rem;
     }
 
-    .svg-container {
-        border-radius: 12px;
-        overflow: hidden;
-        background: white;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        margin-bottom: 20px;
-        flex: 1;
-        position: relative;
-        min-height: 400px;
+    .export-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(250, 194, 17, 0.1);
+        color: var(--color-gold);
+        border: 1px solid rgba(250, 194, 17, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+        background: rgba(250, 194, 17, 0.2);
+        transform: translateY(-1px);
     }
 
     .dimension-controls {
         display: flex;
-        align-items: center;
         gap: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 0.25rem 0.75rem;
-        border-radius: 8px;
-        margin-right: 0.5rem;
+        margin-right: 1rem;
+        padding-right: 1rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .control-group {
@@ -841,96 +773,66 @@
     }
 
     .control-group label {
-        font-size: 0.9rem;
         color: var(--color-gray);
+        font-size: 0.85rem;
         font-weight: 500;
     }
 
     .dim-input {
+        width: 70px;
         background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
         color: var(--color-white);
         padding: 0.25rem 0.5rem;
-        width: 60px;
+        border-radius: 4px;
         font-size: 0.9rem;
-        transition: all 0.2s;
     }
 
     .dim-input:focus {
         outline: none;
         border-color: var(--color-gold);
-        background: rgba(0, 0, 0, 0.4);
     }
 
-    .svg-wrapper {
-        transform-origin: top left;
+    .svg-container {
         width: 100%;
-        height: 100%;
+        height: 400px;
+        background: #f8fafc; /* Slate 50 */
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .svg-canvas {
-        cursor: move;
-        display: block;
-        background-color: #ffffff;
-        width: 100%;
-        height: 100%;
+        cursor: grab;
     }
 
-    .svg-canvas:hover :global(.rectangle) {
-        stroke-width: 3;
+    .svg-canvas:active {
+        cursor: grabbing;
     }
 
-    :global(.rectangle) {
-        transition: stroke-width 0.2s;
+    .rectangle {
         cursor: move;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    text {
+        font-family:
+            "Inter",
+            -apple-system,
+            sans-serif;
+        font-weight: 500;
+        pointer-events: none;
+        user-select: none;
     }
 
     .resize-handle {
-        cursor: nw-resize;
-        opacity: 0.8;
+        cursor: nwse-resize;
+        transition: r 0.2s;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
     .resize-handle:hover {
-        opacity: 1;
-    }
-
-    .export-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: linear-gradient(135deg, var(--color-gold) 0%, #e5af0e 100%);
-        color: var(--color-black);
-        border: none;
-        padding: 0.6rem 1.2rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(250, 194, 17, 0.25);
-    }
-
-    .export-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(250, 194, 17, 0.35);
-    }
-
-    .export-btn:active {
-        transform: translateY(0);
-    }
-
-    @media (max-width: 768px) {
-        .header-section {
-            justify-content: space-between;
-        }
-
-        .btn-text {
-            display: none;
-        }
-
-        .export-btn {
-            padding: 0.6rem;
-        }
+        r: 8;
     }
 </style>

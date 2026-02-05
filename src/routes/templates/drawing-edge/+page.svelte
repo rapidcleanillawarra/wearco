@@ -1,7 +1,6 @@
 <script lang="ts">
 	import PdfOverlay from "./components/PdfOverlay.svelte";
-	import SvgCenterEdgeDrawing from "./components/SvgCenterEdgeDrawing.svelte";
-	import SvgEndEdgeDrawing from "./components/SvgEndEdgeDrawing.svelte";
+	import SvgGenericEdgeDrawing from "./components/SvgGenericEdgeDrawing.svelte";
 	import edgePdf from "$lib/assets/edge.pdf";
 
 	// Props
@@ -39,27 +38,6 @@
 
 	let savedCenter = getDiagramData("Center Edge", centerDefaults);
 
-	let centerEdgeWidth = $state(savedCenter.width);
-	let centerEdgeHeight = $state(savedCenter.height);
-	let centerEdgeHoleType = $state(savedCenter.holeType);
-	let centerEdgeHoleCount = $state(savedCenter.holeCount);
-	let centerEdgeHoleSize = $state(savedCenter.holeSize);
-	let centerEdgePitch = $state(savedCenter.pitch);
-	let centerEdgeTotalHoleDistance = $state(savedCenter.totalHoleDistance);
-	let centerEdgeHoleLeft = $state(savedCenter.holeLeft);
-	let centerEdgeHoleRight = $state(savedCenter.holeRight);
-
-	// Additional PDF overlay fields
-	let customerName = $state("");
-	let orderNumber = $state("");
-	let date = $state(new Date().toISOString().split("T")[0]); // Today's date
-	let material = $state("");
-
-	// SVG-specific values (internal to drawing, not from PDF)
-	let centerEdgeWidthPx = $state(savedCenter.widthPx);
-	let centerEdgeHeightPx = $state(savedCenter.heightPx);
-	let centerEdgeHoleSizePx = $state(savedCenter.holeSizePx);
-
 	// End Edge state values
 	let endDefaults = {
 		width: 300,
@@ -74,59 +52,99 @@
 		widthPx: 300,
 		heightPx: 100,
 		holeSizePx: 20,
+		rectX: 50,
+		rectY: 50,
 	};
 
 	let savedEnd = getDiagramData("End Edge", endDefaults);
 
-	let endEdgeWidthPx = $state(savedEnd.widthPx);
-	let endEdgeHeightPx = $state(savedEnd.heightPx);
-	let endEdgeHoleType = $state(savedEnd.holeType);
-	let endEdgeHoleCount = $state(savedEnd.holeCount);
-	let endEdgeHoleSizePx = $state(savedEnd.holeSizePx);
-	let endEdgeWidth = $state(savedEnd.width);
-	let endEdgeHeight = $state(savedEnd.height);
-	let endEdgeHoleSize = $state(savedEnd.holeSize);
-	let endEdgePitch = $state(savedEnd.pitch);
-	let endEdgeTotalHoleDistance = $state(savedEnd.totalHoleDistance);
-	let endEdgeHoleLeft = $state(savedEnd.holeLeft);
-	let endEdgeHoleRight = $state(savedEnd.holeRight);
+	// Consolidate all state into a single reactive object
+	// This makes it easy to bind to dynamic field names
+	let formData = $state({
+		// Center Edge Defaults
+		centerEdgeWidth: savedCenter.width,
+		centerEdgeHeight: savedCenter.height,
+		centerEdgeHoleType: savedCenter.holeType,
+		centerEdgeHoleCount: savedCenter.holeCount,
+		centerEdgeHoleSize: savedCenter.holeSize,
+		centerEdgePitch: savedCenter.pitch,
+		centerEdgeTotalHoleDistance: savedCenter.totalHoleDistance,
+		centerEdgeHoleLeft: savedCenter.holeLeft,
+		centerEdgeHoleRight: savedCenter.holeRight,
+		centerEdgeWidthPx: savedCenter.widthPx,
+		centerEdgeHeightPx: savedCenter.heightPx,
+		centerEdgeHoleSizePx: savedCenter.holeSizePx,
+		centerEdgeRectX: savedCenter.rectX || 50,
+		centerEdgeRectY: savedCenter.rectY || 50,
+
+		// End Edge Defaults
+		endEdgeWidth: savedEnd.width,
+		endEdgeHeight: savedEnd.height,
+		endEdgeHoleType: savedEnd.holeType,
+		endEdgeHoleCount: savedEnd.holeCount,
+		endEdgeHoleSize: savedEnd.holeSize,
+		endEdgePitch: savedEnd.pitch,
+		endEdgeTotalHoleDistance: savedEnd.totalHoleDistance,
+		endEdgeHoleLeft: savedEnd.holeLeft,
+		endEdgeHoleRight: savedEnd.holeRight,
+		endEdgeWidthPx: savedEnd.widthPx,
+		endEdgeHeightPx: savedEnd.heightPx,
+		endEdgeHoleSizePx: savedEnd.holeSizePx,
+		endEdgeRectX: savedEnd.rectX || 50,
+		endEdgeRectY: savedEnd.rectY || 50,
+
+		// PDF Overlay Extras
+		customerName: "",
+		orderNumber: "",
+		date: new Date().toISOString().split("T")[0],
+		material: "",
+	});
 
 	let isSaving = $state(false);
 
 	function prepareSaveData() {
+		// Use the naming convention from the config to map back to the save structure
+		// For backward compatibility, we reconstruct the specific objects expected by the server
+		// Or update the server to handle generic data.
+		// For now, let's keep the server format: Array of { name, data }
+
 		return JSON.stringify([
 			{
 				name: "Center Edge",
 				data: {
-					width: centerEdgeWidth,
-					height: centerEdgeHeight,
-					holeType: centerEdgeHoleType,
-					holeCount: centerEdgeHoleCount,
-					holeSize: centerEdgeHoleSize,
-					pitch: centerEdgePitch,
-					totalHoleDistance: centerEdgeTotalHoleDistance,
-					holeLeft: centerEdgeHoleLeft,
-					holeRight: centerEdgeHoleRight,
-					widthPx: centerEdgeWidthPx,
-					heightPx: centerEdgeHeightPx,
-					holeSizePx: centerEdgeHoleSizePx,
+					width: formData.centerEdgeWidth,
+					height: formData.centerEdgeHeight,
+					holeType: formData.centerEdgeHoleType,
+					holeCount: formData.centerEdgeHoleCount,
+					holeSize: formData.centerEdgeHoleSize,
+					pitch: formData.centerEdgePitch,
+					totalHoleDistance: formData.centerEdgeTotalHoleDistance,
+					holeLeft: formData.centerEdgeHoleLeft,
+					holeRight: formData.centerEdgeHoleRight,
+					widthPx: formData.centerEdgeWidthPx,
+					heightPx: formData.centerEdgeHeightPx,
+					holeSizePx: formData.centerEdgeHoleSizePx,
+					rectX: formData.centerEdgeRectX,
+					rectY: formData.centerEdgeRectY,
 				},
 			},
 			{
 				name: "End Edge",
 				data: {
-					width: endEdgeWidth,
-					height: endEdgeHeight,
-					holeType: endEdgeHoleType,
-					holeCount: endEdgeHoleCount,
-					holeSize: endEdgeHoleSize,
-					pitch: endEdgePitch,
-					totalHoleDistance: endEdgeTotalHoleDistance,
-					holeLeft: endEdgeHoleLeft,
-					holeRight: endEdgeHoleRight,
-					widthPx: endEdgeWidthPx,
-					heightPx: endEdgeHeightPx,
-					holeSizePx: endEdgeHoleSizePx,
+					width: formData.endEdgeWidth,
+					height: formData.endEdgeHeight,
+					holeType: formData.endEdgeHoleType,
+					holeCount: formData.endEdgeHoleCount,
+					holeSize: formData.endEdgeHoleSize,
+					pitch: formData.endEdgePitch,
+					totalHoleDistance: formData.endEdgeTotalHoleDistance,
+					holeLeft: formData.endEdgeHoleLeft,
+					holeRight: formData.endEdgeHoleRight,
+					widthPx: formData.endEdgeWidthPx,
+					heightPx: formData.endEdgeHeightPx,
+					holeSizePx: formData.endEdgeHoleSizePx,
+					rectX: formData.endEdgeRectX,
+					rectY: formData.endEdgeRectY,
 				},
 			},
 		]);
@@ -214,73 +232,55 @@
 			</div>
 			<PdfOverlay
 				overlayFieldsConfig={overlayConfig}
-				bind:centerEdgeWidth
-				bind:centerEdgeHeight
-				bind:centerEdgeHoleCount
-				bind:centerEdgeHoleSize
-				bind:centerEdgeHoleType
-				bind:centerEdgePitch
-				bind:centerEdgeTotalHoleDistance
-				bind:centerEdgeHoleLeft
-				bind:centerEdgeHoleRight
-				bind:endEdgeWidth
-				bind:endEdgeHeight
-				bind:endEdgeHoleCount
-				bind:endEdgeHoleSize
-				bind:endEdgeHoleType
-				bind:endEdgePitch
-				bind:endEdgeTotalHoleDistance
-				bind:endEdgeHoleLeft
-				bind:endEdgeHoleRight
-				bind:customerName
-				bind:orderNumber
-				bind:date
-				bind:material
+				bind:centerEdgeWidth={formData.centerEdgeWidth}
+				bind:centerEdgeHeight={formData.centerEdgeHeight}
+				bind:centerEdgeHoleCount={formData.centerEdgeHoleCount}
+				bind:centerEdgeHoleSize={formData.centerEdgeHoleSize}
+				bind:centerEdgeHoleType={formData.centerEdgeHoleType}
+				bind:centerEdgePitch={formData.centerEdgePitch}
+				bind:centerEdgeTotalHoleDistance={
+					formData.centerEdgeTotalHoleDistance
+				}
+				bind:centerEdgeHoleLeft={formData.centerEdgeHoleLeft}
+				bind:centerEdgeHoleRight={formData.centerEdgeHoleRight}
+				bind:endEdgeWidth={formData.endEdgeWidth}
+				bind:endEdgeHeight={formData.endEdgeHeight}
+				bind:endEdgeHoleCount={formData.endEdgeHoleCount}
+				bind:endEdgeHoleSize={formData.endEdgeHoleSize}
+				bind:endEdgeHoleType={formData.endEdgeHoleType}
+				bind:endEdgePitch={formData.endEdgePitch}
+				bind:endEdgeTotalHoleDistance={
+					formData.endEdgeTotalHoleDistance
+				}
+				bind:endEdgeHoleLeft={formData.endEdgeHoleLeft}
+				bind:endEdgeHoleRight={formData.endEdgeHoleRight}
+				bind:customerName={formData.customerName}
+				bind:orderNumber={formData.orderNumber}
+				bind:date={formData.date}
+				bind:material={formData.material}
 				pdfUrl={edgePdf}
 			/>
 		</section>
 
-		<!-- SVG Drawing Section -->
-		<section class="section-card svg-section">
-			<div class="section-header">
-				<h2>Center Edge Preview</h2>
+		<!-- Dynamic SVG Drawing Sections -->
+		{#if template.template_data.drawings}
+			{#each template.template_data.drawings as drawing}
+				<section class="section-card svg-section">
+					<div class="section-header">
+						<h2>{drawing.title}</h2>
+					</div>
+					<SvgGenericEdgeDrawing
+						config={drawing}
+						bind:data={formData}
+					/>
+				</section>
+			{/each}
+		{:else}
+			<!-- Fallback if no drawings configured (or while migrating) -->
+			<div class="section-card">
+				<p>No drawings configured for this template.</p>
 			</div>
-			<SvgCenterEdgeDrawing
-				bind:centerEdgeWidthPx
-				bind:centerEdgeHeightPx
-				bind:centerEdgeHoleType
-				bind:centerEdgeHoleCount
-				bind:centerEdgeHoleSizePx
-				bind:centerEdgeWidth
-				bind:centerEdgeHeight
-				bind:centerEdgeHoleSize
-				bind:centerEdgePitch
-				bind:centerEdgeTotalHoleDistance
-				bind:centerEdgeHoleLeft
-				bind:centerEdgeHoleRight
-			/>
-		</section>
-
-		<!-- End Edge SVG Drawing Section -->
-		<section class="section-card svg-section">
-			<div class="section-header">
-				<h2>End Edge Preview</h2>
-			</div>
-			<SvgEndEdgeDrawing
-				bind:endEdgeWidthPx
-				bind:endEdgeHeightPx
-				bind:endEdgeHoleType
-				bind:endEdgeHoleCount
-				bind:endEdgeHoleSizePx
-				bind:endEdgeWidth
-				bind:endEdgeHeight
-				bind:endEdgeHoleSize
-				bind:endEdgePitch
-				bind:endEdgeTotalHoleDistance
-				bind:endEdgeHoleLeft
-				bind:endEdgeHoleRight
-			/>
-		</section>
+		{/if}
 	</main>
 </div>
 
