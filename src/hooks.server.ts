@@ -6,7 +6,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // Routes that require authentication
-const protectedRoutes = ['/dashboard', '/templates', '/customers']
+const protectedRoutes = ['/dashboard', '/templates', '/customers', '/drawings']
 
 export const handle: Handle = async ({ event, resolve }) => {
     // console.log('🔒 [hooks] Processing request:', event.url.pathname)

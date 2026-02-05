@@ -1,11 +1,8 @@
 import type { PageServerLoad } from './$types'
-import { getSupabaseClient } from '$lib/supabase.server'
 import type { WearcoDrawing } from '$lib/types/template'
 
-export const load: PageServerLoad = async () => {
-  const supabase = getSupabaseClient()
-
-  const { data: drawings, error } = await supabase
+export const load: PageServerLoad = async ({ locals }) => {
+  const { data: drawings, error } = await locals.supabase
     .from('wearco_drawings')
     .select('*')
     .is('deleted_at', null)

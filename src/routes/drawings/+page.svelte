@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { WearcoDrawing } from "$lib/types/template";
 
-	let { data } = $props<{ drawings: WearcoDrawing[]; error?: string }>();
+	let { data } = $props<{ data: { drawings?: WearcoDrawing[]; error?: string } }>();
+
+	// Safe access to drawings from wearco_drawings (merged layout + page data)
+	const drawings = $derived(data?.drawings ?? []);
+	const loadError = $derived(data?.error);
 
 	// View mode state
 	let viewMode: "card" | "list" = $state("card");
@@ -164,16 +168,16 @@
 
 	<!-- Main Content -->
 	<main class="templates-main">
-		{#if data.error}
+		{#if loadError}
 			<div class="error-state">
 				<span class="error-icon">⚠️</span>
-				<p>Error loading templates: {data.error}</p>
+				<p>Error loading drawings: {loadError}</p>
 			</div>
 		{:else}
 			<!-- Card View -->
 			{#if viewMode === "card"}
 				<div class="cards-grid">
-					{#each data.drawings as drawing, index}
+					{#each drawings as drawing, index}
 						<article
 							class="template-card"
 							style="--animation-delay: {index * 0.1}s"
@@ -310,7 +314,7 @@
 						<span class="list-col date-col">Last Updated</span>
 						<span class="list-col actions-col">Actions</span>
 					</div>
-					{#each data.drawings as drawing, index}
+					{#each drawings as drawing, index}
 						<div
 							class="list-row"
 							style="--animation-delay: {index * 0.05}s"
@@ -402,7 +406,7 @@
 				</div>
 			{/if}
 
-			{#if data.drawings.length === 0}
+			{#if drawings.length === 0}
 				<div class="empty-state">
 					<h3>No drawings yet</h3>
 					<p>Create your first drawing to get started</p>
