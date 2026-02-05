@@ -39,7 +39,8 @@
     let resizeStart = $state({ width: 0, height: 0 });
 
     // SVG canvas dimensions
-    let svgWidth = $state(600);
+    let containerWidth = $state(600);
+    let svgWidth = $derived(Math.max(containerWidth, centerEdgeWidthPx + 100));
     const svgHeight = 400;
 
     // Zoom functionality
@@ -355,8 +356,8 @@
         </div>
     </div>
 
-    <!-- Bind container clientWidth to svgWidth state -->
-    <div class="svg-container" bind:clientWidth={svgWidth}>
+    <!-- Bind container clientWidth to containerWidth state -->
+    <div class="svg-container" bind:clientWidth={containerWidth}>
         <div
             class="svg-wrapper"
             style="transform: scale({zoomLevel}); transform-origin: top left; width: 100%; height: 100%;"
@@ -794,16 +795,21 @@
 
     .svg-container {
         border-radius: 12px;
-        overflow: hidden;
+        overflow: auto; /* changed from hidden */
         background: white;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
         flex: 1;
         position: relative;
         min-height: 400px;
+        display: flex;
+        justify-content: center; /* center horizontally */
+        align-items: flex-start; /* top align generally better */
     }
 
     .svg-wrapper {
+        flex-shrink: 0; /* don't shrink */
+        margin: auto; /* center if smaller than container */
         transform-origin: top left;
         width: 100%;
         height: 100%;
