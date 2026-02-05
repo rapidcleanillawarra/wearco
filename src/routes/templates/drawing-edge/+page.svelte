@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PdfOverlay from "./components/PdfOverlay.svelte";
-	import SvgGenericEdgeDrawing from "./components/SvgGenericEdgeDrawing.svelte";
+	import SvgGenericDrawing from "./components/SvgGenericDrawing.svelte";
 	import edgePdf from "$lib/assets/edge.pdf";
 
 	// Props
@@ -269,10 +269,7 @@
 					<div class="section-header">
 						<h2>{drawing.title}</h2>
 					</div>
-					<SvgGenericEdgeDrawing
-						config={drawing}
-						bind:data={formData}
-					/>
+					<SvgGenericDrawing config={drawing} bind:data={formData} />
 				</section>
 			{/each}
 		{:else}
