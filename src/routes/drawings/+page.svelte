@@ -404,23 +404,9 @@
 
 			{#if data.drawings.length === 0}
 				<div class="empty-state">
-					<div class="empty-icon">📋</div>
 					<h3>No drawings yet</h3>
 					<p>Create your first drawing to get started</p>
-					<button class="new-template-btn" onclick={openModal}>
-						<svg
-							width="18"
-							height="18"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-						>
-							<line x1="12" y1="5" x2="12" y2="19" />
-							<line x1="5" y1="12" x2="19" y2="12" />
-						</svg>
-						<span>New Drawing</span>
-					</button>
+					
 				</div>
 			{/if}
 		{/if}
