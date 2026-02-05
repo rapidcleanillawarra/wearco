@@ -159,10 +159,10 @@
 				selectedDrawingType === "center-edge" ||
 				selectedDrawingType === "end-edge"
 			) {
-				window.location.href = `/templates/drawing-edge`;
+				window.location.href = `/drawings/drawing-edge`;
 			} else {
 				// For other types, we can add more navigation later
-				window.location.href = `/templates/drawing-edge`;
+				window.location.href = `/drawings/drawing-edge`;
 			}
 		}
 	}
@@ -344,7 +344,7 @@
 							</div>
 							<div class="card-actions">
 								<a
-									href="/templates/edit-edge/{template.id}"
+									href="/drawings/edit-edge/{template.id}"
 									class="action-btn edit-btn"
 								>
 									<svg
@@ -437,7 +437,7 @@
 							>
 							<span class="list-col actions-col">
 								<a
-									href="/templates/edit-edge/{template.id}"
+									href="/drawings/edit-edge/{template.id}"
 									class="row-action"
 								>
 									<svg

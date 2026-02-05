@@ -204,7 +204,7 @@
 						{/if}
 					</button>
 				</form>
-				<a href="/templates" class="back-btn">
+				<a href="/drawings" class="back-btn">
 					<svg
 						width="20"
 						height="20"

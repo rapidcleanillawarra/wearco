@@ -50,7 +50,7 @@
                 managing customers.
             </p>
             <div class="quick-actions">
-                <a href="/templates" class="action-card">
+                <a href="/drawings" class="action-card">
                     <span class="action-icon">📐</span>
                     <span class="action-title">Templates</span>
                     <span class="action-desc">Manage drawings</span>

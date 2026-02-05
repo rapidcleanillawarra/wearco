@@ -16,7 +16,7 @@
 	// Navigation items
 	const navItems = [
 		{ name: "Dashboard", href: "/dashboard" },
-		{ name: "Templates", href: "/templates" },
+		{ name: "Drawings", href: "/drawings" },
 		{ name: "Customers", href: "/customers" },
 	];
 
