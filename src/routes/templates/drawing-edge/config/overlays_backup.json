@@ -418,6 +418,136 @@
             },
             "bindsTo": "topSideAngle",
             "fontSize": 10
+        },
+        {
+            "id": "generalQuantity",
+            "type": "number",
+            "label": "Quantity",
+            "position": {
+                "x": 300,
+                "y": 480,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "generalQuantity",
+            "fontSize": 10
+        },
+        {
+            "id": "generalJobNumber",
+            "type": "text",
+            "label": "Job Number",
+            "position": {
+                "x": 300,
+                "y": 505,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "generalJobNumber",
+            "fontSize": 10
+        },
+        {
+            "id": "generalWorkOrder",
+            "type": "text",
+            "label": "Work Order",
+            "position": {
+                "x": 300,
+                "y": 530,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "generalWorkOrder",
+            "fontSize": 10
+        },
+        {
+            "id": "generalDwgNumber",
+            "type": "text",
+            "label": "DWG Number",
+            "position": {
+                "x": 300,
+                "y": 555,
+                "width": 60,
+                "height": 12
+            },
+            "bindsTo": "generalDwgNumber",
+            "fontSize": 10
+        },
+        {
+            "id": "generalDl",
+            "type": "text",
+            "label": "DL",
+            "position": {
+                "x": 420,
+                "y": 478,
+                "width": 100,
+                "height": 12
+            },
+            "bindsTo": "generalDl",
+            "fontSize": 10
+        },
+        {
+            "id": "generalCheckedBy",
+            "type": "text",
+            "label": "Checked By",
+            "position": {
+                "x": 445,
+                "y": 505,
+                "width": 80,
+                "height": 12
+            },
+            "bindsTo": "generalCheckedBy",
+            "fontSize": 10
+        },
+        {
+            "id": "generalProgBy",
+            "type": "text",
+            "label": "Prog By",
+            "position": {
+                "x": 437,
+                "y": 530,
+                "width": 90,
+                "height": 12
+            },
+            "bindsTo": "generalProgBy",
+            "fontSize": 10
+        },
+        {
+            "id": "generalCustomer",
+            "type": "text",
+            "label": "Customer",
+            "position": {
+                "x": 584,
+                "y": 510,
+                "width": 200,
+                "height": 12
+            },
+            "bindsTo": "generalCustomer",
+            "fontSize": 10
+        },
+        {
+            "id": "generalMaterial",
+            "type": "text",
+            "label": "Material",
+            "position": {
+                "x": 540,
+                "y": 555,
+                "width": 120,
+                "height": 12
+            },
+            "bindsTo": "generalMaterial",
+            "fontSize": 10
+        },
+        {
+            "id": "generalThk",
+            "type": "text",
+            "label": "THK",
+            "position": {
+                "x": 685,
+                "y": 555,
+                "width": 125,
+                "height": 12
+            },
+            "bindsTo": "generalThk",
+            "fontSize": 10
         }
     ]
 }
