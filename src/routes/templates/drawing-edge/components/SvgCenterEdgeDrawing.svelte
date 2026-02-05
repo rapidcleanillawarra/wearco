@@ -285,6 +285,58 @@
 <div class="svg-drawing-container">
     <div class="header-section">
         <div class="editor-controls">
+            <div class="zoom-controls">
+                <button
+                    class="icon-btn"
+                    onclick={zoomOut}
+                    aria-label="Zoom Out"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+                <span class="zoom-level">{Math.round(zoomLevel * 100)}%</span>
+                <button class="icon-btn" onclick={zoomIn} aria-label="Zoom In">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+                <button
+                    class="icon-btn reset-btn"
+                    onclick={resetZoom}
+                    aria-label="Reset Zoom"
+                    title="Reset Zoom"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                        />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                </button>
+            </div>
             <button class="export-btn" onclick={exportSvg}>
                 <svg
                     width="16"
@@ -298,7 +350,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Export SVG
+                <span class="btn-text">Export SVG</span>
             </button>
         </div>
     </div>
@@ -688,6 +740,56 @@
     .editor-controls {
         display: flex;
         align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .zoom-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.25rem;
+        border-radius: 8px;
+    }
+
+    .zoom-level {
+        font-variant-numeric: tabular-nums;
+        font-size: 0.9rem;
+        color: var(--color-gray);
+        min-width: 3.5ch;
+        text-align: center;
+    }
+
+    .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: var(--color-gray);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-white);
+    }
+
+    .icon-btn:active {
+        transform: scale(0.95);
+    }
+
+    .reset-btn {
+        margin-left: 0.25rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        padding-left: 0.5rem;
+        border-radius: 0 6px 6px 0;
     }
 
     .svg-container {
@@ -756,5 +858,19 @@
 
     .export-btn:active {
         transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            justify-content: space-between;
+        }
+
+        .btn-text {
+            display: none;
+        }
+
+        .export-btn {
+            padding: 0.6rem;
+        }
     }
 </style>
