@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { WearcoTemplate } from "$lib/types/template";
+	import type { WearcoDrawing } from "$lib/types/template";
 
-	let { data } = $props<{ templates: WearcoTemplate[]; error?: string }>();
+	let { data } = $props<{ drawings: WearcoDrawing[]; error?: string }>();
 
 	// View mode state
 	let viewMode: "card" | "list" = $state("card");
@@ -10,93 +10,6 @@
 	let showModal = $state(false);
 	let selectedDrawingType: string | null = $state(null);
 
-	// Mock template data for drawings/diagrams
-	const mockTemplates = [
-		{
-			id: "1",
-			template_name: "Center Edge Diagram",
-			template_code: "CED-001",
-			customer: "Industrial Corp",
-			category: "Edge",
-			dimension_schema: { width: 200, height: 150, holes: 5 },
-			template_data: { pitch: 40, holeSize: 10 },
-			created_by: "John Doe",
-			created_at: "2024-01-15T10:30:00Z",
-			updated_at: "2024-01-20T14:45:00Z",
-			drawingType: "center-edge",
-			thumbnail: "📐",
-		},
-		{
-			id: "2",
-			template_name: "End Edge Blueprint",
-			template_code: "EEB-002",
-			customer: "Tech Solutions",
-			category: "Edge",
-			dimension_schema: { width: 180, height: 120, holes: 3 },
-			template_data: { pitch: 35, holeSize: 8 },
-			created_by: "Jane Smith",
-			created_at: "2024-01-18T09:15:00Z",
-			updated_at: "2024-01-22T11:30:00Z",
-			drawingType: "end-edge",
-			thumbnail: "📏",
-		},
-		{
-			id: "3",
-			template_name: "Precision Layout A",
-			template_code: "PLA-003",
-			customer: "Manufacturing Ltd",
-			category: "Layout",
-			dimension_schema: { width: 250, height: 180, holes: 7 },
-			template_data: { pitch: 45, holeSize: 12 },
-			created_by: "Mike Johnson",
-			created_at: "2024-01-10T08:00:00Z",
-			updated_at: "2024-01-25T16:20:00Z",
-			drawingType: "center-edge",
-			thumbnail: "🔧",
-		},
-		{
-			id: "4",
-			template_name: "Custom Perforator",
-			template_code: "CP-004",
-			customer: "Custom Works",
-			category: "Perforation",
-			dimension_schema: { width: 300, height: 200, holes: 10 },
-			template_data: { pitch: 50, holeSize: 15 },
-			created_by: "Sarah Wilson",
-			created_at: "2024-01-20T12:00:00Z",
-			updated_at: "2024-01-28T09:15:00Z",
-			drawingType: "end-edge",
-			thumbnail: "⚙️",
-		},
-		{
-			id: "5",
-			template_name: "Standard Edge V2",
-			template_code: "SEV-005",
-			customer: "Edge Masters",
-			category: "Edge",
-			dimension_schema: { width: 220, height: 160, holes: 6 },
-			template_data: { pitch: 42, holeSize: 11 },
-			created_by: "Alex Brown",
-			created_at: "2024-01-22T15:30:00Z",
-			updated_at: "2024-01-30T10:45:00Z",
-			drawingType: "center-edge",
-			thumbnail: "📊",
-		},
-		{
-			id: "6",
-			template_name: "Heavy Duty Frame",
-			template_code: "HDF-006",
-			customer: "Steel Industries",
-			category: "Frame",
-			dimension_schema: { width: 400, height: 280, holes: 12 },
-			template_data: { pitch: 60, holeSize: 18 },
-			created_by: "Chris Lee",
-			created_at: "2024-01-25T11:00:00Z",
-			updated_at: "2024-02-01T08:30:00Z",
-			drawingType: "end-edge",
-			thumbnail: "🏗️",
-		},
-	];
 
 	// Drawing types for the modal
 	const drawingTypes = [
@@ -152,7 +65,7 @@
 		selectedDrawingType = typeId;
 	}
 
-	function createTemplate() {
+	function createDrawing() {
 		if (selectedDrawingType) {
 			// Navigate to the appropriate drawing editor
 			if (
@@ -181,9 +94,9 @@
 	<header class="page-header">
 		<div class="header-content">
 			<div class="title-section">
-				<h1>Templates</h1>
+				<h1>Drawings</h1>
 				<p class="subtitle">
-					Manage your drawing templates and diagrams
+					Manage your drawings and work orders
 				</p>
 			</div>
 			<div class="header-actions">
@@ -230,7 +143,7 @@
 					</button>
 				</div>
 
-				<!-- New Template Button -->
+				<!-- New Drawing Button -->
 				<button class="new-template-btn" onclick={openModal}>
 					<svg
 						width="18"
@@ -243,7 +156,7 @@
 						<line x1="12" y1="5" x2="12" y2="19" />
 						<line x1="5" y1="12" x2="19" y2="12" />
 					</svg>
-					<span>New Template</span>
+					<span>New Drawing</span>
 				</button>
 			</div>
 		</div>
@@ -260,25 +173,23 @@
 			<!-- Card View -->
 			{#if viewMode === "card"}
 				<div class="cards-grid">
-					{#each mockTemplates as template, index}
+					{#each data.drawings as drawing, index}
 						<article
 							class="template-card"
 							style="--animation-delay: {index * 0.1}s"
 						>
 							<div class="card-thumbnail">
-								<span class="thumbnail-icon"
-									>{template.thumbnail}</span
-								>
+								<span class="thumbnail-icon">📐</span>
 								<div class="card-badge">
-									{template.category}
+									{drawing.quantity || 1} pcs
 								</div>
 							</div>
 							<div class="card-content">
 								<h3 class="card-title">
-									{template.template_name}
+									{drawing.name || drawing.drawing_number || `Drawing ${drawing.id.slice(0, 8)}`}
 								</h3>
 								<p class="card-code">
-									{template.template_code}
+									{drawing.job_number || drawing.work_order || 'No Job #'}
 								</p>
 								<div class="card-meta">
 									<span class="meta-item">
@@ -295,7 +206,7 @@
 											/>
 											<circle cx="12" cy="7" r="4" />
 										</svg>
-										{template.customer}
+										{drawing.customer || 'No Customer'}
 									</span>
 									<span class="meta-item">
 										<svg
@@ -328,23 +239,18 @@
 												y2="10"
 											/>
 										</svg>
-										{formatDate(template.updated_at)}
+										{formatDate(drawing.updated_at)}
 									</span>
 								</div>
 								<div class="card-dimensions">
-									<span class="dimension"
-										>{template.dimension_schema.width} × {template
-											.dimension_schema.height} mm</span
-									>
+									<span class="dimension">{drawing.material || 'No Material'}</span>
 									<span class="separator">•</span>
-									<span class="holes"
-										>{template.dimension_schema.holes} holes</span
-									>
+									<span class="holes">{drawing.thk || 'No Thickness'}</span>
 								</div>
 							</div>
 							<div class="card-actions">
 								<a
-									href="/drawings/edit-edge/{template.id}"
+									href="/drawings/edit/{drawing.id}"
 									class="action-btn edit-btn"
 								>
 									<svg
@@ -396,48 +302,45 @@
 			{:else}
 				<div class="list-container">
 					<div class="list-header">
-						<span class="list-col name-col">Template</span>
-						<span class="list-col code-col">Code</span>
+						<span class="list-col name-col">Drawing</span>
+						<span class="list-col code-col">Job/Work Order</span>
 						<span class="list-col customer-col">Customer</span>
-						<span class="list-col category-col">Category</span>
-						<span class="list-col dimensions-col">Dimensions</span>
+						<span class="list-col category-col">Material</span>
+						<span class="list-col dimensions-col">Thickness</span>
 						<span class="list-col date-col">Last Updated</span>
 						<span class="list-col actions-col">Actions</span>
 					</div>
-					{#each mockTemplates as template, index}
+					{#each data.drawings as drawing, index}
 						<div
 							class="list-row"
 							style="--animation-delay: {index * 0.05}s"
 						>
 							<span class="list-col name-col">
-								<span class="row-icon"
-									>{template.thumbnail}</span
-								>
+								<span class="row-icon">📐</span>
 								<span class="row-name"
-									>{template.template_name}</span
+									>{drawing.name || drawing.drawing_number || `Drawing ${drawing.id.slice(0, 8)}`}</span
 								>
 							</span>
 							<span class="list-col code-col"
-								>{template.template_code}</span
+								>{drawing.job_number || drawing.work_order || 'No Job #'}</span
 							>
 							<span class="list-col customer-col"
-								>{template.customer}</span
+								>{drawing.customer || 'No Customer'}</span
 							>
 							<span class="list-col category-col">
 								<span class="category-badge"
-									>{template.category}</span
+									>{drawing.material || 'No Material'}</span
 								>
 							</span>
 							<span class="list-col dimensions-col">
-								{template.dimension_schema.width} × {template
-									.dimension_schema.height}
+								{drawing.thk || 'No Thickness'}
 							</span>
 							<span class="list-col date-col"
-								>{formatDate(template.updated_at)}</span
+								>{formatDate(drawing.updated_at)}</span
 							>
 							<span class="list-col actions-col">
 								<a
-									href="/drawings/edit-edge/{template.id}"
+									href="/drawings/edit/{drawing.id}"
 									class="row-action"
 								>
 									<svg
@@ -499,11 +402,11 @@
 				</div>
 			{/if}
 
-			{#if mockTemplates.length === 0}
+			{#if data.drawings.length === 0}
 				<div class="empty-state">
 					<div class="empty-icon">📋</div>
-					<h3>No templates yet</h3>
-					<p>Create your first template to get started</p>
+					<h3>No drawings yet</h3>
+					<p>Create your first drawing to get started</p>
 					<button class="new-template-btn" onclick={openModal}>
 						<svg
 							width="18"
@@ -516,7 +419,7 @@
 							<line x1="12" y1="5" x2="12" y2="19" />
 							<line x1="5" y1="12" x2="19" y2="12" />
 						</svg>
-						<span>New Template</span>
+						<span>New Drawing</span>
 					</button>
 				</div>
 			{/if}
@@ -534,7 +437,7 @@
 	>
 		<div class="modal-container" onclick={(e) => e.stopPropagation()}>
 			<div class="modal-header">
-				<h2>Create New Template</h2>
+				<h2>Create New Drawing</h2>
 				<p class="modal-subtitle">Select a drawing type to begin</p>
 				<button
 					class="modal-close"
@@ -597,10 +500,10 @@
 				<button class="cancel-btn" onclick={closeModal}>Cancel</button>
 				<button
 					class="create-btn"
-					onclick={createTemplate}
+					onclick={createDrawing}
 					disabled={!selectedDrawingType}
 				>
-					<span>Create Template</span>
+					<span>Create Drawing</span>
 					<svg
 						width="18"
 						height="18"
