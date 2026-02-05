@@ -78,7 +78,6 @@
 						<form
 							action="/auth/logout"
 							method="POST"
-							use:enhance
 							class="logout-form"
 						>
 							<button type="submit" class="logout-btn">
