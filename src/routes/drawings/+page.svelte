@@ -20,6 +20,16 @@
 		return template.image_display || "📐";
 	}
 
+	// Helper function to check if value is a valid image source
+	function isImageSrc(value: string | null): value is string {
+		return value !== null && (
+			value.startsWith('http://') ||
+			value.startsWith('https://') ||
+			value.startsWith('data:') ||
+			value.startsWith('/')
+		);
+	}
+
 	// Helper function to get gradient based on category
 	function getTemplateGradient(category: string | null): string {
 		const gradients: Record<string, string> = {
@@ -446,7 +456,15 @@
 									class="type-icon-wrapper"
 									style="background: {getTemplateGradient(template.category)}"
 								>
-									<span class="type-icon">{getTemplateIcon(template)}</span>
+									{#if template.image_display && isImageSrc(template.image_display)}
+										<img
+											src={template.image_display}
+											alt=""
+											class="type-icon-img"
+										/>
+									{:else}
+										<span class="type-icon">{getTemplateIcon(template)}</span>
+									{/if}
 								</div>
 								<div class="type-info">
 									<h3 class="type-name">{template.template_name}</h3>
@@ -1184,6 +1202,13 @@
 
 	.type-icon {
 		font-size: 2rem;
+	}
+
+	.type-icon-img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		border-radius: 16px;
 	}
 
 	.type-info {
