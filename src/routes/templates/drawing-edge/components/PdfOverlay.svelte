@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
     import OverlayInput from "./OverlayInput.svelte";
-    import overlayFieldsConfig from "../config/overlays.json";
+
     import {
         exportPdfWithOverlay,
         mapStateToFieldValues,
@@ -10,6 +10,7 @@
 
     // Bindable props for all overlay values
     let {
+        overlayFieldsConfig = $bindable(),
         centerEdgeWidth = $bindable(1000),
         centerEdgeHeight = $bindable(500),
         centerEdgeHoleCount = $bindable(10),
@@ -58,6 +59,7 @@
         material = $bindable(""),
         pdfUrl = "/assets/edge_template2.pdf",
     }: {
+        overlayFieldsConfig: any;
         centerEdgeWidth?: number;
         centerEdgeHeight?: number;
         centerEdgeHoleCount?: number;
@@ -185,7 +187,10 @@
         fieldValues[fieldId] = value;
 
         // Find the field config to get bindsTo
-        const field = overlayFieldsConfig.fields.find((f) => f.id === fieldId);
+        const field = overlayFieldsConfig.fields.find(
+            (f: any) => f.id === fieldId,
+        );
+
         if (!field) return;
 
         // Update the corresponding prop

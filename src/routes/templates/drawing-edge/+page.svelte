@@ -4,8 +4,14 @@
 	import SvgEndEdgeDrawing from "./components/SvgEndEdgeDrawing.svelte";
 	import edgePdf from "$lib/assets/edge.pdf";
 
+	// Props
+	let { data } = $props();
+	let template = $derived(data.template);
+	let overlayConfig = $derived(template.template_data);
+
 	// Shared state for all editable values (source of truth)
 	let centerEdgeWidth = $state(1000);
+
 	let centerEdgeHeight = $state(500);
 	let centerEdgeHoleType = $state("circle");
 	let centerEdgeHoleCount = $state(10);
@@ -75,6 +81,7 @@
 				<h2>Configuration</h2>
 			</div>
 			<PdfOverlay
+				overlayFieldsConfig={overlayConfig}
 				bind:centerEdgeWidth
 				bind:centerEdgeHeight
 				bind:centerEdgeHoleCount
