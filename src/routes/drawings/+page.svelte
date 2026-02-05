@@ -1,7 +1,13 @@
 <script lang="ts">
 	import type { WearcoDrawing, WearcoTemplate } from "$lib/types/template";
 
-	let { data } = $props<{ data: { drawings?: WearcoDrawing[]; templates?: WearcoTemplate[]; error?: string } }>();
+	let { data } = $props<{
+		data: {
+			drawings?: WearcoDrawing[];
+			templates?: WearcoTemplate[];
+			error?: string;
+		};
+	}>();
 
 	// Safe access to drawings from wearco_drawings (merged layout + page data)
 	const drawings = $derived(data?.drawings ?? []);
@@ -22,11 +28,12 @@
 
 	// Helper function to check if value is a valid image source
 	function isImageSrc(value: string | null): value is string {
-		return value !== null && (
-			value.startsWith('http://') ||
-			value.startsWith('https://') ||
-			value.startsWith('data:') ||
-			value.startsWith('/')
+		return (
+			value !== null &&
+			(value.startsWith("http://") ||
+				value.startsWith("https://") ||
+				value.startsWith("data:") ||
+				value.startsWith("/"))
 		);
 	}
 
@@ -88,9 +95,7 @@
 		<div class="header-content">
 			<div class="title-section">
 				<h1>Drawings</h1>
-				<p class="subtitle">
-					Manage your drawings and work orders
-				</p>
+				<p class="subtitle">Manage your drawings and work orders</p>
 			</div>
 			<div class="header-actions">
 				<!-- View Toggle -->
@@ -179,10 +184,14 @@
 							</div>
 							<div class="card-content">
 								<h3 class="card-title">
-									{drawing.name || drawing.drawing_number || `Drawing ${drawing.id.slice(0, 8)}`}
+									{drawing.name ||
+										drawing.drawing_number ||
+										`Drawing ${drawing.id.slice(0, 8)}`}
 								</h3>
 								<p class="card-code">
-									{drawing.job_number || drawing.work_order || 'No Job #'}
+									{drawing.job_number ||
+										drawing.work_order ||
+										"No Job #"}
 								</p>
 								<div class="card-meta">
 									<span class="meta-item">
@@ -199,7 +208,7 @@
 											/>
 											<circle cx="12" cy="7" r="4" />
 										</svg>
-										{drawing.customer || 'No Customer'}
+										{drawing.customer || "No Customer"}
 									</span>
 									<span class="meta-item">
 										<svg
@@ -236,9 +245,14 @@
 									</span>
 								</div>
 								<div class="card-dimensions">
-									<span class="dimension">{drawing.material || 'No Material'}</span>
+									<span class="dimension"
+										>{drawing.material ||
+											"No Material"}</span
+									>
 									<span class="separator">•</span>
-									<span class="holes">{drawing.thk || 'No Thickness'}</span>
+									<span class="holes"
+										>{drawing.thk || "No Thickness"}</span
+									>
 								</div>
 							</div>
 							<div class="card-actions">
@@ -311,22 +325,26 @@
 							<span class="list-col name-col">
 								<span class="row-icon">📐</span>
 								<span class="row-name"
-									>{drawing.name || drawing.drawing_number || `Drawing ${drawing.id.slice(0, 8)}`}</span
+									>{drawing.name ||
+										drawing.drawing_number ||
+										`Drawing ${drawing.id.slice(0, 8)}`}</span
 								>
 							</span>
 							<span class="list-col code-col"
-								>{drawing.job_number || drawing.work_order || 'No Job #'}</span
+								>{drawing.job_number ||
+									drawing.work_order ||
+									"No Job #"}</span
 							>
 							<span class="list-col customer-col"
-								>{drawing.customer || 'No Customer'}</span
+								>{drawing.customer || "No Customer"}</span
 							>
 							<span class="list-col category-col">
 								<span class="category-badge"
-									>{drawing.material || 'No Material'}</span
+									>{drawing.material || "No Material"}</span
 								>
 							</span>
 							<span class="list-col dimensions-col">
-								{drawing.thk || 'No Thickness'}
+								{drawing.thk || "No Thickness"}
 							</span>
 							<span class="list-col date-col"
 								>{formatDate(drawing.updated_at)}</span
@@ -399,7 +417,6 @@
 				<div class="empty-state">
 					<h3>No drawings yet</h3>
 					<p>Create your first drawing to get started</p>
-					
 				</div>
 			{/if}
 		{/if}
@@ -441,20 +458,26 @@
 				{#if templates.length === 0}
 					<div class="empty-templates">
 						<span class="empty-icon">📋</span>
-						<p>No templates available. Please add templates in the database.</p>
+						<p>
+							No templates available. Please add templates in the
+							database.
+						</p>
 					</div>
 				{:else}
 					<div class="drawing-types-grid">
 						{#each templates as template, index}
 							<button
 								class="drawing-type-card"
-								class:selected={selectedTemplateId === template.id}
+								class:selected={selectedTemplateId ===
+									template.id}
 								onclick={() => selectTemplate(template.id)}
 								style="--animation-delay: {index * 0.1}s"
 							>
 								<div
 									class="type-icon-wrapper"
-									style="background: {getTemplateGradient(template.category)}"
+									style="background: {getTemplateGradient(
+										template.category,
+									)}"
 								>
 									{#if template.image_display && isImageSrc(template.image_display)}
 										<img
@@ -463,13 +486,18 @@
 											class="type-icon-img"
 										/>
 									{:else}
-										<span class="type-icon">{getTemplateIcon(template)}</span>
+										<span class="type-icon"
+											>{getTemplateIcon(template)}</span
+										>
 									{/if}
 								</div>
 								<div class="type-info">
-									<h3 class="type-name">{template.template_name}</h3>
+									<h3 class="type-name">
+										{template.template_name}
+									</h3>
 									<p class="type-description">
-										{template.description || 'No description available'}
+										{template.description ||
+											"No description available"}
 									</p>
 								</div>
 								<div class="type-check">
@@ -1120,14 +1148,14 @@
 	.drawing-types-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 1rem;
+		gap: 1.25rem;
 	}
 
 	.drawing-type-card {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		padding: 1.5rem 1rem;
+		align-items: stretch;
+		padding: 0;
 		background: rgba(30, 30, 30, 0.6);
 		border: 2px solid rgba(255, 255, 255, 0.08);
 		border-radius: 16px;
@@ -1186,48 +1214,52 @@
 	}
 
 	.type-icon-wrapper {
-		width: 64px;
-		height: 64px;
+		width: 100%;
+		height: 200px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 16px;
-		margin-bottom: 1rem;
+		border-radius: 14px 14px 0 0;
+		margin-bottom: 0;
 		transition: all 0.3s ease;
+		overflow: hidden;
 	}
 
 	.drawing-type-card:hover .type-icon-wrapper {
-		transform: scale(1.1);
+		transform: scale(1.02);
 	}
 
 	.type-icon {
-		font-size: 2rem;
+		font-size: 4rem;
 	}
 
 	.type-icon-img {
 		width: 100%;
 		height: 100%;
-		object-fit: contain;
-		border-radius: 16px;
+		object-fit: cover;
+		border-radius: 0;
 	}
 
 	.type-info {
 		position: relative;
 		z-index: 1;
+		padding: 1.25rem;
+		text-align: left;
+		background: rgba(20, 20, 20, 0.6);
 	}
 
 	.type-name {
-		font-size: 1rem;
+		font-size: 1.1rem;
 		font-weight: 600;
-		margin: 0 0 0.35rem 0;
+		margin: 0 0 0.5rem 0;
 		color: var(--color-white);
 	}
 
 	.type-description {
-		font-size: 0.8rem;
+		font-size: 0.85rem;
 		color: var(--color-gray);
 		margin: 0;
-		line-height: 1.4;
+		line-height: 1.5;
 	}
 
 	.type-check {
