@@ -281,7 +281,7 @@
 	/* Responsive */
 	@media (max-width: 768px) {
 		.drawing-page-container {
-			padding: 1.5rem;
+			padding: 0.5rem; /* Reduced from 1.5rem to maximize width */
 		}
 
 		.title-section h1 {
@@ -294,7 +294,11 @@
 		}
 
 		.section-card {
-			padding: 1.5rem;
+			padding: 0.75rem; /* Reduced from 1.5rem */
+		}
+
+		.section-header h2 {
+			font-size: 1.25rem;
 		}
 	}
 </style>
