@@ -3,7 +3,10 @@
 	import { page } from "$app/stores";
 
 	import { enhance } from "$app/forms";
+
 	import type { Session } from "@supabase/supabase-js";
+	import QRCode from "qrcode";
+	import { onMount } from "svelte";
 
 	let { children, data } = $props<{
 		data: { session: Session | null; pathname: string };
@@ -23,6 +26,47 @@
 	);
 
 	let isMenuOpen = $state(false);
+
+	// Sticky QR Code Logic
+	let qrCodeUrl = $state("");
+	let showQrFooter = $state(false);
+	let localIp = $state("");
+
+	onMount(async () => {
+		if (import.meta.env.DEV) {
+			try {
+				const response = await fetch("/api/local-ip");
+				const data = await response.json();
+				localIp = data.ip;
+				updateQrCode();
+			} catch (err) {
+				console.error("Failed to fetch local IP", err);
+			}
+		}
+	});
+
+	function updateQrCode() {
+		if (!localIp) return;
+		const port = window.location.port;
+		const protocol = window.location.protocol;
+		const path = $page.url.pathname;
+
+		const localUrl = `${protocol}//${localIp}:${port}${path}`;
+		QRCode.toDataURL(localUrl)
+			.then((url) => {
+				qrCodeUrl = url;
+				showQrFooter = true;
+			})
+			.catch((err) => {
+				console.error("Failed to generate QR code", err);
+			});
+	}
+
+	$effect(() => {
+		if (import.meta.env.DEV && localIp && $page.url.pathname) {
+			updateQrCode();
+		}
+	});
 </script>
 
 <svelte:head>
@@ -153,6 +197,19 @@
 	<main class="main-content">
 		{@render children()}
 	</main>
+
+	<!-- Dev Only Sticky QR Footer -->
+	{#if showQrFooter && qrCodeUrl}
+		<div class="qr-footer">
+			<div class="qr-content">
+				<img src={qrCodeUrl} alt="Localhost QR Code" class="qr-code" />
+				<div class="qr-text">
+					<span class="qr-title">Mobile Dev</span>
+					<span class="qr-subtitle">Scan to test on device</span>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -418,5 +475,68 @@
 	/* Main Content */
 	.main-content {
 		flex: 1;
+	}
+
+	/* QR Code Footer - Only visible on wide screens in Dev mode */
+	.qr-footer {
+		position: fixed;
+		bottom: 2rem;
+		left: 2rem;
+		z-index: 2000; /* High z-index to stay on top */
+		background: rgba(20, 20, 20, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 0.75rem;
+		border-radius: 12px;
+		backdrop-filter: blur(10px);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+		animation: slideUp 0.5s ease-out;
+		display: none; /* Hidden by default, shown via media query */
+	}
+
+	@media (min-width: 1024px) {
+		.qr-footer {
+			display: block;
+		}
+	}
+
+	.qr-content {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.qr-code {
+		width: 60px;
+		height: 60px;
+		border-radius: 6px;
+		background: white;
+		padding: 4px;
+	}
+
+	.qr-text {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.qr-title {
+		color: var(--color-gold);
+		font-weight: 700;
+		font-size: 0.85rem;
+	}
+
+	.qr-subtitle {
+		color: var(--color-gray);
+		font-size: 0.75rem;
+	}
+
+	@keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>

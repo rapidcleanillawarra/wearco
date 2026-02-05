@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -23,8 +23,10 @@
 	"dependencies": {
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.93.2",
+		"@types/qrcode": "^1.5.6",
 		"html2canvas": "^1.4.1",
 		"jspdf": "^4.0.0",
-		"pdfjs-dist": "^5.4.530"
+		"pdfjs-dist": "^5.4.530",
+		"qrcode": "^1.5.4"
 	}
 }
