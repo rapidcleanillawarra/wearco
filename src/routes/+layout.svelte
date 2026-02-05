@@ -31,6 +31,7 @@
 	let qrCodeUrl = $state("");
 	let showQrFooter = $state(false);
 	let localIp = $state("");
+	let isQrExpanded = $state(false);
 
 	onMount(async () => {
 		if (import.meta.env.DEV) {
@@ -200,7 +201,13 @@
 
 	<!-- Dev Only Sticky QR Footer -->
 	{#if showQrFooter && qrCodeUrl}
-		<div class="qr-footer">
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="qr-footer"
+			class:expanded={isQrExpanded}
+			onclick={() => (isQrExpanded = !isQrExpanded)}
+		>
 			<div class="qr-content">
 				<img src={qrCodeUrl} alt="Localhost QR Code" class="qr-code" />
 				<div class="qr-text">
@@ -491,6 +498,60 @@
 		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 		animation: slideUp 0.5s ease-out;
 		display: none; /* Hidden by default, shown via media query */
+		cursor: pointer;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.qr-footer:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+		border-color: rgba(250, 194, 17, 0.3);
+	}
+
+	/* Expanded State */
+	.qr-footer.expanded {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		bottom: auto;
+		right: auto;
+		display: flex !important; /* Force display when expanded */
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.85); /* Dark overlay background */
+		border-radius: 0;
+		padding: 2rem;
+		z-index: 9999;
+	}
+
+	.qr-footer.expanded .qr-content {
+		flex-direction: column;
+		background: var(--color-black);
+		padding: 3rem;
+		border-radius: 20px;
+		border: 1px solid var(--color-gold);
+		box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+		text-align: center;
+		transform: scale(1);
+		gap: 2rem;
+	}
+
+	.qr-footer.expanded .qr-code {
+		width: 300px;
+		height: 300px;
+		padding: 1rem;
+	}
+
+	.qr-footer.expanded .qr-title {
+		font-size: 2rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.qr-footer.expanded .qr-subtitle {
+		font-size: 1.2rem;
+		opacity: 0.8;
 	}
 
 	@media (min-width: 1024px) {
@@ -503,6 +564,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+		transition: all 0.3s ease;
 	}
 
 	.qr-code {
@@ -511,6 +573,7 @@
 		border-radius: 6px;
 		background: white;
 		padding: 4px;
+		transition: all 0.3s ease;
 	}
 
 	.qr-text {
@@ -522,11 +585,13 @@
 		color: var(--color-gold);
 		font-weight: 700;
 		font-size: 0.85rem;
+		transition: all 0.3s ease;
 	}
 
 	.qr-subtitle {
 		color: var(--color-gray);
 		font-size: 0.75rem;
+		transition: all 0.3s ease;
 	}
 
 	@keyframes slideUp {
