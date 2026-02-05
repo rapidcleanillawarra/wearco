@@ -9,8 +9,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 const protectedRoutes = ['/dashboard', '/templates', '/customers']
 
 export const handle: Handle = async ({ event, resolve }) => {
-    console.log('🔒 [hooks] Processing request:', event.url.pathname)
-    console.log('🔒 [hooks] All cookies:', event.cookies.getAll().map(c => c.name))
+    // console.log('🔒 [hooks] Processing request:', event.url.pathname)
+    // console.log('🔒 [hooks] All cookies:', event.cookies.getAll().map(c => c.name))
 
     // Create Supabase client with cookies
     event.locals.supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -29,7 +29,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     // Get session helper - use getUser() for proper JWT validation
     event.locals.getSession = async () => {
         const { data: { user }, error } = await event.locals.supabase.auth.getUser()
-        console.log('🔒 [hooks] getUser result:', { user: user?.email, error: error?.message })
+        // console.log('🔒 [hooks] getUser result:', { user: user?.email, error: error?.message })
 
         if (error || !user) {
             return null
@@ -45,11 +45,15 @@ export const handle: Handle = async ({ event, resolve }) => {
         event.url.pathname.startsWith(route)
     )
 
-    console.log('🔒 [hooks] Is protected route:', isProtectedRoute)
+    // console.log('🔒 [hooks] Is protected route:', isProtectedRoute)
+
+    // CRITICAL FIX: Always call getUser() to ensure any necessary token refreshes (cookie updates)
+    // happen BEFORE the response is generated. This prevents "Cannot use cookies.set..." errors.
+    await event.locals.supabase.auth.getUser()
 
     if (isProtectedRoute) {
         const session = await event.locals.getSession()
-        console.log('🔒 [hooks] Session exists:', !!session)
+        // console.log('🔒 [hooks] Session exists:', !!session)
 
         if (!session) {
             console.log('🔒 [hooks] No session, redirecting to /')
