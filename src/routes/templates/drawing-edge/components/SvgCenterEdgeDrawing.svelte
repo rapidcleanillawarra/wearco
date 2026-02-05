@@ -286,6 +286,30 @@
 <div class="svg-drawing-container">
     <div class="header-section">
         <div class="editor-controls">
+            <div class="dimension-controls">
+                <div class="control-group">
+                    <label for="width-control">W:</label>
+                    <input
+                        id="width-control"
+                        type="number"
+                        value={centerEdgeWidthPx}
+                        oninput={handleWidthChange}
+                        min="10"
+                        class="dim-input"
+                    />
+                </div>
+                <div class="control-group">
+                    <label for="height-control">H:</label>
+                    <input
+                        id="height-control"
+                        type="number"
+                        value={centerEdgeHeightPx}
+                        oninput={handleHeightChange}
+                        min="10"
+                        class="dim-input"
+                    />
+                </div>
+            </div>
             <div class="zoom-controls">
                 <button
                     class="icon-btn"
@@ -798,6 +822,49 @@
         overflow: auto; /* changed from hidden */
         background: white;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .dimension-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+        margin-right: 0.5rem;
+    }
+
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .control-group label {
+        font-size: 0.9rem;
+        color: var(--color-gray);
+        font-weight: 500;
+    }
+
+    .dim-input {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        color: var(--color-white);
+        padding: 0.25rem 0.5rem;
+        width: 60px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .dim-input:focus {
+        outline: none;
+        border-color: var(--color-gold);
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .svg-container {
         margin-bottom: 20px;
         flex: 1;
         position: relative;
