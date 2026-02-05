@@ -356,9 +356,12 @@
             originalWidth = viewport.width;
             originalHeight = viewport.height;
 
-            // Calculate scale to fit container width
+            // Calculate scale to fit container width but ensure minimum readability
             const containerWidth = containerElement?.clientWidth || 800;
-            scale = containerWidth / viewport.width;
+            const minReadableWidth = 800; // Minimum width where text remains legible
+            const targetWidth = Math.max(containerWidth, minReadableWidth);
+
+            scale = targetWidth / viewport.width;
 
             const scaledViewport = page.getViewport({ scale });
 
@@ -464,42 +467,79 @@
         </div>
     </div>
 
-    <div class="pdf-wrapper" style="height: {originalHeight * scale}px;">
-        {#if pdfError}
-            <div class="error-message">
-                <span class="error-icon">⚠️</span>
-                <p>Failed to load PDF: {pdfError}</p>
-                <button onclick={loadPdf}>Retry</button>
-            </div>
-        {:else if !pdfLoaded}
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading PDF...</p>
-            </div>
-        {/if}
+    <div class="pdf-scroll-container">
+        <div
+            class="pdf-wrapper"
+            style="height: {originalHeight * scale}px; width: {originalWidth *
+                scale}px;"
+        >
+            {#if pdfError}
+                <div class="error-message">
+                    <span class="error-icon">⚠️</span>
+                    <p>Failed to load PDF: {pdfError}</p>
+                    <button onclick={loadPdf}>Retry</button>
+                </div>
+            {:else if !pdfLoaded}
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading PDF...</p>
+                </div>
+            {/if}
 
-        <canvas bind:this={canvasElement} class="pdf-canvas"></canvas>
+            <canvas bind:this={canvasElement} class="pdf-canvas"></canvas>
 
-        {#if pdfLoaded}
-            <div class="overlay-container">
-                {#each overlayFieldsConfig.fields as field (field.id)}
-                    <OverlayInput
-                        {field}
-                        {scale}
-                        bind:value={
-                            () => fieldValues[field.id],
-                            (v) => updateFieldValue(field.id, v)
-                        }
-                    />
-                {/each}
-            </div>
-        {/if}
+            {#if pdfLoaded}
+                <div class="overlay-container">
+                    {#each overlayFieldsConfig.fields as field (field.id)}
+                        <OverlayInput
+                            {field}
+                            {scale}
+                            bind:value={
+                                () => fieldValues[field.id],
+                                (v) => updateFieldValue(field.id, v)
+                            }
+                        />
+                    {/each}
+                </div>
+            {/if}
+        </div>
     </div>
 </div>
 
 <style>
     .pdf-overlay-container {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pdf-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        border-radius: 8px;
+        background: #2a2a2a;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom scrollbar for better visibility */
+    .pdf-scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-track {
+        background: #1a1a1a;
+        border-radius: 4px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 
     .pdf-header {
@@ -563,16 +603,13 @@
 
     .pdf-wrapper {
         position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        background: #2a2a2a; /* Dark background behind PDF */
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        /* No longer needs border-radius/overflow here as parent handles it */
+        background: #2a2a2a;
     }
 
     .pdf-canvas {
         display: block;
-        width: 100%;
-        height: auto;
+        /* Width/Height handled by attribute binding */
     }
 
     .overlay-container {
