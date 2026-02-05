@@ -544,21 +544,7 @@
 {/if}
 
 <style>
-	/* Color Theme Variables */
-	:root {
-		--color-black: #000000;
-		--color-gold: #fac211;
-		--color-white: #ffffff;
-		--color-gray: #aaaaaa;
-		--color-dark-gray: #1a1a1a;
-		--color-light-gray: #f5f5f5;
-	}
-
-	/* Global Reset */
-	:global(html, body) {
-		margin: 0;
-		padding: 0;
-	}
+	/* Drawings page-specific styles - Theme variables from global CSS */
 
 	/* Container Styles */
 	.templates-container {

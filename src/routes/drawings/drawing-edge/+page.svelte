@@ -280,43 +280,23 @@
 </div>
 
 <style>
-	/* Color Theme Variables */
-	:root {
-		--color-black: #000000;
-		--color-gold: #fac211;
-		--color-white: #ffffff;
-		--color-gray: #aaaaaa;
-		--color-dark-gray: #1a1a1a;
-		--color-light-gray: #f5f5f5;
-	}
+	/* Drawing editor-specific styles - Theme variables and animations from global CSS */
 
 	/* Global Reset is handled in layout, but we ensure container styles here */
 
 	.drawing-page-container {
 		min-height: 100vh;
-		background: linear-gradient(
-			135deg,
-			#0a0a0a 0%,
-			#1a1a1a 50%,
-			#0f0f0f 100%
-		);
+		background: var(--gradient-dark);
 		color: var(--color-white);
-		padding: 2rem 3rem;
-		font-family:
-			"Inter",
-			-apple-system,
-			BlinkMacSystemFont,
-			"Segoe UI",
-			Roboto,
-			sans-serif;
-		box-sizing: border-box;
+		padding: var(--spacing-xl) var(--spacing-2xl);
+		font-family: var(--font-primary);
 	}
 
 	/* Header Styles */
 	.page-header {
-		margin-bottom: 2.5rem;
-		padding-bottom: 1.5rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: var(--spacing-xl);
+		padding-bottom: var(--spacing-lg);
+		border-bottom: var(--border-light);
 	}
 
 	.header-content {
@@ -324,38 +304,24 @@
 		justify-content: space-between;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: 1.5rem;
+		gap: var(--spacing-lg);
 	}
 
 	.title-section h1 {
-		font-size: 2.5rem;
-		font-weight: 700;
-		margin: 0 0 0.5rem 0;
-		background: linear-gradient(
-			135deg,
-			var(--color-white) 0%,
-			var(--color-gold) 100%
-		);
+		font-size: var(--font-size-4xl);
+		font-weight: var(--font-weight-bold);
+		margin: 0 0 var(--spacing-sm) 0;
+		background: var(--gradient-title);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
 		animation: shimmer 3s ease-in-out infinite;
 	}
 
-	@keyframes shimmer {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.85;
-		}
-	}
-
 	.subtitle {
 		color: var(--color-gray);
 		margin: 0;
-		font-size: 1rem;
+		font-size: var(--font-size-base);
 	}
 
 	.back-btn {

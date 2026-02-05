@@ -212,16 +212,7 @@
 </div>
 
 <style>
-    /* Color Theme Variables */
-    :root {
-        --color-black: #000000;
-        --color-gold: #fac211;
-        --color-white: #ffffff;
-        --color-gray: #aaaaaa;
-        --color-dark-gray: #1a1a1a;
-        --color-error: #ef4444;
-        --color-success: #22c55e;
-    }
+    /* Login-specific styles - Theme variables from global CSS */
 
     /* Container */
     .login-container {

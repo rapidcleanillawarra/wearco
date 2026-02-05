@@ -1,4 +1,5 @@
 <script lang="ts">
+	import "$lib/styles/index.css";
 	import favicon from "$lib/assets/favicon.svg";
 	import { page } from "$app/stores";
 
@@ -220,31 +221,7 @@
 </div>
 
 <style>
-	/* Color Theme Variables */
-	:root {
-		--color-black: #000000;
-		--color-gold: #fac211;
-		--color-white: #ffffff;
-		--color-gray: #aaaaaa;
-		--color-dark-gray: #1a1a1a;
-	}
-
-	/* Global Reset */
-	:global(html, body) {
-		margin: 0;
-		padding: 0;
-		font-family:
-			"Inter",
-			-apple-system,
-			BlinkMacSystemFont,
-			"Segoe UI",
-			Roboto,
-			sans-serif;
-	}
-
-	:global(*) {
-		box-sizing: border-box;
-	}
+	/* Layout-specific styles - Global styles imported via index.css */
 
 	/* App Layout */
 	.app-layout {
