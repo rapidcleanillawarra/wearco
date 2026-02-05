@@ -29,9 +29,28 @@ export const load: PageServerLoad = async ({ locals }) => {
         // We don't throw here to allow the page to load even if diagrams fail (graceful degradation)
     }
 
+    // Generate PDF URL from storage if visual_document is set
+    let pdfUrl: string | undefined = undefined;
+    if (template.visual_document) {
+        console.log('Generating signed URL for:', `templates/${template.visual_document}`);
+        const { data: signedUrlData, error: signedUrlError } = await locals.supabase.storage
+            .from('wearco')
+            .createSignedUrl(`templates/${template.visual_document}`, 3600); // 1 hour expiry
+
+        if (signedUrlError) {
+            console.error('Error creating signed URL:', signedUrlError);
+        } else if (signedUrlData) {
+            pdfUrl = signedUrlData.signedUrl;
+            console.log('Generated signed URL:', pdfUrl);
+        }
+    } else {
+        console.log('No visual_document set for template');
+    }
+
     return {
         template,
-        svgDiagrams: svgDiagrams || []
+        svgDiagrams: svgDiagrams || [],
+        pdfUrl
     };
 };
 

@@ -1,9 +1,6 @@
 <script lang="ts">
 	import PdfOverlay from "./components/PdfOverlay.svelte";
 	import SvgGenericDrawing from "./components/SvgGenericDrawing.svelte";
-	import edgePdf from "$lib/assets/edge.pdf";
-
-	// Props
 	import { enhance } from "$app/forms";
 
 	// Props
@@ -11,6 +8,7 @@
 	let template = $derived(data.template);
 	let overlayConfig = $derived(template.template_data);
 	let svgDiagrams = $derived(data.svgDiagrams || []);
+	let pdfUrl = $derived(data.pdfUrl);
 
 	// Helper to find diagram data
 	function getDiagramData(name: string, defaultData: any) {
@@ -258,7 +256,7 @@
 				bind:orderNumber={formData.orderNumber}
 				bind:date={formData.date}
 				bind:material={formData.material}
-				pdfUrl={edgePdf}
+				{pdfUrl}
 			/>
 		</section>
 

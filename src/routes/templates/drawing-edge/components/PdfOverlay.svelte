@@ -57,7 +57,7 @@
         orderNumber = $bindable(""),
         date = $bindable(""),
         material = $bindable(""),
-        pdfUrl = "/assets/edge_template2.pdf",
+        pdfUrl,
     }: {
         overlayFieldsConfig: any;
         centerEdgeWidth?: number;
@@ -339,6 +339,12 @@
     async function loadPdf() {
         if (!browser) return;
 
+        if (!pdfUrl) {
+            pdfError =
+                "No PDF URL configured. Please set a visual document for this template.";
+            return;
+        }
+
         try {
             pdfError = null;
 
@@ -415,6 +421,11 @@
     let exportError = $state<string | null>(null);
 
     async function handlePrintPdf() {
+        if (!pdfUrl) {
+            exportError = "No PDF URL configured";
+            return;
+        }
+
         isExporting = true;
         exportError = null;
 
