@@ -59,30 +59,38 @@
         width: 100%;
         height: 100%;
         padding: 2px 4px;
-        border: 1px solid rgba(79, 70, 229, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 2px;
         background: rgba(255, 255, 255, 0.9);
         font-family: inherit;
         box-sizing: border-box;
         transition:
             border-color 0.2s,
-            box-shadow 0.2s;
+            box-shadow 0.2s,
+            background-color 0.2s;
+        color: #000;
+        font-weight: 500;
     }
 
     input:focus {
         outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        border-color: var(--color-gold);
+        box-shadow: 0 0 0 2px rgba(250, 194, 17, 0.2);
         background: white;
     }
 
+    input:hover {
+        border-color: rgba(0, 0, 0, 0.4);
+    }
+
     input::placeholder {
-        color: #9ca3af;
+        color: #6b7280;
         font-size: 0.9em;
     }
 
     input[type="number"] {
         -moz-appearance: textfield;
+        appearance: textfield;
     }
 
     input[type="number"]::-webkit-outer-spin-button,

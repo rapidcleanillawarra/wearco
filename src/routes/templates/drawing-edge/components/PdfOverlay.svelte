@@ -429,30 +429,38 @@
 
 <div class="pdf-overlay-container" bind:this={containerElement}>
     <div class="pdf-header">
-        <div class="header-content">
-            <div>
-                <h2>Edge Template</h2>
-                <p class="hint">
-                    Fill in the fields below. Values will sync with the drawing.
-                </p>
-            </div>
-            <div class="header-actions">
-                <button
-                    class="print-pdf-btn"
-                    onclick={handlePrintPdf}
-                    disabled={isExporting}
-                >
-                    {#if isExporting}
-                        <span class="spinner-small"></span>
-                        Generating...
-                    {:else}
-                        📄 Print PDF
-                    {/if}
-                </button>
-                {#if exportError}
-                    <span class="export-error">{exportError}</span>
+        <div class="header-actions">
+            <button
+                class="print-pdf-btn"
+                onclick={handlePrintPdf}
+                disabled={isExporting}
+            >
+                {#if isExporting}
+                    <span class="spinner-small"></span>
+                    Generating...
+                {:else}
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        ></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Print PDF
                 {/if}
-            </div>
+            </button>
+            {#if exportError}
+                <span class="export-error">{exportError}</span>
+            {/if}
         </div>
     </div>
 
@@ -492,17 +500,12 @@
 <style>
     .pdf-overlay-container {
         width: 100%;
-        margin-bottom: 30px;
     }
 
     .pdf-header {
-        margin-bottom: 16px;
-    }
-
-    .header-content {
+        margin-bottom: 1rem;
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        justify-content: flex-end; /* Align actions to the right */
     }
 
     .header-actions {
@@ -515,35 +518,40 @@
     .print-pdf-btn {
         display: flex;
         align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--color-gold) 0%, #e5af0e 100%);
+        color: var(--color-black);
         border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 0.95rem;
         cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(250, 194, 17, 0.3);
     }
 
     .print-pdf-btn:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(250, 194, 17, 0.4);
+    }
+
+    .print-pdf-btn:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     .print-pdf-btn:disabled {
         opacity: 0.7;
         cursor: not-allowed;
-        transform: none;
+        background: var(--color-gray);
+        box-shadow: none;
     }
 
     .spinner-small {
-        width: 14px;
-        height: 14px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: var(--color-black);
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
@@ -553,25 +561,12 @@
         font-size: 12px;
     }
 
-    .pdf-header h2 {
-        margin: 0 0 4px 0;
-        color: #1f2937;
-        font-size: 20px;
-    }
-
-    .pdf-header .hint {
-        margin: 0;
-        color: #6b7280;
-        font-size: 14px;
-    }
-
     .pdf-wrapper {
         position: relative;
-        border: 2px solid #e5e7eb;
         border-radius: 8px;
         overflow: hidden;
-        background: #f9fafb;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        background: #2a2a2a; /* Dark background behind PDF */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
 
     .pdf-canvas {
@@ -606,14 +601,19 @@
     .loading p,
     .error-message p {
         margin: 12px 0 0 0;
-        color: #6b7280;
+        color: var(--color-gray);
     }
 
     .error-message {
-        background: white;
+        background: #1a1a1a;
         padding: 24px;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .error-message p {
+        color: var(--color-white);
     }
 
     .error-icon {
@@ -623,8 +623,8 @@
     .error-message button {
         margin-top: 12px;
         padding: 8px 16px;
-        background: #4f46e5;
-        color: white;
+        background: var(--color-gold);
+        color: var(--color-black);
         border: none;
         border-radius: 6px;
         cursor: pointer;
@@ -632,14 +632,14 @@
     }
 
     .error-message button:hover {
-        background: #4338ca;
+        opacity: 0.9;
     }
 
     .spinner {
         width: 40px;
         height: 40px;
-        border: 4px solid #e5e7eb;
-        border-top-color: #4f46e5;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--color-gold);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto;

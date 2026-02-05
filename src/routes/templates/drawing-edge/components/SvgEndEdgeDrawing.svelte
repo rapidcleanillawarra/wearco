@@ -284,10 +284,22 @@
 
 <div class="svg-drawing-container">
     <div class="header-section">
-        <h2>End Edge Drawing</h2>
-
         <div class="editor-controls">
-            <button class="export-btn" onclick={exportSvg}>Export SVG</button>
+            <button class="export-btn" onclick={exportSvg}>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export SVG
+            </button>
         </div>
     </div>
 
@@ -662,19 +674,9 @@
 
     .header-section {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 20px;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    h2 {
-        color: #1f2937;
-        margin: 0;
-        font-size: 20px;
+        margin-bottom: 1rem;
     }
 
     .editor-controls {
@@ -683,11 +685,10 @@
     }
 
     .svg-container {
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
         background: white;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
         flex: 1;
         position: relative;
@@ -704,6 +705,8 @@
         cursor: move;
         display: block;
         background-color: #ffffff;
+        width: 100%;
+        height: 100%;
     }
 
     .svg-canvas:hover :global(.rectangle) {
@@ -725,18 +728,27 @@
     }
 
     .export-btn {
-        background-color: #4f46e5;
-        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--color-gold) 0%, #e5af0e 100%);
+        color: var(--color-black);
         border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
         font-weight: 600;
+        font-size: 0.9rem;
         cursor: pointer;
-        transition: background-color 0.2s;
-        margin-right: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(250, 194, 17, 0.25);
     }
 
     .export-btn:hover {
-        background-color: #4338ca;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(250, 194, 17, 0.35);
+    }
+
+    .export-btn:active {
+        transform: translateY(0);
     }
 </style>
