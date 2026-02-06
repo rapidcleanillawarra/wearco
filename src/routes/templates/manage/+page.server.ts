@@ -20,8 +20,45 @@ export const load: PageServerLoad = async ({ url, locals }) => {
         }
     }
 
+    let signedVisualDocumentUrl = null;
+    if (template?.visual_document) {
+        let storagePath = template.visual_document;
+        // Ensure path includes templates/ prefix if not already present
+        if (!storagePath.startsWith('templates/')) {
+            storagePath = `templates/${storagePath}`;
+        }
+
+        console.log('Generating signed URL for:', storagePath);
+        const { data: signedData, error: signedError } = await locals.supabase
+            .storage
+            .from('wearco')
+            .createSignedUrl(storagePath, 3600); // 1 hour expiry
+
+        if (signedError) {
+            console.error('Error creating signed URL:', signedError);
+            // Try fallback to root path just in case
+            if (storagePath.startsWith('templates/')) {
+                console.log('Retrying with root path...');
+                const { data: retryData, error: retryError } = await locals.supabase
+                    .storage
+                    .from('wearco')
+                    .createSignedUrl(template.visual_document, 3600);
+
+                if (!retryError) {
+                    signedVisualDocumentUrl = retryData?.signedUrl;
+                }
+            }
+        } else {
+            console.log('Signed URL generated successfully');
+            signedVisualDocumentUrl = signedData?.signedUrl;
+        }
+    } else {
+        console.log('No visual_document found in template or template is null');
+    }
+
     return {
         template,
+        signedVisualDocumentUrl,
         mode: id ? 'edit' : 'create'
     };
 };

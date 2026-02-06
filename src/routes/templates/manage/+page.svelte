@@ -3,7 +3,16 @@
     import type { PageData } from "./$types";
     import TemplateEditor from "./components/TemplateEditor.svelte";
 
-    let { data } = $props<{ data: PageData }>();
+    let { data } = $props<{
+        data: PageData & { signedVisualDocumentUrl?: string | null };
+    }>();
+
+    $effect(() => {
+        console.log("Client Data:", {
+            signedVisualDocumentUrl: data.signedVisualDocumentUrl,
+            visualDocument: data.template?.visual_document,
+        });
+    });
 
     let templateName = $state(data.template?.template_name || "");
     let category = $state(data.template?.category || "Edge");
@@ -227,7 +236,7 @@
 
         <main class="editor-main">
             <TemplateEditor
-                pdfUrl={visualDocument}
+                pdfUrl={data.signedVisualDocumentUrl || visualDocument}
                 bind:fields
                 bind:selectedFieldId
             />
