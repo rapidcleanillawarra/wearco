@@ -20,7 +20,7 @@
 	<span class="list-col dimensions-col">{drawing.thickness}</span>
 	<span class="list-col date-col">{drawing.updatedLabel}</span>
 	<span class="list-col actions-col">
-		<a href="/drawings/edit/{drawing.id}" class="row-action">
+		<a href="/drawings/draw?id={drawing.id}" class="row-action">
 			<svg
 				width="16"
 				height="16"
