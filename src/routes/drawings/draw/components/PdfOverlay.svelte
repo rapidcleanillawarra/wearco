@@ -9,6 +9,7 @@
         pdfHeight,
         fieldValues = {},
         onFieldUpdate,
+        onFieldBlur,
     } = $props<{
         fields: TemplateField[];
         templateWidth: number;
@@ -17,6 +18,7 @@
         pdfHeight: number;
         fieldValues: Record<string, string>;
         onFieldUpdate: (fieldId: string, value: string) => void;
+        onFieldBlur?: (fieldId: string) => void;
     }>();
 
     // Calculate scale factors
@@ -50,6 +52,7 @@
                 id={field.id}
                 value={fieldValues[field.id] || ""}
                 oninput={(e) => handleInput(field.id, e)}
+                onblur={() => onFieldBlur?.(field.id)}
                 style={getFieldStyle(field)}
                 class="overlay-input overlay-textarea"
                 placeholder={field.label}
@@ -60,6 +63,7 @@
                 id={field.id}
                 value={fieldValues[field.id] ?? ""}
                 oninput={(e) => handleInput(field.id, e)}
+                onblur={() => onFieldBlur?.(field.id)}
                 style={getFieldStyle(field)}
                 class="overlay-input"
                 placeholder={field.label}

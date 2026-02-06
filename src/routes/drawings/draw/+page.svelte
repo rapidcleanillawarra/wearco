@@ -202,15 +202,15 @@
 	function handleOverlayFieldUpdate(fieldId: string, value: string) {
 		// Find the field definition to check if it has a targetField
 		const field = templateData?.fields.find((f) => f.id === fieldId);
-		
+
 		// Update the mutable state which will trigger re-derivation
 		fieldUpdateState[fieldId] = value;
-		
+
 		const targetFieldName = field ? getTargetField(field) : "";
 		// If field has a targetField (and it's not empty), update drawingFormData
 		if (targetFieldName !== "") {
 			const targetField = targetFieldName as keyof DrawingFormData;
-			
+
 			// Check the type of the target field to handle conversion
 			if (targetField === "quantity") {
 				// Convert to number for quantity field
@@ -233,6 +233,14 @@
 			}
 			// Note: additional_data and drawing_data are not updated via targetField
 		}
+	}
+
+	// Handle overlay field blur events
+	function handleOverlayFieldBlur(fieldId: string) {
+		console.log('Overlay field blur:', {
+			overlayValues: overlayFieldValues,
+			drawingData: drawingFormData
+		});
 	}
 </script>
 
@@ -404,6 +412,7 @@
 							pdfHeight={pdfDimensions.height}
 							fieldValues={overlayFieldValues}
 							onFieldUpdate={handleOverlayFieldUpdate}
+							onFieldBlur={handleOverlayFieldBlur}
 						/>
 					{/if}
 				</PdfViewer>
