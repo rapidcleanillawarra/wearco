@@ -407,12 +407,24 @@
 
                         <div class="form-group">
                             <label for="field_targetFieldf">Target Field</label>
-                            <input
-                                type="text"
+                            <select
                                 id="field_targetFieldf"
                                 bind:value={selectedField.targetFieldf}
-                                placeholder="Enter target field name"
-                            />
+                            >
+                                <option value="">None</option>
+                                <option value="job_number">Job Number</option>
+                                <option value="work_order">Work Order</option>
+                                <option value="drawing_number">Drawing Number</option>
+                                <option value="name">Name</option>
+                                <option value="customer">Customer</option>
+                                <option value="customer_source">Customer Source</option>
+                                <option value="quantity">Quantity</option>
+                                <option value="dl">DL</option>
+                                <option value="checked_by">Checked By</option>
+                                <option value="prog_by">Prog By</option>
+                                <option value="material">Material</option>
+                                <option value="thk">THK</option>
+                            </select>
                         </div>
 
                         <button
