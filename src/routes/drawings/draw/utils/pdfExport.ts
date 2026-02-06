@@ -95,15 +95,33 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
             if (value !== undefined && value !== null && value !== '') {
                 const text = String(value);
                 const fontSize = field.fontSize || 12;
+                const textPosition = field.textPosition || 'left';
 
                 pdfDoc.setFontSize(fontSize);
 
                 // Position text - PDF.js renders from top-left, jsPDF y is from top
                 // Add small offset to center text vertically in the field
                 const textY = field.position.y + (field.position.height / 2) + (fontSize / 3);
-                const textX = field.position.x + 4; // Small left padding
+                
+                // Calculate X position based on text alignment
+                let textX: number;
+                const padding = 4;
+                
+                if (textPosition === 'center') {
+                    // For center alignment, x is the center of the field
+                    textX = field.position.x + (field.position.width / 2);
+                } else if (textPosition === 'right') {
+                    // For right alignment, x is the right edge of the field minus padding
+                    textX = field.position.x + field.position.width - padding;
+                } else {
+                    // For left alignment (default), x is the left edge plus padding
+                    textX = field.position.x + padding;
+                }
 
-                pdfDoc.text(text, textX, textY);
+                // Map textPosition to jsPDF alignment option
+                const align = textPosition === 'center' ? 'center' : textPosition === 'right' ? 'right' : 'left';
+                
+                pdfDoc.text(text, textX, textY, { align });
             }
         }
 
