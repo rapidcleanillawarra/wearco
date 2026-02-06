@@ -69,6 +69,11 @@
 			updateQrCode();
 		}
 	});
+
+	function closeQrFooter() {
+		showQrFooter = false;
+		isQrExpanded = false;
+	}
 </script>
 
 <svelte:head>
@@ -202,14 +207,26 @@
 
 	<!-- Dev Only Sticky QR Footer -->
 	{#if showQrFooter && qrCodeUrl}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="qr-footer"
 			class:expanded={isQrExpanded}
-			onclick={() => (isQrExpanded = !isQrExpanded)}
 		>
-			<div class="qr-content">
+			<button
+				class="qr-close-btn"
+				aria-label="Close QR code"
+				onclick={(e) => {
+					e.stopPropagation();
+					closeQrFooter();
+				}}
+			>
+				×
+			</button>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div
+				class="qr-content"
+				onclick={() => (isQrExpanded = !isQrExpanded)}
+			>
 				<img src={qrCodeUrl} alt="Localhost QR Code" class="qr-code" />
 				<div class="qr-text">
 					<span class="qr-title">Mobile Dev</span>
@@ -477,6 +494,36 @@
 		display: none; /* Hidden by default, shown via media query */
 		cursor: pointer;
 		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		position: relative;
+	}
+
+	.qr-close-btn {
+		position: absolute;
+		top: -8px;
+		right: -8px;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: var(--color-white);
+		font-size: 18px;
+		font-weight: 300;
+		line-height: 1;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+		z-index: 2001;
+		padding: 0;
+		font-family: inherit;
+	}
+
+	.qr-close-btn:hover {
+		background: rgba(255, 0, 0, 0.8);
+		border-color: rgba(255, 0, 0, 0.9);
+		transform: scale(1.1);
 	}
 
 	.qr-footer:hover {
@@ -529,6 +576,16 @@
 	.qr-footer.expanded .qr-subtitle {
 		font-size: 1.2rem;
 		opacity: 0.8;
+	}
+
+	.qr-footer.expanded .qr-close-btn {
+		top: 1rem;
+		right: 1rem;
+		width: 40px;
+		height: 40px;
+		font-size: 32px;
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	@media (min-width: 1024px) {
