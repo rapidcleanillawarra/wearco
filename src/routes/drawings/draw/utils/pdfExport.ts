@@ -96,32 +96,42 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
                 const text = String(value);
                 const fontSize = field.fontSize || 12;
                 const textPosition = field.textPosition || 'left';
+                const padding = 4;
+                const isTextarea = field.type === 'textarea';
 
                 pdfDoc.setFontSize(fontSize);
 
-                // Position text - PDF.js renders from top-left, jsPDF y is from top
-                // Add small offset to center text vertically in the field
-                const textY = field.position.y + (field.position.height / 2) + (fontSize / 3);
-                
                 // Calculate X position based on text alignment
                 let textX: number;
-                const padding = 4;
-                
                 if (textPosition === 'center') {
-                    // For center alignment, x is the center of the field
                     textX = field.position.x + (field.position.width / 2);
                 } else if (textPosition === 'right') {
-                    // For right alignment, x is the right edge of the field minus padding
                     textX = field.position.x + field.position.width - padding;
                 } else {
-                    // For left alignment (default), x is the left edge plus padding
                     textX = field.position.x + padding;
                 }
-
-                // Map textPosition to jsPDF alignment option
                 const align = textPosition === 'center' ? 'center' : textPosition === 'right' ? 'right' : 'left';
-                
-                pdfDoc.text(text, textX, textY, { align });
+
+                if (isTextarea) {
+                    // Textarea: start from top, wrap to field width, respect newlines
+                    const maxWidth = field.position.width - padding * 2;
+                    const lineHeight = fontSize * 1.2;
+                    let textY = field.position.y + padding + (fontSize / 3);
+
+                    // splitTextToSize handles both newlines and word-wrap within maxWidth
+                    const lines = pdfDoc.splitTextToSize(text, maxWidth);
+
+                    for (const line of lines) {
+                        // Don't overflow below the field
+                        if (textY + lineHeight > field.position.y + field.position.height - padding) break;
+                        pdfDoc.text(line, textX, textY, { align });
+                        textY += lineHeight;
+                    }
+                } else {
+                    // Single-line: center vertically in the field
+                    const textY = field.position.y + (field.position.height / 2) + (fontSize / 3);
+                    pdfDoc.text(text, textX, textY, { align });
+                }
             }
         }
 
