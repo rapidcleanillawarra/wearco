@@ -1,5 +1,5 @@
 <script lang="ts">
-    import PdfViewer from "../../../drawings/draw/components/PdfViewer.svelte";
+    import PdfViewer from "./PdfViewer.svelte";
     import { onMount } from "svelte";
 
     type Field = {
@@ -71,7 +71,9 @@
     function handleMouseMove(e: MouseEvent) {
         if ((!isDragging && !isResizing) || !selectedFieldId) return;
 
-        const fieldIndex = fields.findIndex((f) => f.id === selectedFieldId);
+        const fieldIndex = fields.findIndex(
+            (f: Field) => f.id === selectedFieldId,
+        );
         if (fieldIndex === -1) return;
 
         const field = fields[fieldIndex];
