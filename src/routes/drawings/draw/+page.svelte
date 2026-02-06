@@ -11,49 +11,29 @@
 	let svgDiagrams = $derived(data.svgDiagrams || []);
 	let pdfUrl = $derived(data.pdfUrl);
 
-	// Defaults
-	const centerDefaults = {
-		width: 1000,
-		height: 500,
-		holeType: "circle",
-		holeCount: 10,
-		holeSize: 10,
-		pitch: 250,
-		totalHoleDistance: 500,
-		holeLeft: 250,
-		holeRight: 250,
-		widthPx: 1000,
-		heightPx: 200,
-		holeSizePx: 20,
-	};
-
-	const endDefaults = {
-		width: 300,
-		height: 150,
-		holeType: "circle",
-		holeCount: 4,
-		holeSize: 10,
-		pitch: 60,
-		totalHoleDistance: 180,
-		holeLeft: 60,
-		holeRight: 60,
-		widthPx: 300,
-		heightPx: 100,
-		holeSizePx: 20,
-		rectX: 50,
-		rectY: 50,
-		widthPx: 300,
-		heightPx: 100,
-		holeSizePx: 20,
-		rectX: 50,
-		rectY: 50,
-	};
-
 	function getInitialFormData(currentData: any) {
 		const currentDrawing = currentData.drawing;
 		const currentDiagrams = currentData.svgDiagrams;
 
-		function getDiagramData(name: string, defaultData: any) {
+		// Default "empty" values if no data exists
+		const defaultData = {
+			width: 0,
+			height: 0,
+			holeType: "circle",
+			holeCount: 0,
+			holeSize: 0,
+			pitch: 0,
+			totalHoleDistance: 0,
+			holeLeft: 0,
+			holeRight: 0,
+			widthPx: 0,
+			heightPx: 0,
+			holeSizePx: 0,
+			rectX: 50,
+			rectY: 50,
+		};
+
+		function getDiagramData(name: string) {
 			// 1. Check existing drawing
 			if (currentDrawing && currentDrawing.drawing_data) {
 				const savedDiagram = currentDrawing.drawing_data.find(
@@ -69,8 +49,8 @@
 			return diagram ? { ...defaultData, ...diagram.data } : defaultData;
 		}
 
-		const savedCenter = getDiagramData("Center Edge", centerDefaults);
-		const savedEnd = getDiagramData("End Edge", endDefaults);
+		const savedCenter = getDiagramData("Center Edge");
+		const savedEnd = getDiagramData("End Edge");
 
 		return {
 			// Center Edge Defaults
