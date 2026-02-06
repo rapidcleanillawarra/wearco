@@ -2,7 +2,6 @@
 	import type { PageData } from "./$types";
 	import type { DrawingFormData } from "../types";
 	import type { TemplateData } from "./types";
-	import { enhance } from "$app/forms";
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
@@ -383,21 +382,28 @@
 							});
 
 							try {
-								const formData = new FormData(e.target as HTMLFormElement);
+								const formElement = e.target as HTMLFormElement;
+								const formData = new FormData(formElement);
 
-								const response = await fetch(e.target.action, {
+								const response = await fetch(formElement.action, {
 									method: 'POST',
-									body: formData
+									body: formData,
+									headers: {
+										'x-sveltekit-action': 'true'
+									}
 								});
 
 								const result = await response.json();
 
-								if (response.ok && result?.success) {
+								if (result.type === 'success') {
+									// Parse the actual action data from the result.data string
+									const actionData = JSON.parse(result.data);
+
 									// Handle URL redirection for new drawings
-									if (mode === 'new' && result?.drawingId) {
+									if (mode === 'new' && actionData?.drawingId) {
 										// Preserve existing query parameters except template_id
 										const url = new URL(window.location.href);
-										url.searchParams.set('id', result.drawingId);
+										url.searchParams.set('id', actionData.drawingId);
 										url.searchParams.delete('template_id');
 
 										// Update URL without page reload, maintaining history
@@ -408,7 +414,7 @@
 									}
 								} else {
 									console.error('Server error:', result);
-									alert(`Failed to save drawing: ${result?.message || 'Unknown error'}`);
+									alert(`Failed to save drawing: ${result?.error?.message || 'Unknown error'}`);
 								}
 							} catch (error) {
 								console.error('Network error:', error);
