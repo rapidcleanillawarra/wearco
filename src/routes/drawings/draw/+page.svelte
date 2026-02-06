@@ -6,20 +6,13 @@
 	// Props
 	let { data } = $props();
 	let template = $derived(data.template);
+	let drawing = $derived(data.drawing);
 	let overlayConfig = $derived(template.template_data);
 	let svgDiagrams = $derived(data.svgDiagrams || []);
 	let pdfUrl = $derived(data.pdfUrl);
 
-	// Helper to find diagram data
-	function getDiagramData(name: string, defaultData: any) {
-		if (!data.svgDiagrams) return defaultData;
-		const diagram = data.svgDiagrams.find((d: any) => d.name === name);
-		return diagram ? { ...defaultData, ...diagram.data } : defaultData;
-	}
-
-	// Shared state for all editable values (source of truth)
-	// Initialize from DB if available
-	let centerDefaults = {
+	// Defaults
+	const centerDefaults = {
 		width: 1000,
 		height: 500,
 		holeType: "circle",
@@ -34,10 +27,7 @@
 		holeSizePx: 20,
 	};
 
-	let savedCenter = getDiagramData("Center Edge", centerDefaults);
-
-	// End Edge state values
-	let endDefaults = {
+	const endDefaults = {
 		width: 300,
 		height: 150,
 		holeType: "circle",
@@ -52,50 +42,83 @@
 		holeSizePx: 20,
 		rectX: 50,
 		rectY: 50,
+		widthPx: 300,
+		heightPx: 100,
+		holeSizePx: 20,
+		rectX: 50,
+		rectY: 50,
 	};
 
-	let savedEnd = getDiagramData("End Edge", endDefaults);
+	function getInitialFormData(currentData: any) {
+		const currentDrawing = currentData.drawing;
+		const currentDiagrams = currentData.svgDiagrams;
 
-	// Consolidate all state into a single reactive object
-	// This makes it easy to bind to dynamic field names
-	let formData = $state({
-		// Center Edge Defaults
-		centerEdgeWidth: savedCenter.width,
-		centerEdgeHeight: savedCenter.height,
-		centerEdgeHoleType: savedCenter.holeType,
-		centerEdgeHoleCount: savedCenter.holeCount,
-		centerEdgeHoleSize: savedCenter.holeSize,
-		centerEdgePitch: savedCenter.pitch,
-		centerEdgeTotalHoleDistance: savedCenter.totalHoleDistance,
-		centerEdgeHoleLeft: savedCenter.holeLeft,
-		centerEdgeHoleRight: savedCenter.holeRight,
-		centerEdgeWidthPx: savedCenter.widthPx,
-		centerEdgeHeightPx: savedCenter.heightPx,
-		centerEdgeHoleSizePx: savedCenter.holeSizePx,
-		centerEdgeRectX: savedCenter.rectX || 50,
-		centerEdgeRectY: savedCenter.rectY || 50,
+		function getDiagramData(name: string, defaultData: any) {
+			// 1. Check existing drawing
+			if (currentDrawing && currentDrawing.drawing_data) {
+				const savedDiagram = currentDrawing.drawing_data.find(
+					(d: any) => d.name === name,
+				);
+				if (savedDiagram) {
+					return { ...defaultData, ...savedDiagram.data };
+				}
+			}
+			// 2. Check template defaults
+			if (!currentDiagrams) return defaultData;
+			const diagram = currentDiagrams.find((d: any) => d.name === name);
+			return diagram ? { ...defaultData, ...diagram.data } : defaultData;
+		}
 
-		// End Edge Defaults
-		endEdgeWidth: savedEnd.width,
-		endEdgeHeight: savedEnd.height,
-		endEdgeHoleType: savedEnd.holeType,
-		endEdgeHoleCount: savedEnd.holeCount,
-		endEdgeHoleSize: savedEnd.holeSize,
-		endEdgePitch: savedEnd.pitch,
-		endEdgeTotalHoleDistance: savedEnd.totalHoleDistance,
-		endEdgeHoleLeft: savedEnd.holeLeft,
-		endEdgeHoleRight: savedEnd.holeRight,
-		endEdgeWidthPx: savedEnd.widthPx,
-		endEdgeHeightPx: savedEnd.heightPx,
-		endEdgeHoleSizePx: savedEnd.holeSizePx,
-		endEdgeRectX: savedEnd.rectX || 50,
-		endEdgeRectY: savedEnd.rectY || 50,
+		const savedCenter = getDiagramData("Center Edge", centerDefaults);
+		const savedEnd = getDiagramData("End Edge", endDefaults);
 
-		// PDF Overlay Extras
-		customerName: "",
-		orderNumber: "",
-		date: new Date().toISOString().split("T")[0],
-		material: "",
+		return {
+			// Center Edge Defaults
+			centerEdgeWidth: savedCenter.width,
+			centerEdgeHeight: savedCenter.height,
+			centerEdgeHoleType: savedCenter.holeType,
+			centerEdgeHoleCount: savedCenter.holeCount,
+			centerEdgeHoleSize: savedCenter.holeSize,
+			centerEdgePitch: savedCenter.pitch,
+			centerEdgeTotalHoleDistance: savedCenter.totalHoleDistance,
+			centerEdgeHoleLeft: savedCenter.holeLeft,
+			centerEdgeHoleRight: savedCenter.holeRight,
+			centerEdgeWidthPx: savedCenter.widthPx,
+			centerEdgeHeightPx: savedCenter.heightPx,
+			centerEdgeHoleSizePx: savedCenter.holeSizePx,
+			centerEdgeRectX: savedCenter.rectX || 50,
+			centerEdgeRectY: savedCenter.rectY || 50,
+
+			// End Edge Defaults
+			endEdgeWidth: savedEnd.width,
+			endEdgeHeight: savedEnd.height,
+			endEdgeHoleType: savedEnd.holeType,
+			endEdgeHoleCount: savedEnd.holeCount,
+			endEdgeHoleSize: savedEnd.holeSize,
+			endEdgePitch: savedEnd.pitch,
+			endEdgeTotalHoleDistance: savedEnd.totalHoleDistance,
+			endEdgeHoleLeft: savedEnd.holeLeft,
+			endEdgeHoleRight: savedEnd.holeRight,
+			endEdgeWidthPx: savedEnd.widthPx,
+			endEdgeHeightPx: savedEnd.heightPx,
+			endEdgeHoleSizePx: savedEnd.holeSizePx,
+			endEdgeRectX: savedEnd.rectX || 50,
+			endEdgeRectY: savedEnd.rectY || 50,
+
+			// PDF Overlay Extras
+			customerName: currentDrawing?.customer || "",
+			orderNumber: currentDrawing?.work_order || "",
+			date: new Date().toISOString().split("T")[0],
+			material: currentDrawing?.material || "",
+		};
+	}
+
+	// Initialize state
+	let formData = $state(getInitialFormData(data));
+
+	// Update state when data changes (e.g. navigation)
+	$effect(() => {
+		formData = getInitialFormData(data);
 	});
 
 	let isSaving = $state(false);
@@ -154,9 +177,11 @@
 	<header class="page-header">
 		<div class="header-content">
 			<div class="title-section">
-				<h1>Center & End Edge Diagrams</h1>
+				<h1>{drawing ? "Edit Drawing" : "New Drawing"}</h1>
 				<p class="subtitle">
-					Configure your edge drawing parameters and export to PDF
+					{drawing
+						? `Editing: ${drawing.name}`
+						: "Configure your edge drawing parameters and export to PDF"}
 				</p>
 			</div>
 			<div class="header-actions">
@@ -176,6 +201,13 @@
 						name="templateId"
 						value={template.id}
 					/>
+					{#if drawing}
+						<input
+							type="hidden"
+							name="drawingId"
+							value={drawing.id}
+						/>
+					{/if}
 					<input
 						type="hidden"
 						name="diagrams"
