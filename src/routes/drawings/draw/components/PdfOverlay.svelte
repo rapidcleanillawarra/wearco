@@ -44,7 +44,7 @@
     });
 
     function handleInput(fieldId: string, event: Event) {
-        const target = event.target as HTMLInputElement;
+        const target = event.target as HTMLInputElement | HTMLTextAreaElement;
         onFieldUpdate(fieldId, target.value);
     }
 
@@ -65,15 +65,26 @@
 
 <div class="pdf-overlay">
     {#each fields as field (field.id)}
-        <input
-            type="text"
-            id={field.id}
-            value={fieldValues[field.id] || ""}
-            oninput={(e) => handleInput(field.id, e)}
-            style={getFieldStyle(field)}
-            class="overlay-input"
-            placeholder={field.label}
-        />
+        {#if field.type === "textarea"}
+            <textarea
+                id={field.id}
+                value={fieldValues[field.id] || ""}
+                oninput={(e) => handleInput(field.id, e)}
+                style={getFieldStyle(field)}
+                class="overlay-input overlay-textarea"
+                placeholder={field.label}
+            ></textarea>
+        {:else}
+            <input
+                type={field.type === "number" ? "number" : "text"}
+                id={field.id}
+                value={fieldValues[field.id] ?? ""}
+                oninput={(e) => handleInput(field.id, e)}
+                style={getFieldStyle(field)}
+                class="overlay-input"
+                placeholder={field.label}
+            />
+        {/if}
     {/each}
 </div>
 
@@ -106,5 +117,9 @@
 
     .overlay-input:hover {
         border-color: #3b82f6;
+    }
+
+    .overlay-textarea {
+        resize: none;
     }
 </style>
