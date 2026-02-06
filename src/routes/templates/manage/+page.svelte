@@ -21,7 +21,35 @@
     let imageDisplay = $state(data.template?.image_display || "");
 
     // Parse existing fields or default to empty
-    let fields = $state<any[]>(data.template?.template_data?.fields || []);
+    let rawFields = data.template?.template_data?.fields || [];
+    let duplicateWarning = $state(false);
+
+    // Deduplicate IDs
+    const seenIds = new Set();
+    const sanitizedFields = rawFields.map((field: any) => {
+        let newId = field.id;
+        let counter = 1;
+
+        // If ID is missing, generate one
+        if (!newId) {
+            newId = `field_${Date.now()}`;
+        }
+
+        const originalId = newId;
+        while (seenIds.has(newId)) {
+            newId = `${originalId}_${counter}`;
+            counter++;
+            duplicateWarning = true;
+        }
+        seenIds.add(newId);
+
+        if (newId !== field.id) {
+            return { ...field, id: newId };
+        }
+        return field;
+    });
+
+    let fields = $state<any[]>(sanitizedFields);
     let selectedFieldId = $state<string | null>(null);
 
     let selectedField = $derived(
@@ -54,6 +82,17 @@
         }
     }
 
+    function updateFieldId(e: Event) {
+        const input = e.target as HTMLInputElement;
+        const newId = input.value;
+        if (selectedField) {
+            // Update the ID on the object
+            selectedField.id = newId;
+            // Immediately update the selection pointer to match so the derived store doesn't lose it
+            selectedFieldId = newId;
+        }
+    }
+
     let isSaving = $state(false);
 </script>
 
@@ -73,6 +112,17 @@
     </header>
 
     <div class="content-layout">
+        {#if duplicateWarning}
+            <div class="alert-warning">
+                <strong>Warning:</strong> Duplicate field IDs were detected and
+                automatically fixed. Please save the template to make these
+                changes permanent.
+                <button
+                    class="btn-close"
+                    onclick={() => (duplicateWarning = false)}>&times;</button
+                >
+            </div>
+        {/if}
         <aside class="sidebar">
             <form
                 method="POST"
@@ -174,7 +224,8 @@
                             <input
                                 type="text"
                                 id="field_id"
-                                bind:value={selectedField.id}
+                                value={selectedField.id}
+                                oninput={updateFieldId}
                             />
                         </div>
 
@@ -414,5 +465,37 @@
 
     .btn-danger:hover {
         background: rgba(239, 68, 68, 0.3);
+    }
+
+    .alert-warning {
+        position: absolute;
+        top: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 50;
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        color: inherit;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.8;
+    }
+
+    .btn-close:hover {
+        opacity: 1;
     }
 </style>
