@@ -1,8 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    let { url } = $props<{
+    import type { TemplateData } from "../types";
+
+    let { url, templateData, children } = $props<{
         url: string | null | undefined;
+        templateData?: TemplateData | null;
+        children?: import("svelte").Snippet;
     }>();
 
     // PDF Viewer State
@@ -11,6 +15,10 @@
     let isLoadingPdf = $state(false);
     let pdfError = $state<string | null>(null);
     let pdfjsLib: any = $state(null);
+
+    // Exposed PDF dimensions for overlay positioning
+    let pdfWidth = $state(0);
+    let pdfHeight = $state(0);
 
     onMount(async () => {
         try {
@@ -89,6 +97,12 @@
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
+            // Update PDF dimensions (for first page)
+            if (pageNum === 1) {
+                pdfWidth = viewport.width;
+                pdfHeight = viewport.height;
+            }
+
             // High DPI support
             const dpr = window.devicePixelRatio || 1;
             canvas.style.width = `${viewport.width}px`;
@@ -130,7 +144,17 @@
             {/if}
 
             <!-- Container for PDF Canvases -->
-            <div bind:this={pdfContainer} class="pdf-canvas-container"></div>
+            <div bind:this={pdfContainer} class="pdf-canvas-container">
+                <!-- Render overlay as a snippet if provided -->
+                {#if children && pdfWidth > 0 && pdfHeight > 0}
+                    <div
+                        class="pdf-overlay-wrapper"
+                        style="width: {pdfWidth}px; height: {pdfHeight}px;"
+                    >
+                        {@render children()}
+                    </div>
+                {/if}
+            </div>
         </div>
     {:else}
         <div class="empty-state">
@@ -171,6 +195,15 @@
         min-width: 100%; /* Ensure it takes at least full width */
         align-items: center;
         margin: 0 auto; /* Center when it fits, otherwise scroll start handles it */
+        position: relative;
+    }
+
+    .pdf-overlay-wrapper {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
     }
 
     /* Style for dynamic canvases */

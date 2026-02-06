@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
 	import type { DrawingFormData } from "../types";
+	import type { TemplateData } from "./types";
 	import { enhance } from "$app/forms";
 	import { onMount } from "svelte";
 	import PdfViewer from "./components/PdfViewer.svelte";
+	import PdfOverlay from "./components/PdfOverlay.svelte";
 
 	let { data } = $props<{
 		data: PageData;
@@ -15,33 +17,19 @@
 	const drawing = $derived(data.drawing);
 	const pdfUrl = $derived(data.pdfUrl);
 
-	// Drawing form data - merged from template + drawing
-	let drawingFormData: DrawingFormData = $state({
-		job_number: "",
-		work_order: "",
-		drawing_number: "",
-		name: "",
-		customer: "",
-		customer_source: "",
-		quantity: 0,
-		dl: "",
-		checked_by: "",
-		prog_by: "",
-		material: "",
-		thk: "",
-		additional_data: {},
-		drawing_data: {},
-	});
+	// Parse template data for overlay fields
+	const templateData = $derived<TemplateData | null>(
+		template?.template_data as TemplateData | null,
+	);
 
-	// Initialize form data when data loads
-	$effect(() => {
-		if (template) {
-			// Start with template defaults
-			drawingFormData = {
+	// Drawing form data - computed based on mode and available data
+	const drawingFormData = $derived.by<DrawingFormData>(() => {
+		if (!template) {
+			return {
 				job_number: "",
 				work_order: "",
 				drawing_number: "",
-				name: template.template_name || "",
+				name: "",
 				customer: "",
 				customer_source: "",
 				quantity: 0,
@@ -50,31 +38,68 @@
 				prog_by: "",
 				material: "",
 				thk: "",
-				additional_data: template.template_data || {},
+				additional_data: {},
 				drawing_data: {},
 			};
-
-			// Override with drawing data if in edit mode
-			if (mode === "edit" && drawing) {
-				drawingFormData = {
-					...drawingFormData,
-					job_number: drawing.job_number || "",
-					work_order: drawing.work_order || "",
-					drawing_number: drawing.drawing_number || "",
-					name: drawing.name || template.template_name || "",
-					customer: drawing.customer || "",
-					customer_source: drawing.customer_source || "",
-					quantity: drawing.quantity || 0,
-					dl: drawing.dl || "",
-					checked_by: drawing.checked_by || "",
-					prog_by: drawing.prog_by || "",
-					material: drawing.material || "",
-					thk: drawing.thk || "",
-					additional_data:
-						drawing.additional_data || template.template_data || {},
-				};
-			}
 		}
+
+		// Start with template defaults
+		const baseData: DrawingFormData = {
+			job_number: "",
+			work_order: "",
+			drawing_number: "",
+			name: template.template_name || "",
+			customer: "",
+			customer_source: "",
+			quantity: 0,
+			dl: "",
+			checked_by: "",
+			prog_by: "",
+			material: "",
+			thk: "",
+			additional_data: template.template_data || {},
+			drawing_data: {},
+		};
+
+		// Override with drawing data if in edit mode
+		if (mode === "edit" && drawing) {
+			return {
+				...baseData,
+				job_number: drawing.job_number || "",
+				work_order: drawing.work_order || "",
+				drawing_number: drawing.drawing_number || "",
+				name: drawing.name || template.template_name || "",
+				customer: drawing.customer || "",
+				customer_source: drawing.customer_source || "",
+				quantity: drawing.quantity || 0,
+				dl: drawing.dl || "",
+				checked_by: drawing.checked_by || "",
+				prog_by: drawing.prog_by || "",
+				material: drawing.material || "",
+				thk: drawing.thk || "",
+				additional_data:
+					drawing.additional_data || template.template_data || {},
+			};
+		}
+
+		return baseData;
+	});
+
+	// Mutable state for field value updates (user input)
+	let fieldUpdateState = $state<Record<string, string>>({});
+
+	// Overlay field values derived from additional_data, merged with user updates
+	const overlayFieldValues = $derived.by<Record<string, string>>(() => {
+		if (!templateData?.fields) return {};
+
+		const values: Record<string, string> = {};
+		templateData.fields.forEach((field) => {
+			// Use updated value if available, otherwise use value from drawingFormData
+			values[field.id] =
+				fieldUpdateState[field.id] ??
+				((drawingFormData.additional_data?.[field.id] as string) || "");
+		});
+		return values;
 	});
 
 	async function handleExportPdf() {
@@ -107,6 +132,12 @@
 
 	// Form state for saving drawings (if needed)
 	let isSaving = $state(false);
+
+	// Handle overlay field updates
+	function handleOverlayFieldUpdate(fieldId: string, value: string) {
+		// Update the mutable state which will trigger re-derivation
+		fieldUpdateState[fieldId] = value;
+	}
 </script>
 
 <div class="page-container-dark drawings-page">
@@ -200,6 +231,15 @@
 								value={drawing.id}
 							/>
 						{/if}
+						<!-- Hidden inputs for overlay field values -->
+						<input
+							type="hidden"
+							name="additional_data"
+							value={JSON.stringify({
+								...drawingFormData.additional_data,
+								...fieldUpdateState,
+							})}
+						/>
 						<button class="btn-primary" disabled={isSaving}>
 							{#if isSaving}
 								<span class="spinner"></span>
@@ -233,7 +273,17 @@
 	<main class="templates-main">
 		<section class="section-card pdf-viewer-section">
 			<div class="section-content">
-				<PdfViewer url={pdfUrl} />
+				<PdfViewer url={pdfUrl} {templateData}>
+					{#if templateData?.fields && templateData.pageWidth && templateData.pageHeight}
+						<PdfOverlay
+							fields={templateData.fields}
+							templateWidth={templateData.pageWidth}
+							templateHeight={templateData.pageHeight}
+							fieldValues={overlayFieldValues}
+							onFieldUpdate={handleOverlayFieldUpdate}
+						/>
+					{/if}
+				</PdfViewer>
 			</div>
 		</section>
 	</main>
