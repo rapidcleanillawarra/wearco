@@ -173,7 +173,7 @@
 				<!-- PDF Viewer Component -->
 				<div class="pdf-viewer-container">
 					<iframe
-						src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH"
+						src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=Fit"
 						class="pdf-iframe"
 						title={template.template_name}
 						allowfullscreen
@@ -302,6 +302,10 @@
 		border-radius: var(--radius-2xl);
 		padding: var(--spacing-xl);
 		box-shadow: var(--shadow-md);
+	}
+
+	.pdf-viewer-section {
+		padding: 0;
 	}
 
 	.section-header {
