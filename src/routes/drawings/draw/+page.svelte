@@ -169,15 +169,6 @@
 
 	<main class="templates-main">
 		<section class="section-card pdf-viewer-section">
-			<div class="section-header">
-				<h2>{template.template_name}</h2>
-				{#if template.description}
-					<p class="section-description">
-						{template.description}
-					</p>
-				{/if}
-			</div>
-
 			{#if pdfUrl}
 				<!-- PDF Viewer Component -->
 				<div class="pdf-viewer-container">
