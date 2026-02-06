@@ -65,6 +65,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 export const actions: Actions = {
     save: async ({ request, locals }) => {
+        console.log('Saving template...');
         const formData = await request.formData();
         const id = formData.get('id') as string;
         const name = formData.get('template_name') as string;

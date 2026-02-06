@@ -140,6 +140,7 @@
         <div class="actions">
             <a href="/templates" class="btn-secondary">Cancel</a>
             <button
+                type="submit"
                 class="btn-primary"
                 form="template-form"
                 disabled={isSaving}
@@ -166,15 +167,28 @@
                 method="POST"
                 action="?/save"
                 id="template-form"
-                use:enhance={() => {
+                use:enhance={({ formData }) => {
+                    console.log("=== FORM SUBMITTING ===");
+                    console.log("Form data entries:");
+                    for (const [key, value] of formData.entries()) {
+                        console.log(`  ${key}:`, value);
+                    }
                     isSaving = true;
-                    return async ({ result }) => {
+                    return async ({ result, update }) => {
                         isSaving = false;
+                        console.log("Form result:", result);
+                        console.log("Result type:", result.type);
+                        if (
+                            result.type !== "redirect" &&
+                            result.type !== "error"
+                        ) {
+                            console.log("Result data:", result.data);
+                        }
 
                         if (result.type === "success" && result.data?.success) {
                             showToaster(
                                 "success",
-                                result.data.message ||
+                                (result.data.message as string) ||
                                     "Template saved successfully",
                             );
                             // Update the URL to include the ID for new templates without reloading
@@ -192,7 +206,7 @@
                         } else if (result.type === "failure") {
                             showToaster(
                                 "error",
-                                result.data?.message ||
+                                (result.data?.message as string) ||
                                     "Failed to save template",
                             );
                         } else if (result.type === "error") {
