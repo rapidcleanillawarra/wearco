@@ -3,10 +3,16 @@
 
     import type { TemplateData } from "../types";
 
-    let { url, templateData, children } = $props<{
+    let {
+        url,
+        templateData,
+        children,
+        pdfDimensions = $bindable({ width: 0, height: 0 }),
+    } = $props<{
         url: string | null | undefined;
         templateData?: TemplateData | null;
         children?: import("svelte").Snippet;
+        pdfDimensions?: { width: number; height: number };
     }>();
 
     // PDF Viewer State
@@ -16,9 +22,19 @@
     let pdfError = $state<string | null>(null);
     let pdfjsLib: any = $state(null);
 
-    // Exposed PDF dimensions for overlay positioning
+    // Internal PDF dimensions
     let pdfWidth = $state(0);
     let pdfHeight = $state(0);
+
+    // Sync internal dimensions to bindable prop
+    $effect(() => {
+        console.log("PdfViewer - Syncing dimensions to parent:", {
+            width: pdfWidth,
+            height: pdfHeight,
+        });
+        pdfDimensions.width = pdfWidth;
+        pdfDimensions.height = pdfHeight;
+    });
 
     onMount(async () => {
         try {
@@ -144,12 +160,16 @@
             {/if}
 
             <!-- Container for PDF Canvases -->
-            <div bind:this={pdfContainer} class="pdf-canvas-container">
+            <div class="pdf-canvas-container">
+                <div bind:this={pdfContainer} class="pdf-render-target"></div>
+
                 <!-- Render overlay as a snippet if provided -->
                 {#if children && pdfWidth > 0 && pdfHeight > 0}
                     <div
                         class="pdf-overlay-wrapper"
                         style="width: {pdfWidth}px; height: {pdfHeight}px;"
+                        data-pdf-width={pdfWidth}
+                        data-pdf-height={pdfHeight}
                     >
                         {@render children()}
                     </div>
@@ -188,14 +208,21 @@
     }
 
     .pdf-canvas-container {
+        position: relative;
+        width: fit-content;
+        min-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pdf-render-target {
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
-        width: fit-content; /* Allow container to be wider than parent */
-        min-width: 100%; /* Ensure it takes at least full width */
+        width: 100%;
         align-items: center;
-        margin: 0 auto; /* Center when it fits, otherwise scroll start handles it */
-        position: relative;
     }
 
     .pdf-overlay-wrapper {

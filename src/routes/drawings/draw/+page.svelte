@@ -88,6 +88,16 @@
 	// Mutable state for field value updates (user input)
 	let fieldUpdateState = $state<Record<string, string>>({});
 
+	// PDF dimensions state - will be set by PdfViewer via callback
+	let pdfDimensions = $state<{ width: number; height: number }>({
+		width: 0,
+		height: 0,
+	});
+
+	$effect(() => {
+		console.log("Page - pdfDimensions updated:", pdfDimensions);
+	});
+
 	// Overlay field values derived from additional_data, merged with user updates
 	const overlayFieldValues = $derived.by<Record<string, string>>(() => {
 		if (!templateData?.fields) return {};
@@ -273,12 +283,14 @@
 	<main class="templates-main">
 		<section class="section-card pdf-viewer-section">
 			<div class="section-content">
-				<PdfViewer url={pdfUrl} {templateData}>
+				<PdfViewer url={pdfUrl} {templateData} bind:pdfDimensions>
 					{#if templateData?.fields && templateData.pageWidth && templateData.pageHeight}
 						<PdfOverlay
 							fields={templateData.fields}
 							templateWidth={templateData.pageWidth}
 							templateHeight={templateData.pageHeight}
+							pdfWidth={pdfDimensions.width}
+							pdfHeight={pdfDimensions.height}
 							fieldValues={overlayFieldValues}
 							onFieldUpdate={handleOverlayFieldUpdate}
 						/>

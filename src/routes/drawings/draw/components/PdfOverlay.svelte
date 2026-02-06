@@ -5,45 +5,43 @@
         fields = [],
         templateWidth,
         templateHeight,
+        pdfWidth,
+        pdfHeight,
         fieldValues = {},
         onFieldUpdate,
     } = $props<{
         fields: TemplateField[];
         templateWidth: number;
         templateHeight: number;
+        pdfWidth: number;
+        pdfHeight: number;
         fieldValues: Record<string, string>;
         onFieldUpdate: (fieldId: string, value: string) => void;
     }>();
 
-    // Self-measure PDF dimensions from parent container
-    let containerElement: HTMLDivElement | undefined;
-    let pdfWidth = $state(0);
-    let pdfHeight = $state(0);
-
-    // Update dimensions when container mounts or changes
+    // Debug: Log received dimensions
     $effect(() => {
-        if (containerElement) {
-            const updateDimensions = () => {
-                if (containerElement) {
-                    pdfWidth = containerElement.offsetWidth;
-                    pdfHeight = containerElement.offsetHeight;
-                }
-            };
-            updateDimensions();
-
-            // Update on resize
-            const resizeObserver = new ResizeObserver(updateDimensions);
-            resizeObserver.observe(containerElement);
-
-            return () => {
-                resizeObserver.disconnect();
-            };
-        }
+        console.log("PdfOverlay - Received dimensions:", {
+            pdfWidth,
+            pdfHeight,
+            templateWidth,
+            templateHeight,
+        });
     });
 
     // Calculate scale factors
     const scaleX = $derived(pdfWidth / templateWidth);
     const scaleY = $derived(pdfHeight / templateHeight);
+
+    // Debug scale factors and field positions
+    $effect(() => {
+        console.log("PdfOverlay - Scale factors:", { scaleX, scaleY });
+        console.log("PdfOverlay - Fields:", fields);
+        fields.forEach((field: TemplateField) => {
+            const style = getFieldStyle(field);
+            console.log(`Field ${field.id} style:`, style);
+        });
+    });
 
     function handleInput(fieldId: string, event: Event) {
         const target = event.target as HTMLInputElement;
@@ -65,7 +63,7 @@
     }
 </script>
 
-<div bind:this={containerElement} class="pdf-overlay">
+<div class="pdf-overlay">
     {#each fields as field (field.id)}
         <input
             type="text"
