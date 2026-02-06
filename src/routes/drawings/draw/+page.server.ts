@@ -160,18 +160,22 @@ export const actions: Actions = {
             }
         } else {
             // Create new drawing
-            const { error } = await locals.supabase
+            const { data, error } = await locals.supabase
                 .from('wearco_drawings')
                 .insert({
                     ...payload,
                     created_by: userEmail,
                     updated_by: userEmail,
-                });
+                })
+                .select('id')
+                .single();
 
             if (error) {
                 console.error('Error creating drawing:', error);
                 return fail(500, { success: false, message: 'Failed to create drawing' });
             }
+
+            return { success: true, drawingId: data.id };
         }
 
         return { success: true };

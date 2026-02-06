@@ -4,6 +4,8 @@
 	import type { TemplateData } from "./types";
 	import { enhance } from "$app/forms";
 	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
 	import { exportPdfWithOverlay } from "./utils/pdfExport";
@@ -375,9 +377,20 @@
 								drawingId: drawing?.id,
 								drawingFormData
 							});
-							return async ({ update }) => {
+							return async ({ update, result }) => {
 								await update();
 								isSaving = false;
+
+								// Handle URL redirection for new drawings
+								if (mode === 'new' && result?.data?.drawingId) {
+									// Preserve existing query parameters except template_id
+									const url = new URL(window.location.href);
+									url.searchParams.set('id', result.data.drawingId);
+									url.searchParams.delete('template_id');
+
+									// Update URL without page reload, maintaining history
+									goto(url.toString(), { replaceState: false });
+								}
 							};
 						}}
 					>
