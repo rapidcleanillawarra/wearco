@@ -3,7 +3,7 @@
 	import type { DrawingFormData } from "../types";
 	import { enhance } from "$app/forms";
 	import { onMount } from "svelte";
-	import PdfViewer from "$lib/components/PdfViewer.svelte";
+	import PdfViewer from "./components/PdfViewer.svelte";
 
 	let { data } = $props<{
 		data: PageData;
