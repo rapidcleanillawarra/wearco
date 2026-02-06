@@ -369,7 +369,11 @@
 					<form
 						method="POST"
 						action="?/save"
-						use:enhance={() => {
+						onsubmit={async (e) => {
+							e.preventDefault(); // Explicitly prevent form submission
+
+							if (isSaving) return;
+
 							isSaving = true;
 							console.log('Saving to database:', {
 								mode,
@@ -377,21 +381,41 @@
 								drawingId: drawing?.id,
 								drawingFormData
 							});
-							return async ({ update, result }) => {
-								await update();
-								isSaving = false;
 
-								// Handle URL redirection for new drawings
-								if (mode === 'new' && result?.data?.drawingId) {
-									// Preserve existing query parameters except template_id
-									const url = new URL(window.location.href);
-									url.searchParams.set('id', result.data.drawingId);
-									url.searchParams.delete('template_id');
+							try {
+								const formData = new FormData(e.target as HTMLFormElement);
 
-									// Update URL without page reload, maintaining history
-									goto(url.toString(), { replaceState: false });
+								const response = await fetch(e.target.action, {
+									method: 'POST',
+									body: formData
+								});
+
+								const result = await response.json();
+
+								if (response.ok && result?.success) {
+									// Handle URL redirection for new drawings
+									if (mode === 'new' && result?.drawingId) {
+										// Preserve existing query parameters except template_id
+										const url = new URL(window.location.href);
+										url.searchParams.set('id', result.drawingId);
+										url.searchParams.delete('template_id');
+
+										// Update URL without page reload, maintaining history
+										goto(url.toString(), { replaceState: false });
+									} else {
+										// For updates, just show success message
+										console.log('Drawing updated successfully');
+									}
+								} else {
+									console.error('Server error:', result);
+									alert(`Failed to save drawing: ${result?.message || 'Unknown error'}`);
 								}
-							};
+							} catch (error) {
+								console.error('Network error:', error);
+								alert('Failed to save drawing. Please check your connection and try again.');
+							} finally {
+								isSaving = false;
+							}
 						}}
 					>
 						<input
@@ -434,7 +458,7 @@
 								),
 							})}
 						/>
-						<button class="btn-primary" disabled={isSaving}>
+						<button class="btn-primary" disabled={isSaving} type="submit">
 							{#if isSaving}
 								<span class="spinner"></span>
 								Saving...
