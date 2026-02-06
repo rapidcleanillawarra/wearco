@@ -28,10 +28,6 @@
 
     // Sync internal dimensions to bindable prop
     $effect(() => {
-        console.log("PdfViewer - Syncing dimensions to parent:", {
-            width: pdfWidth,
-            height: pdfHeight,
-        });
         pdfDimensions.width = pdfWidth;
         pdfDimensions.height = pdfHeight;
     });
@@ -45,7 +41,6 @@
                 import.meta.url,
             ).toString();
         } catch (e) {
-            console.error("Failed to load pdfjs-dist", e);
             pdfError = "Failed to load PDF library";
         }
     });
@@ -77,7 +72,6 @@
                 await renderPage(pageNum);
             }
         } catch (err: any) {
-            console.error("Error loading PDF:", err);
             pdfError = err.message || "Failed to load PDF";
         } finally {
             isLoadingPdf = false;
@@ -138,7 +132,7 @@
                 await page.render(renderContext).promise;
             }
         } catch (err) {
-            console.error(`Error rendering page ${pageNum}:`, err);
+            // Error rendering page
         }
     }
 </script>

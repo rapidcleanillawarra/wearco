@@ -74,19 +74,13 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
 
         // Generate PDF URL from storage if visual_document is set
         if (template.visual_document) {
-            console.log('Generating signed URL for:', `templates/${template.visual_document}`);
             const { data: signedUrlData, error: signedUrlError } = await locals.supabase.storage
                 .from('wearco')
                 .createSignedUrl(`templates/${template.visual_document}`, 3600); // 1 hour expiry
 
-            if (signedUrlError) {
-                console.error('Error creating signed URL:', signedUrlError);
-            } else if (signedUrlData) {
+            if (!signedUrlError && signedUrlData) {
                 pdfUrl = signedUrlData.signedUrl;
-                console.log('Generated signed URL:', pdfUrl);
             }
-        } else {
-            console.log('No visual_document set for template');
         }
 
         return {
@@ -97,7 +91,6 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
         };
     } catch (err) {
         // Any error (database, network, etc.) - redirect to drawings list
-        console.error('Error in drawing load:', err);
         throw redirect(302, '/drawings');
     }
 };

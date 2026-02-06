@@ -141,7 +141,6 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
         // Cleanup
         URL.revokeObjectURL(pdfUrl2);
     } catch (error) {
-        console.error('Error generating PDF:', error);
         throw error;
     }
 }

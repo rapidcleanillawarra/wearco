@@ -19,29 +19,9 @@
         onFieldUpdate: (fieldId: string, value: string) => void;
     }>();
 
-    // Debug: Log received dimensions
-    $effect(() => {
-        console.log("PdfOverlay - Received dimensions:", {
-            pdfWidth,
-            pdfHeight,
-            templateWidth,
-            templateHeight,
-        });
-    });
-
     // Calculate scale factors
     const scaleX = $derived(pdfWidth / templateWidth);
     const scaleY = $derived(pdfHeight / templateHeight);
-
-    // Debug scale factors and field positions
-    $effect(() => {
-        console.log("PdfOverlay - Scale factors:", { scaleX, scaleY });
-        console.log("PdfOverlay - Fields:", fields);
-        fields.forEach((field: TemplateField) => {
-            const style = getFieldStyle(field);
-            console.log(`Field ${field.id} style:`, style);
-        });
-    });
 
     function handleInput(fieldId: string, event: Event) {
         const target = event.target as HTMLInputElement | HTMLTextAreaElement;

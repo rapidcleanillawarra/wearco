@@ -115,7 +115,7 @@
 	});
 
 	$effect(() => {
-		console.log("Page - pdfDimensions updated:", pdfDimensions);
+		// pdfDimensions tracking effect
 	});
 
 	// Overlay field values derived from additional_data or drawingFormData fields, merged with user updates
@@ -184,7 +184,6 @@
 				document.body.removeChild(a);
 			}
 		} catch (err) {
-			console.error("Error downloading PDF:", err);
 			alert("Failed to download PDF. Please try again.");
 		}
 	}
