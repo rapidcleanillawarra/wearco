@@ -237,9 +237,61 @@
 
 	// Handle overlay field blur events
 	function handleOverlayFieldBlur(fieldId: string) {
+		// Find the field definition to check if it has a targetField
+		const field = templateData?.fields.find((f) => f.id === fieldId);
+		const targetFieldName = field ? getTargetField(field) : "";
+
+		console.log('Blur debug:', {
+			fieldId,
+			field,
+			targetFieldName,
+			currentOverlayValue: overlayFieldValues[fieldId],
+			drawingFormDataBefore: { ...drawingFormData }
+		});
+
+		// If field has a targetField (and it's not empty), update drawingFormData
+		if (targetFieldName !== "") {
+			const targetField = targetFieldName as keyof DrawingFormData;
+			const currentValue = overlayFieldValues[fieldId] || "";
+
+			// Check the type of the target field to handle conversion
+			if (targetField === "quantity") {
+				// Convert to number for quantity field
+				drawingFormData[targetField] = Number(currentValue) || 0 as any;
+			} else if (
+				targetField === "job_number" ||
+				targetField === "work_order" ||
+				targetField === "drawing_number" ||
+				targetField === "name" ||
+				targetField === "customer" ||
+				targetField === "customer_source" ||
+				targetField === "dl" ||
+				targetField === "checked_by" ||
+				targetField === "prog_by" ||
+				targetField === "material" ||
+				targetField === "thk"
+			) {
+				// String fields
+				drawingFormData[targetField] = currentValue as any;
+			}
+			// Note: additional_data and drawing_data are not updated via targetField
+		}
+
+		// Create overlay values with targetTo property
+		const overlayValuesWithTargets: Record<string, { value: string; targetTo: string }> = {};
+		if (templateData?.fields) {
+			templateData.fields.forEach((field) => {
+				const targetField = getTargetField(field);
+				overlayValuesWithTargets[field.id] = {
+					value: overlayFieldValues[field.id] || "",
+					targetTo: targetField
+				};
+			});
+		}
+
 		console.log('Overlay field blur:', {
-			overlayValues: overlayFieldValues,
-			drawingData: drawingFormData
+			overlayValues: overlayValuesWithTargets,
+			drawingData: { ...drawingFormData }
 		});
 	}
 </script>
