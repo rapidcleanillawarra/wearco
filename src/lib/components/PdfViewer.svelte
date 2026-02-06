@@ -73,8 +73,13 @@
 
             // Adjust scale to fit container width, but maintain high quality
             const containerWidth = pdfContainer.clientWidth - 40; // minus padding
+
+            // Enforce a minimum width for readability on small screens
+            // This prevents the PDF from rendering too small/blurry on phones
+            const targetWidth = Math.max(containerWidth, 800);
+
             const unscaledViewport = page.getViewport({ scale: 1 });
-            const scale = containerWidth / unscaledViewport.width;
+            const scale = targetWidth / unscaledViewport.width;
             // Ensure a minimum scale for readability if container is small
             const finalScale = Math.max(scale, 1.0);
 
@@ -149,20 +154,23 @@
         background: rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start; /* Changed from center to allow scrolling */
         padding: var(--spacing-xs);
         min-height: 600px;
         padding-top: var(--spacing-md);
         padding-bottom: var(--spacing-md);
         flex: 1;
+        overflow-x: auto; /* Enable horizontal scrolling */
     }
 
     .pdf-canvas-container {
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
-        width: 100%;
+        width: fit-content; /* Allow container to be wider than parent */
+        min-width: 100%; /* Ensure it takes at least full width */
         align-items: center;
+        margin: 0 auto; /* Center when it fits, otherwise scroll start handles it */
     }
 
     /* Style for dynamic canvases */
@@ -171,7 +179,7 @@
             0 4px 6px -1px rgba(0, 0, 0, 0.1),
             0 2px 4px -1px rgba(0, 0, 0, 0.06);
         border-radius: var(--radius-sm);
-        max-width: 100%;
+        max-width: none; /* Removed max-width 100% to allow horizontal overflow */
         height: auto !important; /* Allow aspect ratio to remain */
     }
 
