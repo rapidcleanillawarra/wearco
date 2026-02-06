@@ -9,50 +9,68 @@
         data: PageData & { signedVisualDocumentUrl?: string | null };
     }>();
 
+    // Derive template values from props - these update when data changes
+    let templateData = $derived(data.template);
+
+    // Local editable state - initialized once from template data
+    let templateName = $state("");
+    let category = $state("Edge");
+    let description = $state("");
+    let visualDocument = $state("");
+    let imageDisplay = $state("");
+    let fields = $state<any[]>([]);
+    let selectedFieldId = $state<string | null>(null);
+    let duplicateWarning = $state(false);
+    let initialized = $state(false);
+
+    // Effect to initialize local state when template data loads or changes
+    $effect(() => {
+        const template = templateData;
+        // Only re-initialize if templateData identity changes and we haven't initialized yet
+        // or if the template ID changed (navigating to different template)
+        if (template && !initialized) {
+            templateName = template.template_name || "";
+            category = template.category || "Edge";
+            description = template.description || "";
+            visualDocument = template.visual_document || "";
+            imageDisplay = template.image_display || "";
+
+            // Parse and deduplicate fields
+            const rawFields = template.template_data?.fields || [];
+            const seenIds = new Set<string>();
+            const sanitizedFields = rawFields.map((field: any) => {
+                let newId = field.id;
+                let counter = 1;
+
+                if (!newId) {
+                    newId = `field_${Date.now()}`;
+                }
+
+                const originalId = newId;
+                while (seenIds.has(newId)) {
+                    newId = `${originalId}_${counter}`;
+                    counter++;
+                    duplicateWarning = true;
+                }
+                seenIds.add(newId);
+
+                if (newId !== field.id) {
+                    return { ...field, id: newId };
+                }
+                return field;
+            });
+
+            fields = sanitizedFields;
+            initialized = true;
+        }
+    });
+
     $effect(() => {
         console.log("Client Data:", {
             signedVisualDocumentUrl: data.signedVisualDocumentUrl,
             visualDocument: data.template?.visual_document,
         });
     });
-
-    let templateName = $state(data.template?.template_name || "");
-    let category = $state(data.template?.category || "Edge");
-    let description = $state(data.template?.description || "");
-    let visualDocument = $state(data.template?.visual_document || "");
-    let imageDisplay = $state(data.template?.image_display || "");
-
-    // Parse existing fields or default to empty
-    let rawFields = data.template?.template_data?.fields || [];
-    let duplicateWarning = $state(false);
-
-    // Deduplicate IDs
-    const seenIds = new Set();
-    const sanitizedFields = rawFields.map((field: any) => {
-        let newId = field.id;
-        let counter = 1;
-
-        // If ID is missing, generate one
-        if (!newId) {
-            newId = `field_${Date.now()}`;
-        }
-
-        const originalId = newId;
-        while (seenIds.has(newId)) {
-            newId = `${originalId}_${counter}`;
-            counter++;
-            duplicateWarning = true;
-        }
-        seenIds.add(newId);
-
-        if (newId !== field.id) {
-            return { ...field, id: newId };
-        }
-        return field;
-    });
-
-    let fields = $state<any[]>(sanitizedFields);
-    let selectedFieldId = $state<string | null>(null);
 
     let selectedField = $derived(
         selectedFieldId ? fields.find((f) => f.id === selectedFieldId) : null,
@@ -197,7 +215,10 @@
                                 !$page.url.searchParams.get("id")
                             ) {
                                 const newUrl = new URL($page.url);
-                                newUrl.searchParams.set("id", result.data.id);
+                                newUrl.searchParams.set(
+                                    "id",
+                                    String(result.data.id),
+                                );
                                 goto(newUrl.toString(), {
                                     replaceState: true,
                                     noScroll: true,
