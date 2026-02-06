@@ -6,6 +6,7 @@
 	import { onMount } from "svelte";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
+	import { exportPdfWithOverlay } from "./utils/pdfExport";
 
 	let { data } = $props<{
 		data: PageData;
@@ -116,24 +117,40 @@
 		if (!pdfUrl) return;
 
 		try {
-			// Fetch the original blob to ensure clean download
-			const response = await fetch(pdfUrl);
-			if (!response.ok) throw new Error("Network response was not ok");
-
-			const blob = await response.blob();
-			const url = window.URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.style.display = "none";
-			a.href = url;
-			// Name the file
 			const filename = drawing?.name
 				? `${drawing.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`
 				: "drawing.pdf";
-			a.download = filename;
-			document.body.appendChild(a);
-			a.click();
-			window.URL.revokeObjectURL(url);
-			document.body.removeChild(a);
+
+			if (
+				templateData?.fields &&
+				templateData.pageWidth &&
+				templateData.pageHeight
+			) {
+				await exportPdfWithOverlay({
+					pdfUrl,
+					fieldValues: overlayFieldValues,
+					fields: templateData.fields,
+					pageWidth: templateData.pageWidth,
+					pageHeight: templateData.pageHeight,
+					filename,
+				});
+			} else {
+				// Fallback: Fetch the original blob to ensure clean download
+				const response = await fetch(pdfUrl);
+				if (!response.ok)
+					throw new Error("Network response was not ok");
+
+				const blob = await response.blob();
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.style.display = "none";
+				a.href = url;
+				a.download = filename;
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(url);
+				document.body.removeChild(a);
+			}
 		} catch (err) {
 			console.error("Error downloading PDF:", err);
 			alert("Failed to download PDF. Please try again.");

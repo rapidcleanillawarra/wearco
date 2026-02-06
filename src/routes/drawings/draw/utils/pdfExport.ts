@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import overlayFieldsConfig from '../config/overlays.json';
+import type { TemplateField } from '../types';
 
 interface FieldValues {
     [key: string]: string | number;
@@ -9,13 +9,23 @@ interface ExportOptions {
     filename?: string;
     pdfUrl: string;
     fieldValues: FieldValues;
+    fields: TemplateField[];
+    pageWidth: number;
+    pageHeight: number;
 }
 
 /**
  * Generates a PDF with the template and overlay values embedded as text
  */
 export async function exportPdfWithOverlay(options: ExportOptions): Promise<void> {
-    const { filename = 'edge-template-filled.pdf', pdfUrl, fieldValues } = options;
+    const {
+        filename = 'edge-template-filled.pdf',
+        pdfUrl,
+        fieldValues,
+        fields,
+        pageWidth,
+        pageHeight
+    } = options;
 
     try {
         // Fetch the original PDF as an image via canvas
@@ -62,7 +72,7 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
         const pdfDoc = new jsPDF({
             orientation: 'landscape',
             unit: 'pt',
-            format: [overlayFieldsConfig.pageWidth, overlayFieldsConfig.pageHeight]
+            format: [pageWidth, pageHeight]
         });
 
         // Add the PDF template as background image
@@ -71,8 +81,8 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
             'JPEG',
             0,
             0,
-            overlayFieldsConfig.pageWidth,
-            overlayFieldsConfig.pageHeight
+            pageWidth,
+            pageHeight
         );
 
         // Set font for text overlay
@@ -80,7 +90,7 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
         pdfDoc.setTextColor(0, 0, 0);
 
         // Add each field value as text at its configured position
-        for (const field of overlayFieldsConfig.fields) {
+        for (const field of fields) {
             const value = fieldValues[field.id];
             if (value !== undefined && value !== null && value !== '') {
                 const text = String(value);
@@ -106,42 +116,4 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
         console.error('Error generating PDF:', error);
         throw error;
     }
-}
-
-/**
- * Get field values mapped by field ID from the state values
- */
-export function mapStateToFieldValues(stateValues: {
-    centerEdgeWidth: number;
-    centerEdgeHeight: number;
-    centerEdgeHoleCount: number;
-    centerEdgeHoleSize: number;
-    centerEdgePitch: number;
-    centerEdgeTotalHoleDistance: number;
-    centerEdgeHoleLeft: number;
-    centerEdgeHoleRight: number;
-    customerName: string;
-    orderNumber: string;
-    date: string;
-    material: string;
-    endEdgeWidth: number;
-    endEdgeHeight: number;
-    endEdgeHoleCount: number;
-    endEdgeHoleSize: number;
-    endEdgeHoleType: string;
-    endEdgePitch: number;
-    endEdgeTotalHoleDistance: number;
-    endEdgeHoleLeft: number;
-    endEdgeHoleRight: number;
-}): FieldValues {
-    const fieldValues: FieldValues = {};
-
-    for (const field of overlayFieldsConfig.fields) {
-        const key = field.bindsTo as keyof typeof stateValues;
-        if (key in stateValues) {
-            fieldValues[field.id] = stateValues[key];
-        }
-    }
-
-    return fieldValues;
 }
