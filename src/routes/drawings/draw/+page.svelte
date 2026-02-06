@@ -173,7 +173,7 @@
 				<!-- PDF Viewer Component -->
 				<div class="pdf-viewer-container">
 					<iframe
-						src="{pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
+						src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH"
 						class="pdf-iframe"
 						title={template.template_name}
 						allowfullscreen
