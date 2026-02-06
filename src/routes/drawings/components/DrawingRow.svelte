@@ -20,7 +20,11 @@
 	<span class="list-col dimensions-col">{drawing.thickness}</span>
 	<span class="list-col date-col">{drawing.updatedLabel}</span>
 	<span class="list-col actions-col">
-		<a href="/drawings/draw?id={drawing.id}" class="row-action">
+		<a
+			href="/drawings/draw?id={drawing.id}"
+			class="row-action"
+			aria-label="Edit drawing"
+		>
 			<svg
 				width="16"
 				height="16"
@@ -37,7 +41,7 @@
 				/>
 			</svg>
 		</a>
-		<button class="row-action">
+		<button class="row-action" aria-label="Copy drawing">
 			<svg
 				width="16"
 				height="16"
@@ -52,7 +56,7 @@
 				/>
 			</svg>
 		</button>
-		<button class="row-action delete">
+		<button class="row-action delete" aria-label="Delete drawing">
 			<svg
 				width="16"
 				height="16"

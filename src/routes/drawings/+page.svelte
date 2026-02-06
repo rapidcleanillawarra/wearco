@@ -54,7 +54,7 @@
 	}
 
 	const drawingItems = $derived(
-		drawings.map((drawing) => formatDrawing(drawing)),
+		drawings.map((drawing: WearcoDrawing) => formatDrawing(drawing)),
 	);
 
 	function openModal() {
