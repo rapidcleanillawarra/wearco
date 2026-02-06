@@ -54,10 +54,10 @@
                 }
                 seenIds.add(newId);
 
-                if (newId !== field.id) {
-                    return { ...field, id: newId };
-                }
-                return field;
+                // Normalize targetField (support legacy targetFieldf)
+                const targetField = field.targetField ?? field.targetFieldf ?? "";
+                const { targetFieldf: _tf, ...rest } = field;
+                return { ...rest, id: newId, targetField };
             });
 
             fields = sanitizedFields;
@@ -90,7 +90,7 @@
                 height: 30,
             },
             textPosition: "left",
-            targetFieldf: "",
+            targetField: "",
         });
         selectedFieldId = newId;
     }
@@ -406,10 +406,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="field_targetFieldf">Target Field</label>
+                            <label for="field_targetField">Target Field</label>
                             <select
-                                id="field_targetFieldf"
-                                bind:value={selectedField.targetFieldf}
+                                id="field_targetField"
+                                bind:value={selectedField.targetField}
                             >
                                 <option value="">None</option>
                                 <option value="job_number">Job Number</option>

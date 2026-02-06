@@ -63,7 +63,7 @@
 			return;
 		}
 
-		// Start with template defaults
+		// Start with template defaults (additional_data holds overlay values, not template structure)
 		const baseData: DrawingFormData = {
 			job_number: "",
 			work_order: "",
@@ -77,7 +77,7 @@
 			prog_by: "",
 			material: "",
 			thk: "",
-			additional_data: template.template_data || {},
+			additional_data: {},
 			drawing_data: {},
 		};
 
@@ -118,15 +118,22 @@
 		// pdfDimensions tracking effect
 	});
 
+	// Resolve target field: support both targetField and targetFieldf (legacy typo from template editor)
+	function getTargetField(field: { targetField?: string; targetFieldf?: string }): string {
+		const t = field.targetField || field.targetFieldf || "";
+		return (typeof t === "string" ? t : "").trim();
+	}
+
 	// Overlay field values derived from additional_data or drawingFormData fields, merged with user updates
 	const overlayFieldValues = $derived.by<Record<string, string>>(() => {
 		if (!templateData?.fields) return {};
 
 		const values: Record<string, string> = {};
 		templateData.fields.forEach((field) => {
+			const targetField = getTargetField(field);
 			// If field has a targetField, read from drawingFormData
-			if (field.targetField && field.targetField.trim() !== "") {
-				const targetValue = drawingFormData[field.targetField as keyof DrawingFormData];
+			if (targetField !== "") {
+				const targetValue = drawingFormData[targetField as keyof DrawingFormData];
 				// Handle different types (string, number)
 				if (typeof targetValue === "string") {
 					values[field.id] = fieldUpdateState[field.id] ?? targetValue ?? "";
@@ -199,9 +206,10 @@
 		// Update the mutable state which will trigger re-derivation
 		fieldUpdateState[fieldId] = value;
 		
+		const targetFieldName = field ? getTargetField(field) : "";
 		// If field has a targetField (and it's not empty), update drawingFormData
-		if (field?.targetField && field.targetField.trim() !== "") {
-			const targetField = field.targetField as keyof DrawingFormData;
+		if (targetFieldName !== "") {
+			const targetField = targetFieldName as keyof DrawingFormData;
 			
 			// Check the type of the target field to handle conversion
 			if (targetField === "quantity") {
@@ -301,6 +309,12 @@
 						action="?/save"
 						use:enhance={() => {
 							isSaving = true;
+							console.log('Saving to database:', {
+								mode,
+								templateId: template?.id,
+								drawingId: drawing?.id,
+								drawingFormData
+							});
 							return async ({ update }) => {
 								await update();
 								isSaving = false;
@@ -342,7 +356,7 @@
 									Object.entries(fieldUpdateState).filter(([fieldId]) => {
 										const field = templateData?.fields.find((f) => f.id === fieldId);
 										// Only include fields without targetField or with empty targetField
-										return !field?.targetField || field.targetField.trim() === "";
+										return !field || getTargetField(field) === "";
 									})
 								),
 							})}

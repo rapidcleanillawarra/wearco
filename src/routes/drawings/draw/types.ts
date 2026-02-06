@@ -16,10 +16,10 @@ export interface TemplateField {
     type: string;
     label: string;
     textPosition?: string;
-    targetFieldf?: string;
+    targetField?: string; // Maps to a DrawingFormData field name (e.g., "job_number", "customer", etc.)
+    targetFieldf?: string; // Legacy typo - supported for backwards compatibility
     fontSize?: number;
     position: TemplateFieldPosition;
-    targetField?: string; // Maps to a DrawingFormData field name (e.g., "job_number", "customer", etc.)
 }
 
 /**
