@@ -1,5 +1,7 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
+    import { goto } from "$app/navigation";
+    import { page } from "$app/stores";
     import type { PageData } from "./$types";
     import TemplateEditor from "./components/TemplateEditor.svelte";
 
@@ -94,9 +96,45 @@
     }
 
     let isSaving = $state(false);
+
+    // Toaster notification state
+    let toaster = $state<{
+        show: boolean;
+        type: "success" | "error";
+        message: string;
+    }>({
+        show: false,
+        type: "success",
+        message: "",
+    });
+
+    function showToaster(type: "success" | "error", message: string) {
+        toaster = { show: true, type, message };
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+            toaster = { ...toaster, show: false };
+        }, 4000);
+    }
 </script>
 
 <div class="page-container">
+    {#if toaster.show}
+        <div class="toaster {toaster.type}">
+            <span class="toaster-icon">
+                {#if toaster.type === "success"}
+                    ✓
+                {:else}
+                    ✕
+                {/if}
+            </span>
+            <span class="toaster-message">{toaster.message}</span>
+            <button
+                class="toaster-close"
+                onclick={() => (toaster = { ...toaster, show: false })}
+                >&times;</button
+            >
+        </div>
+    {/if}
     <header class="page-header">
         <h1>{data.mode === "edit" ? "Edit Template" : "Create Template"}</h1>
         <div class="actions">
@@ -130,9 +168,39 @@
                 id="template-form"
                 use:enhance={() => {
                     isSaving = true;
-                    return async ({ update }) => {
-                        await update();
+                    return async ({ result }) => {
                         isSaving = false;
+
+                        if (result.type === "success" && result.data?.success) {
+                            showToaster(
+                                "success",
+                                result.data.message ||
+                                    "Template saved successfully",
+                            );
+                            // Update the URL to include the ID for new templates without reloading
+                            if (
+                                result.data.id &&
+                                !$page.url.searchParams.get("id")
+                            ) {
+                                const newUrl = new URL($page.url);
+                                newUrl.searchParams.set("id", result.data.id);
+                                goto(newUrl.toString(), {
+                                    replaceState: true,
+                                    noScroll: true,
+                                });
+                            }
+                        } else if (result.type === "failure") {
+                            showToaster(
+                                "error",
+                                result.data?.message ||
+                                    "Failed to save template",
+                            );
+                        } else if (result.type === "error") {
+                            showToaster(
+                                "error",
+                                "An unexpected error occurred",
+                            );
+                        }
                     };
                 }}
             >
@@ -496,6 +564,69 @@
     }
 
     .btn-close:hover {
+        opacity: 1;
+    }
+
+    /* Toaster notifications */
+    .toaster {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .toaster.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .toaster.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .toaster-icon {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .toaster-message {
+        font-weight: 500;
+    }
+
+    .toaster-close {
+        background: none;
+        border: none;
+        color: inherit;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 0.5rem;
+        line-height: 1;
+        opacity: 0.8;
+    }
+
+    .toaster-close:hover {
         opacity: 1;
     }
 </style>

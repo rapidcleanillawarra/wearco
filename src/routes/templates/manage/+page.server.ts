@@ -81,6 +81,7 @@ export const actions: Actions = {
         let template_data = {};
         try {
             template_data = JSON.parse(template_data_str || '{}');
+            console.log('Saving template_data:', JSON.stringify(template_data, null, 2));
         } catch (e) {
             return fail(400, { invalid: true, message: 'Invalid template data JSON' });
         }
@@ -124,9 +125,9 @@ export const actions: Actions = {
 
         if (error) {
             console.error('Error saving template:', error);
-            return fail(500, { supabase: true, message: 'Failed to save template' });
+            return fail(500, { success: false, message: 'Failed to save template' });
         }
 
-        throw redirect(303, `/templates/manage?id=${resultId}`);
+        return { success: true, message: 'Template saved successfully', id: resultId };
     }
 };
