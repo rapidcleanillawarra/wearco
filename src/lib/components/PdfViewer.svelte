@@ -150,8 +150,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: var(--spacing-lg);
+        padding: var(--spacing-xs);
         min-height: 600px;
+        padding-top: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
         flex: 1;
     }
 
