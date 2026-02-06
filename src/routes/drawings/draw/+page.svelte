@@ -23,10 +23,28 @@
 		template?.template_data as TemplateData | null,
 	);
 
-	// Drawing form data - computed based on mode and available data
-	const drawingFormData = $derived.by<DrawingFormData>(() => {
+	// Drawing form data - mutable state that can be updated by overlay fields
+	let drawingFormData = $state<DrawingFormData>({
+		job_number: "",
+		work_order: "",
+		drawing_number: "",
+		name: "",
+		customer: "",
+		customer_source: "",
+		quantity: 0,
+		dl: "",
+		checked_by: "",
+		prog_by: "",
+		material: "",
+		thk: "",
+		additional_data: {},
+		drawing_data: {},
+	});
+
+	// Initialize drawingFormData when template or drawing changes
+	$effect(() => {
 		if (!template) {
-			return {
+			drawingFormData = {
 				job_number: "",
 				work_order: "",
 				drawing_number: "",
@@ -42,6 +60,7 @@
 				additional_data: {},
 				drawing_data: {},
 			};
+			return;
 		}
 
 		// Start with template defaults
@@ -64,7 +83,7 @@
 
 		// Override with drawing data if in edit mode
 		if (mode === "edit" && drawing) {
-			return {
+			drawingFormData = {
 				...baseData,
 				job_number: drawing.job_number || "",
 				work_order: drawing.work_order || "",
@@ -81,9 +100,9 @@
 				additional_data:
 					drawing.additional_data || template.template_data || {},
 			};
+		} else {
+			drawingFormData = baseData;
 		}
-
-		return baseData;
 	});
 
 	// Mutable state for field value updates (user input)
@@ -99,16 +118,29 @@
 		console.log("Page - pdfDimensions updated:", pdfDimensions);
 	});
 
-	// Overlay field values derived from additional_data, merged with user updates
+	// Overlay field values derived from additional_data or drawingFormData fields, merged with user updates
 	const overlayFieldValues = $derived.by<Record<string, string>>(() => {
 		if (!templateData?.fields) return {};
 
 		const values: Record<string, string> = {};
 		templateData.fields.forEach((field) => {
-			// Use updated value if available, otherwise use value from drawingFormData
-			values[field.id] =
-				fieldUpdateState[field.id] ??
-				((drawingFormData.additional_data?.[field.id] as string) || "");
+			// If field has a targetField, read from drawingFormData
+			if (field.targetField && field.targetField.trim() !== "") {
+				const targetValue = drawingFormData[field.targetField as keyof DrawingFormData];
+				// Handle different types (string, number)
+				if (typeof targetValue === "string") {
+					values[field.id] = fieldUpdateState[field.id] ?? targetValue ?? "";
+				} else if (typeof targetValue === "number") {
+					values[field.id] = fieldUpdateState[field.id] ?? String(targetValue ?? "");
+				} else {
+					values[field.id] = fieldUpdateState[field.id] ?? "";
+				}
+			} else {
+				// No targetField - use value from additional_data
+				values[field.id] =
+					fieldUpdateState[field.id] ??
+					((drawingFormData.additional_data?.[field.id] as string) || "");
+			}
 		});
 		return values;
 	});
@@ -162,8 +194,38 @@
 
 	// Handle overlay field updates
 	function handleOverlayFieldUpdate(fieldId: string, value: string) {
+		// Find the field definition to check if it has a targetField
+		const field = templateData?.fields.find((f) => f.id === fieldId);
+		
 		// Update the mutable state which will trigger re-derivation
 		fieldUpdateState[fieldId] = value;
+		
+		// If field has a targetField (and it's not empty), update drawingFormData
+		if (field?.targetField && field.targetField.trim() !== "") {
+			const targetField = field.targetField as keyof DrawingFormData;
+			
+			// Check the type of the target field to handle conversion
+			if (targetField === "quantity") {
+				// Convert to number for quantity field
+				drawingFormData[targetField] = Number(value) || 0 as any;
+			} else if (
+				targetField === "job_number" ||
+				targetField === "work_order" ||
+				targetField === "drawing_number" ||
+				targetField === "name" ||
+				targetField === "customer" ||
+				targetField === "customer_source" ||
+				targetField === "dl" ||
+				targetField === "checked_by" ||
+				targetField === "prog_by" ||
+				targetField === "material" ||
+				targetField === "thk"
+			) {
+				// String fields
+				drawingFormData[targetField] = value as any;
+			}
+			// Note: additional_data and drawing_data are not updated via targetField
+		}
 	}
 </script>
 
@@ -258,13 +320,32 @@
 								value={drawing.id}
 							/>
 						{/if}
-						<!-- Hidden inputs for overlay field values -->
+						<!-- Hidden inputs for drawingFormData fields -->
+						<input type="hidden" name="job_number" value={drawingFormData.job_number} />
+						<input type="hidden" name="work_order" value={drawingFormData.work_order} />
+						<input type="hidden" name="drawing_number" value={drawingFormData.drawing_number} />
+						<input type="hidden" name="name" value={drawingFormData.name} />
+						<input type="hidden" name="customer" value={drawingFormData.customer} />
+						<input type="hidden" name="customer_source" value={drawingFormData.customer_source} />
+						<input type="hidden" name="quantity" value={drawingFormData.quantity} />
+						<input type="hidden" name="dl" value={drawingFormData.dl} />
+						<input type="hidden" name="checked_by" value={drawingFormData.checked_by} />
+						<input type="hidden" name="prog_by" value={drawingFormData.prog_by} />
+						<input type="hidden" name="material" value={drawingFormData.material} />
+						<input type="hidden" name="thk" value={drawingFormData.thk} />
+						<!-- Hidden inputs for overlay field values (fields without targetField go to additional_data) -->
 						<input
 							type="hidden"
 							name="additional_data"
 							value={JSON.stringify({
 								...drawingFormData.additional_data,
-								...fieldUpdateState,
+								...Object.fromEntries(
+									Object.entries(fieldUpdateState).filter(([fieldId]) => {
+										const field = templateData?.fields.find((f) => f.id === fieldId);
+										// Only include fields without targetField or with empty targetField
+										return !field?.targetField || field.targetField.trim() === "";
+									})
+								),
 							})}
 						/>
 						<button class="btn-primary" disabled={isSaving}>
