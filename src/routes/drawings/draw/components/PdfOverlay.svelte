@@ -1,0 +1,706 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { browser } from "$app/environment";
+    import OverlayInput from "./OverlayInput.svelte";
+
+    import {
+        exportPdfWithOverlay,
+        mapStateToFieldValues,
+    } from "../utils/pdfExport";
+
+    // Bindable props for all overlay values
+    let {
+        overlayFieldsConfig = $bindable(),
+        centerEdgeWidth = $bindable(1000),
+        centerEdgeHeight = $bindable(500),
+        centerEdgeHoleCount = $bindable(10),
+        centerEdgeHoleSize = $bindable(10),
+        centerEdgeHoleType = $bindable("circle"),
+        centerEdgePitch = $bindable(250),
+        centerEdgeTotalHoleDistance = $bindable(500),
+        centerEdgeHoleLeft = $bindable(0),
+        centerEdgeHoleRight = $bindable(0),
+        centerEdgePlateThicknessAndGrade = $bindable(""),
+        centerEdgeQuantity = $bindable(1),
+        centerEdgeBevelAngleAndType = $bindable(""),
+        centerEdgeBevelTopAndBottom = $bindable("both"),
+        centerEdgeSingleOrDoubleBevel = $bindable("single"),
+        endEdgeWidth = $bindable(300),
+        endEdgeHeight = $bindable(150),
+        endEdgeHoleCount = $bindable(4),
+        endEdgeHoleSize = $bindable(10),
+        endEdgeHoleType = $bindable("circle"),
+        endEdgePitch = $bindable(60),
+        endEdgeTotalHoleDistance = $bindable(180),
+        endEdgeHoleLeft = $bindable(60),
+        endEdgeHoleRight = $bindable(60),
+        endEdgePlateThicknessAndGrade = $bindable(""),
+        endEdgeQuantity = $bindable(1),
+        endEdgeBevelAngleAndType = $bindable(""),
+        endEdgeBevelTopAndBottom = $bindable("both"),
+        endEdgeSingleOrDoubleBevel = $bindable("single"),
+        topSideWidth = $bindable(200),
+        topSideBeforeCurve = $bindable(50),
+        topSideAfterCurve = $bindable(50),
+        topSideAngle = $bindable(45),
+        generalQuantity = $bindable(1),
+        generalJobNumber = $bindable(""),
+        generalWorkOrder = $bindable(""),
+        generalDwgNumber = $bindable(""),
+        generalDl = $bindable(""),
+        generalCheckedBy = $bindable(""),
+        generalProgBy = $bindable(""),
+        generalCustomer = $bindable(""),
+        generalMaterial = $bindable(""),
+        generalThk = $bindable(""),
+        customerName = $bindable(""),
+        orderNumber = $bindable(""),
+        date = $bindable(""),
+        material = $bindable(""),
+        pdfUrl,
+    }: {
+        overlayFieldsConfig: any;
+        centerEdgeWidth?: number;
+        centerEdgeHeight?: number;
+        centerEdgeHoleCount?: number;
+        centerEdgeHoleSize?: number;
+        centerEdgeHoleType?: string;
+        centerEdgePitch?: number;
+        centerEdgeTotalHoleDistance?: number;
+        centerEdgeHoleLeft?: number;
+        centerEdgeHoleRight?: number;
+        centerEdgePlateThicknessAndGrade?: string;
+        centerEdgeQuantity?: number;
+        centerEdgeBevelAngleAndType?: string;
+        centerEdgeBevelTopAndBottom?: string;
+        centerEdgeSingleOrDoubleBevel?: string;
+        endEdgeWidth?: number;
+        endEdgeHeight?: number;
+        endEdgeHoleCount?: number;
+        endEdgeHoleSize?: number;
+        endEdgeHoleType?: string;
+        endEdgePitch?: number;
+        endEdgeTotalHoleDistance?: number;
+        endEdgeHoleLeft?: number;
+        endEdgeHoleRight?: number;
+        endEdgePlateThicknessAndGrade?: string;
+        endEdgeQuantity?: number;
+        endEdgeBevelAngleAndType?: string;
+        endEdgeBevelTopAndBottom?: string;
+        endEdgeSingleOrDoubleBevel?: string;
+        topSideWidth?: number;
+        topSideBeforeCurve?: number;
+        topSideAfterCurve?: number;
+        topSideAngle?: number;
+        generalQuantity?: number;
+        generalJobNumber?: string;
+        generalWorkOrder?: string;
+        generalDwgNumber?: string;
+        generalDl?: string;
+        generalCheckedBy?: string;
+        generalProgBy?: string;
+        generalCustomer?: string;
+        generalMaterial?: string;
+        generalThk?: string;
+        customerName?: string;
+        orderNumber?: string;
+        date?: string;
+        material?: string;
+        pdfUrl?: string;
+    } = $props();
+
+    // Map of bindsTo keys to their values
+    const valueMap = $derived({
+        centerEdgeWidth,
+        centerEdgeHeight,
+        centerEdgeHoleCount,
+        centerEdgeHoleSize,
+        centerEdgeHoleType,
+        centerEdgePitch,
+        centerEdgeTotalHoleDistance,
+        centerEdgeHoleLeft,
+        centerEdgeHoleRight,
+        centerEdgePlateThicknessAndGrade,
+        centerEdgeQuantity,
+        centerEdgeBevelAngleAndType,
+        centerEdgeBevelTopAndBottom,
+        centerEdgeSingleOrDoubleBevel,
+        endEdgeWidth,
+        endEdgeHeight,
+        endEdgeHoleCount,
+        endEdgeHoleSize,
+        endEdgeHoleType,
+        endEdgePitch,
+        endEdgeTotalHoleDistance,
+        endEdgeHoleLeft,
+        endEdgeHoleRight,
+        endEdgePlateThicknessAndGrade,
+        endEdgeQuantity,
+        endEdgeBevelAngleAndType,
+        endEdgeBevelTopAndBottom,
+        endEdgeSingleOrDoubleBevel,
+        topSideWidth,
+        topSideBeforeCurve,
+        topSideAfterCurve,
+        topSideAngle,
+        generalQuantity,
+        generalJobNumber,
+        generalWorkOrder,
+        generalDwgNumber,
+        generalDl,
+        generalCheckedBy,
+        generalProgBy,
+        generalCustomer,
+        generalMaterial,
+        generalThk,
+        customerName,
+        orderNumber,
+        date,
+        material,
+    });
+
+    let canvasElement: HTMLCanvasElement;
+    let containerElement: HTMLDivElement;
+    let pdfLoaded = $state(false);
+    let pdfError = $state<string | null>(null);
+    let scale = $state(1);
+    let originalWidth = $state(595);
+    let originalHeight = $state(842);
+
+    // Field values as a reactive object
+    let fieldValues = $state<Record<string, string | number>>({});
+
+    // Initialize field values from props
+    $effect(() => {
+        const newValues: Record<string, string | number> = {};
+        for (const field of overlayFieldsConfig.fields) {
+            const key = field.bindsTo;
+            if (key in valueMap) {
+                newValues[field.id] = valueMap[key as keyof typeof valueMap];
+            }
+        }
+        fieldValues = newValues;
+    });
+
+    // Sync field values back to props
+    function updateFieldValue(fieldId: string, value: string | number) {
+        fieldValues[fieldId] = value;
+
+        // Find the field config to get bindsTo
+        const field = overlayFieldsConfig.fields.find(
+            (f: any) => f.id === fieldId,
+        );
+
+        if (!field) return;
+
+        // Update the corresponding prop
+        switch (field.bindsTo) {
+            case "centerEdgeWidth":
+                centerEdgeWidth = Number(value);
+                break;
+            case "centerEdgeHeight":
+                centerEdgeHeight = Number(value);
+                break;
+            case "centerEdgeHoleCount":
+                centerEdgeHoleCount = Number(value);
+                break;
+            case "centerEdgeHoleSize":
+                centerEdgeHoleSize = Number(value);
+                break;
+            case "centerEdgeHoleType":
+                centerEdgeHoleType = String(value);
+                break;
+            case "centerEdgePitch":
+                centerEdgePitch = Number(value);
+                break;
+            case "centerEdgeTotalHoleDistance":
+                centerEdgeTotalHoleDistance = Number(value);
+                break;
+            case "centerEdgeHoleLeft":
+                centerEdgeHoleLeft = Number(value);
+                break;
+            case "centerEdgeHoleRight":
+                centerEdgeHoleRight = Number(value);
+                break;
+            case "centerEdgePlateThicknessAndGrade":
+                centerEdgePlateThicknessAndGrade = String(value);
+                break;
+            case "centerEdgeQuantity":
+                centerEdgeQuantity = Number(value);
+                break;
+            case "centerEdgeBevelAngleAndType":
+                centerEdgeBevelAngleAndType = String(value);
+                break;
+            case "centerEdgeBevelTopAndBottom":
+                centerEdgeBevelTopAndBottom = String(value);
+                break;
+            case "centerEdgeSingleOrDoubleBevel":
+                centerEdgeSingleOrDoubleBevel = String(value);
+                break;
+            case "endEdgeWidth":
+                endEdgeWidth = Number(value);
+                break;
+            case "endEdgeHeight":
+                endEdgeHeight = Number(value);
+                break;
+            case "endEdgeHoleCount":
+                endEdgeHoleCount = Number(value);
+                break;
+            case "endEdgeHoleSize":
+                endEdgeHoleSize = Number(value);
+                break;
+            case "endEdgeHoleType":
+                endEdgeHoleType = String(value);
+                break;
+            case "endEdgePitch":
+                endEdgePitch = Number(value);
+                break;
+            case "endEdgeTotalHoleDistance":
+                endEdgeTotalHoleDistance = Number(value);
+                break;
+            case "endEdgeHoleLeft":
+                endEdgeHoleLeft = Number(value);
+                break;
+            case "endEdgeHoleRight":
+                endEdgeHoleRight = Number(value);
+                break;
+            case "endEdgePlateThicknessAndGrade":
+                endEdgePlateThicknessAndGrade = String(value);
+                break;
+            case "endEdgeQuantity":
+                endEdgeQuantity = Number(value);
+                break;
+            case "endEdgeBevelAngleAndType":
+                endEdgeBevelAngleAndType = String(value);
+                break;
+            case "endEdgeBevelTopAndBottom":
+                endEdgeBevelTopAndBottom = String(value);
+                break;
+            case "endEdgeSingleOrDoubleBevel":
+                endEdgeSingleOrDoubleBevel = String(value);
+                break;
+            case "topSideWidth":
+                topSideWidth = Number(value);
+                break;
+            case "topSideBeforeCurve":
+                topSideBeforeCurve = Number(value);
+                break;
+            case "topSideAfterCurve":
+                topSideAfterCurve = Number(value);
+                break;
+            case "topSideAngle":
+                topSideAngle = Number(value);
+                break;
+            case "generalQuantity":
+                generalQuantity = Number(value);
+                break;
+            case "generalJobNumber":
+                generalJobNumber = String(value);
+                break;
+            case "generalWorkOrder":
+                generalWorkOrder = String(value);
+                break;
+            case "generalDwgNumber":
+                generalDwgNumber = String(value);
+                break;
+            case "generalDl":
+                generalDl = String(value);
+                break;
+            case "generalCheckedBy":
+                generalCheckedBy = String(value);
+                break;
+            case "generalProgBy":
+                generalProgBy = String(value);
+                break;
+            case "generalCustomer":
+                generalCustomer = String(value);
+                break;
+            case "generalMaterial":
+                generalMaterial = String(value);
+                break;
+            case "generalThk":
+                generalThk = String(value);
+                break;
+            case "customerName":
+                customerName = String(value);
+                break;
+            case "orderNumber":
+                orderNumber = String(value);
+                break;
+            case "date":
+                date = String(value);
+                break;
+            case "material":
+                material = String(value);
+                break;
+        }
+    }
+
+    async function loadPdf() {
+        if (!browser) return;
+
+        if (!pdfUrl) {
+            pdfError =
+                "No PDF URL configured. Please set a visual document for this template.";
+            return;
+        }
+
+        try {
+            pdfError = null;
+
+            // Dynamically import pdfjs-dist only on client side
+            const pdfjsLib = await import("pdfjs-dist");
+
+            // Use local worker file via Vite's URL handling
+            const workerUrl = new URL(
+                "pdfjs-dist/build/pdf.worker.min.mjs",
+                import.meta.url,
+            ).href;
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            const pdf = await loadingTask.promise;
+            const page = await pdf.getPage(1);
+
+            const viewport = page.getViewport({ scale: 1 });
+            originalWidth = viewport.width;
+            originalHeight = viewport.height;
+
+            // Calculate scale to fit container width but ensure minimum readability
+            const containerWidth = containerElement?.clientWidth || 800;
+            const minReadableWidth = 800; // Minimum width where text remains legible
+            const targetWidth = Math.max(containerWidth, minReadableWidth);
+
+            scale = targetWidth / viewport.width;
+
+            const scaledViewport = page.getViewport({ scale });
+
+            canvasElement.width = scaledViewport.width;
+            canvasElement.height = scaledViewport.height;
+
+            const context = canvasElement.getContext("2d");
+            if (!context) {
+                throw new Error("Could not get canvas context");
+            }
+
+            await page.render({
+                canvasContext: context,
+                viewport: scaledViewport,
+                canvas: context.canvas,
+            }).promise;
+
+            pdfLoaded = true;
+        } catch (err) {
+            console.error("Error loading PDF:", err);
+            pdfError =
+                err instanceof Error ? err.message : "Failed to load PDF";
+        }
+    }
+
+    onMount(() => {
+        loadPdf();
+
+        // Handle resize
+        const resizeObserver = new ResizeObserver(() => {
+            if (pdfLoaded) {
+                loadPdf();
+            }
+        });
+
+        if (containerElement) {
+            resizeObserver.observe(containerElement);
+        }
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    });
+
+    let isExporting = $state(false);
+    let exportError = $state<string | null>(null);
+
+    async function handlePrintPdf() {
+        if (!pdfUrl) {
+            exportError = "No PDF URL configured";
+            return;
+        }
+
+        isExporting = true;
+        exportError = null;
+
+        try {
+            const fieldValues = mapStateToFieldValues(valueMap);
+
+            await exportPdfWithOverlay({
+                pdfUrl,
+                fieldValues,
+                filename: `edge-template-${orderNumber || "filled"}.pdf`,
+            });
+        } catch (err) {
+            console.error("Export failed:", err);
+            exportError = err instanceof Error ? err.message : "Export failed";
+        } finally {
+            isExporting = false;
+        }
+    }
+</script>
+
+<div class="pdf-overlay-container" bind:this={containerElement}>
+    <div class="pdf-header">
+        <div class="header-actions">
+            <button
+                class="print-pdf-btn"
+                onclick={handlePrintPdf}
+                disabled={isExporting}
+            >
+                {#if isExporting}
+                    <span class="spinner-small"></span>
+                    Generating...
+                {:else}
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        ></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Print PDF
+                {/if}
+            </button>
+            {#if exportError}
+                <span class="export-error">{exportError}</span>
+            {/if}
+        </div>
+    </div>
+
+    <div class="pdf-scroll-container">
+        <div
+            class="pdf-wrapper"
+            style="height: {originalHeight * scale}px; width: {originalWidth *
+                scale}px;"
+        >
+            {#if pdfError}
+                <div class="error-message">
+                    <span class="error-icon">⚠️</span>
+                    <p>Failed to load PDF: {pdfError}</p>
+                    <button onclick={loadPdf}>Retry</button>
+                </div>
+            {:else if !pdfLoaded}
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading PDF...</p>
+                </div>
+            {/if}
+
+            <canvas bind:this={canvasElement} class="pdf-canvas"></canvas>
+
+            {#if pdfLoaded}
+                <div class="overlay-container">
+                    {#each overlayFieldsConfig.fields as field (field.id)}
+                        <OverlayInput
+                            {field}
+                            {scale}
+                            bind:value={
+                                () => fieldValues[field.id],
+                                (v) => updateFieldValue(field.id, v)
+                            }
+                        />
+                    {/each}
+                </div>
+            {/if}
+        </div>
+    </div>
+</div>
+
+<style>
+    .pdf-overlay-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pdf-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        border-radius: 8px;
+        background: #2a2a2a;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom scrollbar for better visibility */
+    .pdf-scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-track {
+        background: #1a1a1a;
+        border-radius: 4px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+
+    .pdf-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .pdf-header {
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end; /* Align actions to the right */
+    }
+
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .print-pdf-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--color-gold) 0%, #e5af0e 100%);
+        color: var(--color-black);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(250, 194, 17, 0.3);
+    }
+
+    .print-pdf-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(250, 194, 17, 0.4);
+    }
+
+    .print-pdf-btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .print-pdf-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background: var(--color-gray);
+        box-shadow: none;
+    }
+
+    .spinner-small {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: var(--color-black);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .export-error {
+        color: #ef4444;
+        font-size: 12px;
+    }
+
+    .pdf-wrapper {
+        position: relative;
+        /* No longer needs border-radius/overflow here as parent handles it */
+        background: #2a2a2a;
+    }
+
+    .pdf-canvas {
+        display: block;
+        /* Width/Height handled by attribute binding */
+    }
+
+    .overlay-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .overlay-container :global(.overlay-input-wrapper) {
+        pointer-events: auto;
+    }
+
+    .loading,
+    .error-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 20;
+    }
+
+    .loading p,
+    .error-message p {
+        margin: 12px 0 0 0;
+        color: var(--color-gray);
+    }
+
+    .error-message {
+        background: #1a1a1a;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .error-message p {
+        color: var(--color-white);
+    }
+
+    .error-icon {
+        font-size: 48px;
+    }
+
+    .error-message button {
+        margin-top: 12px;
+        padding: 8px 16px;
+        background: var(--color-gold);
+        color: var(--color-black);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .error-message button:hover {
+        opacity: 0.9;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--color-gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>

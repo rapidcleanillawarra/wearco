@@ -1,0 +1,423 @@
+{
+    "pdfPath": "/assets/edge_template.pdf",
+    "pageWidth": 842,
+    "pageHeight": 595,
+    "fields": [
+        {
+            "id": "centerEdgeWidth",
+            "type": "number",
+            "label": "Width (mm)",
+            "position": {
+                "x": 375,
+                "y": 30,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeWidth",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHeight",
+            "type": "number",
+            "label": "Height (mm)",
+            "position": {
+                "x": 45,
+                "y": 105,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHeight",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleCount",
+            "type": "number",
+            "label": "Hole Count",
+            "position": {
+                "x": 535,
+                "y": 315,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleCount",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleSize",
+            "type": "number",
+            "label": "Hole Size (mm)",
+            "position": {
+                "x": 120,
+                "y": 160,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleSize",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleType",
+            "type": "dropdown",
+            "label": "Hole Type",
+            "position": {
+                "x": 535,
+                "y": 345,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleType",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgePitch",
+            "type": "number",
+            "label": "Pitch (mm)",
+            "position": {
+                "x": 160,
+                "y": 95,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgePitch",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeTotalHoleDistance",
+            "type": "number",
+            "label": "Total Distance (mm)",
+            "position": {
+                "x": 350,
+                "y": 50,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeTotalHoleDistance",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleLeft",
+            "type": "number",
+            "label": "Hole Left (mm)",
+            "position": {
+                "x": 100,
+                "y": 50,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleLeft",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeHoleRight",
+            "type": "number",
+            "label": "Hole Right (mm)",
+            "position": {
+                "x": 600,
+                "y": 50,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeHoleRight",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgePlateThicknessAndGrade",
+            "type": "text",
+            "label": "Plate Thickness & Grade",
+            "position": {
+                "x": 535,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgePlateThicknessAndGrade",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeQuantity",
+            "type": "number",
+            "label": "Quantity",
+            "position": {
+                "x": 535,
+                "y": 285,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeQuantity",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeBevelAngleAndType",
+            "type": "text",
+            "label": "Bevel Angle & Type",
+            "position": {
+                "x": 535,
+                "y": 375,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeBevelAngleAndType",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeBevelTopAndBottom",
+            "type": "dropdown",
+            "label": "Bevel Top/Bottom",
+            "position": {
+                "x": 535,
+                "y": 400,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeBevelTopAndBottom",
+            "fontSize": 10
+        },
+        {
+            "id": "centerEdgeSingleOrDoubleBevel",
+            "type": "dropdown",
+            "label": "Single/Double Bevel",
+            "position": {
+                "x": 535,
+                "y": 430,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "centerEdgeSingleOrDoubleBevel",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeWidth",
+            "type": "number",
+            "label": "End Width (mm)",
+            "position": {
+                "x": 190,
+                "y": 244,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeWidth",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHeight",
+            "type": "number",
+            "label": "End Height (mm)",
+            "position": {
+                "x": 60,
+                "y": 320,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHeight",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleCount",
+            "type": "number",
+            "label": "End Hole Count",
+            "position": {
+                "x": 615,
+                "y": 315,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleCount",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleSize",
+            "type": "number",
+            "label": "End Hole Size (mm)",
+            "position": {
+                "x": 120,
+                "y": 360,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleSize",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleType",
+            "type": "dropdown",
+            "label": "End Hole Type",
+            "position": {
+                "x": 615,
+                "y": 345,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleType",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgePitch",
+            "type": "number",
+            "label": "End Pitch (mm)",
+            "position": {
+                "x": 175,
+                "y": 300,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgePitch",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeTotalHoleDistance",
+            "type": "number",
+            "label": "End Total Distance (mm)",
+            "position": {
+                "x": 175,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeTotalHoleDistance",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleLeft",
+            "type": "number",
+            "label": "End Hole Left (mm)",
+            "position": {
+                "x": 105,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleLeft",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeHoleRight",
+            "type": "number",
+            "label": "End Hole Right (mm)",
+            "position": {
+                "x": 250,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeHoleRight",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgePlateThicknessAndGrade",
+            "type": "text",
+            "label": "End Plate Thickness & Grade",
+            "position": {
+                "x": 615,
+                "y": 260,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgePlateThicknessAndGrade",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeQuantity",
+            "type": "number",
+            "label": "End Quantity",
+            "position": {
+                "x": 615,
+                "y": 285,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeQuantity",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeBevelAngleAndType",
+            "type": "text",
+            "label": "End Bevel Angle & Type",
+            "position": {
+                "x": 615,
+                "y": 375,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeBevelAngleAndType",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeBevelTopAndBottom",
+            "type": "dropdown",
+            "label": "End Bevel Top/Bottom",
+            "position": {
+                "x": 615,
+                "y": 400,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeBevelTopAndBottom",
+            "fontSize": 10
+        },
+        {
+            "id": "endEdgeSingleOrDoubleBevel",
+            "type": "dropdown",
+            "label": "End Single/Double Bevel",
+            "position": {
+                "x": 615,
+                "y": 430,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "endEdgeSingleOrDoubleBevel",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideWidth",
+            "type": "number",
+            "label": "Top Side Width",
+            "position": {
+                "x": 660,
+                "y": 130,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "topSideWidth",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideBeforeCurve",
+            "type": "number",
+            "label": "Before Curve",
+            "position": {
+                "x": 687,
+                "y": 225,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "topSideBeforeCurve",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideAfterCurve",
+            "type": "number",
+            "label": "After Curve",
+            "position": {
+                "x": 690,
+                "y": 50,
+                "width": 30,
+                "height": 12
+            },
+            "bindsTo": "topSideAfterCurve",
+            "fontSize": 10
+        },
+        {
+            "id": "topSideAngle",
+            "type": "number",
+            "label": "Angle",
+            "position": {
+                "x": 730,
+                "y": 180,
+                "width": 40,
+                "height": 12
+            },
+            "bindsTo": "topSideAngle",
+            "fontSize": 10
+        }
+    ]
+}
