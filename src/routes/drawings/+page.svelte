@@ -73,7 +73,7 @@
 
 	function createDrawing() {
 		if (selectedTemplateId) {
-			window.location.href = `/drawings/drawing-edge?template_id=${selectedTemplateId}`;
+			window.location.href = `/drawings/draw?template_id=${selectedTemplateId}`;
 		}
 	}
 
