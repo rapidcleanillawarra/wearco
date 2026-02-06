@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import type { WearcoTemplate } from "$lib/types/template";
     import TemplateCard from "./components/TemplateCard.svelte";
     import TemplateRow from "./components/TemplateRow.svelte";
-    import TemplateModal from "./components/TemplateModal.svelte";
     import { fade } from "svelte/transition";
 
     let { data, form } = $props<{
@@ -22,9 +22,6 @@
     let viewMode: "card" | "list" = $state("card");
     let searchQuery = $state("");
     let selectedCategory = $state("all");
-
-    let showModal = $state(false);
-    let selectedTemplate: WearcoTemplate | null = $state(null);
 
     // Derived state for filtering
     const uniqueCategories = $derived([
@@ -48,71 +45,63 @@
     );
 
     function openCreateModal() {
-        selectedTemplate = null;
-        showModal = true;
+        goto("/templates/manage");
     }
 
     function openEditModal(template: WearcoTemplate) {
-        selectedTemplate = template;
-        showModal = true;
-    }
-
-    function closeModal() {
-        showModal = false;
-        selectedTemplate = null;
-    }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Escape" && showModal) {
-            closeModal();
-        }
+        goto(`/templates/manage?id=${template.id}`);
     }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<!-- removed svelte:window -->
 
 <div class="page-container-dark templates-page">
-    <!-- Header Section -->
-    <header class="page-header">
+    <div class="page-header" in:fade={{ duration: 300, delay: 100 }}>
         <div class="header-content">
             <div class="title-section">
                 <h1>Templates</h1>
-                <p class="subtitle">Manage your drawing templates</p>
+                <p class="subtitle">
+                    Manage and organize your drawing templates
+                </p>
             </div>
-
-            <div class="header-actions">
-                <button class="create-btn" onclick={openCreateModal}>
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path d="M12 5v14M5 12h14" />
-                    </svg>
-                    New Template
-                </button>
-            </div>
+            <button class="create-btn" onclick={openCreateModal}>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Template
+            </button>
         </div>
 
-        <!-- Controls Bar -->
         <div class="controls-bar">
             <div class="search-filters">
                 <div class="search-box">
-                    <svg
-                        class="search-icon"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
+                    <span class="search-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
                     <input
                         type="text"
                         placeholder="Search templates..."
@@ -123,11 +112,11 @@
                 <div class="category-filter">
                     <select bind:value={selectedCategory}>
                         {#each uniqueCategories as category}
-                            <option value={category}
-                                >{category === "all"
+                            <option value={category}>
+                                {category === "all"
                                     ? "All Categories"
-                                    : category}</option
-                            >
+                                    : category}
+                            </option>
                         {/each}
                     </select>
                 </div>
@@ -135,107 +124,123 @@
 
             <div class="view-toggles">
                 <button
-                    class="toggle-btn {viewMode === 'card' ? 'active' : ''}"
+                    class="toggle-btn"
+                    class:active={viewMode === "card"}
                     onclick={() => (viewMode = "card")}
-                    aria-label="Grid view"
+                    title="Grid View"
                 >
                     <svg
-                        width="18"
-                        height="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
                         stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                     >
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
                 </button>
                 <button
-                    class="toggle-btn {viewMode === 'list' ? 'active' : ''}"
+                    class="toggle-btn"
+                    class:active={viewMode === "list"}
                     onclick={() => (viewMode = "list")}
-                    aria-label="List view"
+                    title="List View"
                 >
                     <svg
-                        width="18"
-                        height="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
                         stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                     >
-                        <line x1="8" y1="6" x2="21" y2="6" />
-                        <line x1="8" y1="12" x2="21" y2="12" />
-                        <line x1="8" y1="18" x2="21" y2="18" />
-                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
                     </svg>
                 </button>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="templates-main">
-        {#if form?.message}
-            <div
-                class="alert {form.success ? 'success' : 'error'}"
-                transition:fade
-            >
-                {form.message}
-            </div>
-        {/if}
+    {#if form?.message}
+        <div
+            class="alert"
+            class:success={form.success}
+            class:error={!form.success}
+            transition:fade
+        >
+            {form.message}
+        </div>
+    {/if}
 
-        {#if loadError}
-            <div class="error-state">
-                <span class="error-icon">⚠️</span>
-                <p>Error loading templates: {loadError}</p>
+    {#if loadError}
+        <div class="alert error" transition:fade>
+            Error loading templates: {loadError}
+        </div>
+    {/if}
+
+    {#if filteredTemplates.length === 0}
+        <div class="empty-state" in:fade>
+            <h3>No templates found</h3>
+            <p>
+                {searchQuery
+                    ? "Try adjusting your search or filters"
+                    : "Create your first template to get started"}
+            </p>
+            {#if !searchQuery && selectedCategory === "all"}
+                <button
+                    class="create-btn"
+                    style="margin: 1rem auto;"
+                    onclick={openCreateModal}
+                >
+                    Create Template
+                </button>
+            {/if}
+        </div>
+    {:else if viewMode === "card"}
+        <div class="cards-grid" in:fade>
+            {#each filteredTemplates as template, index (template.id)}
+                <TemplateCard
+                    {template}
+                    {index}
+                    onEdit={() => openEditModal(template)}
+                />
+            {/each}
+        </div>
+    {:else}
+        <div class="list-container" in:fade>
+            <div class="list-header">
+                <div>Name/Description</div>
+                <div>Category</div>
+                <div>Created</div>
+                <div>Last Updated</div>
+                <div style="text-align: right">Actions</div>
             </div>
-        {:else if filteredTemplates.length === 0}
-            <div class="empty-state">
-                <h3>No templates found</h3>
-                <p>
-                    {searchQuery
-                        ? "Try adjusting your search or filters"
-                        : "Create your first template to get started"}
-                </p>
-            </div>
-        {:else if viewMode === "card"}
-            <div class="cards-grid">
-                {#each filteredTemplates as template, index (template.id)}
-                    <TemplateCard
-                        {template}
-                        {index}
-                        onEdit={() => openEditModal(template)}
-                    />
-                {/each}
-            </div>
-        {:else}
-            <div class="list-container">
-                <div class="list-header">
-                    <span class="list-col name-col">Template</span>
-                    <span class="list-col category-col">Category</span>
-                    <span class="list-col desc-col">Description</span>
-                    <span class="list-col date-col">Last Updated</span>
-                    <span class="list-col actions-col">Actions</span>
-                </div>
-                {#each filteredTemplates as template, index (template.id)}
-                    <TemplateRow
-                        {template}
-                        {index}
-                        onEdit={() => openEditModal(template)}
-                    />
-                {/each}
-            </div>
-        {/if}
-    </main>
+            {#each filteredTemplates as template, index (template.id)}
+                <TemplateRow
+                    {template}
+                    {index}
+                    onEdit={() => openEditModal(template)}
+                />
+            {/each}
+        </div>
+    {/if}
 </div>
 
-{#if showModal}
-    <TemplateModal template={selectedTemplate} onClose={closeModal} />
-{/if}
+<!-- removed TemplateModal block -->
 
 <style>
     /* Reuse global styles and specific page styles similar to Drawings page */
