@@ -14,7 +14,7 @@
             height: number;
         };
         textPosition: "left" | "center" | "right";
-        staticVariableBind?: string;
+        targetFieldf?: string;
     };
 
     let {

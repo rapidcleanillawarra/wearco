@@ -16,7 +16,7 @@ export interface TemplateField {
     type: string;
     label: string;
     textPosition?: string;
-    staticVariableBind?: string;
+    targetFieldf?: string;
     fontSize?: number;
     position: TemplateFieldPosition;
     targetField?: string; // Maps to a DrawingFormData field name (e.g., "job_number", "customer", etc.)

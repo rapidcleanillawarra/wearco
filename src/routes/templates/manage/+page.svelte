@@ -90,7 +90,7 @@
                 height: 30,
             },
             textPosition: "left",
-            staticVariableBind: "",
+            targetFieldf: "",
         });
         selectedFieldId = newId;
     }
@@ -403,6 +403,16 @@
                                 <option value="center">Center</option>
                                 <option value="right">Right</option>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_targetFieldf">Target Field</label>
+                            <input
+                                type="text"
+                                id="field_targetFieldf"
+                                bind:value={selectedField.targetFieldf}
+                                placeholder="Enter target field name"
+                            />
                         </div>
 
                         <button
