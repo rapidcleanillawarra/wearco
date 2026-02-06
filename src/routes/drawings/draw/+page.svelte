@@ -1,14 +1,78 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
+	import type { DrawingFormData } from "../types";
 	import { enhance } from "$app/forms";
 
 	let { data } = $props<{
 		data: PageData;
 	}>();
 
+	// Extract data from the new structure
+	const mode = $derived(data.mode);
 	const template = $derived(data.template);
+	const drawing = $derived(data.drawing);
 	const pdfUrl = $derived(data.pdfUrl);
-	const error = $derived(data.error);
+
+	// Drawing form data - merged from template + drawing
+	let drawingFormData: DrawingFormData = $state({
+		job_number: '',
+		work_order: '',
+		drawing_number: '',
+		name: '',
+		customer: '',
+		customer_source: '',
+		quantity: 0,
+		dl: '',
+		checked_by: '',
+		prog_by: '',
+		material: '',
+		thk: '',
+		additional_data: {},
+		drawing_data: {}
+	});
+
+	// Initialize form data when data loads
+	$effect(() => {
+		if (template) {
+			// Start with template defaults
+			drawingFormData = {
+				job_number: '',
+				work_order: '',
+				drawing_number: '',
+				name: template.template_name || '',
+				customer: '',
+				customer_source: '',
+				quantity: 0,
+				dl: '',
+				checked_by: '',
+				prog_by: '',
+				material: '',
+				thk: '',
+				additional_data: template.template_data || {},
+				drawing_data: {}
+			};
+
+			// Override with drawing data if in edit mode
+			if (mode === 'edit' && drawing) {
+				drawingFormData = {
+					...drawingFormData,
+					job_number: drawing.job_number || '',
+					work_order: drawing.work_order || '',
+					drawing_number: drawing.drawing_number || '',
+					name: drawing.name || template.template_name || '',
+					customer: drawing.customer || '',
+					customer_source: drawing.customer_source || '',
+					quantity: drawing.quantity || 0,
+					dl: drawing.dl || '',
+					checked_by: drawing.checked_by || '',
+					prog_by: drawing.prog_by || '',
+					material: drawing.material || '',
+					thk: drawing.thk || '',
+					additional_data: drawing.additional_data || template.template_data || {}
+				};
+			}
+		}
+	});
 
 	// Form state for saving drawings (if needed)
 	let isSaving = $state(false);
@@ -19,12 +83,36 @@
 	<header class="page-header">
 		<div class="header-content">
 			<div class="title-section">
+				<div class="mode-indicator">
+					<span class="mode-badge mode-{mode}">
+						{mode === 'new' ? 'New Drawing' : 'Edit Drawing'}
+					</span>
+				</div>
 				<h1 class="title-gradient">
-					{template?.template_name || "Drawing Viewer"}
+					{mode === 'edit' && drawing?.name ? drawing.name : template?.template_name || "Drawing Editor"}
 				</h1>
 				<p class="subtitle">
-					View and interact with your drawing template
+					{mode === 'new'
+						? 'Create a new drawing from template'
+						: `Editing drawing ${drawing?.drawing_number || ''} - Job: ${drawing?.job_number || ''}`
+					}
 				</p>
+				{#if mode === 'edit' && drawing}
+					<div class="drawing-meta">
+						<span class="meta-item">
+							<strong>Customer:</strong> {drawing.customer || 'Not set'}
+						</span>
+						<span class="meta-item">
+							<strong>Material:</strong> {drawing.material || 'Not set'}
+						</span>
+						<span class="meta-item">
+							<strong>Quantity:</strong> {drawing.quantity || 0}
+						</span>
+						<span class="meta-item">
+							<strong>Last Updated:</strong> {new Date(drawing.updated_at).toLocaleDateString()}
+						</span>
+					</div>
+				{/if}
 			</div>
 			<div class="header-actions">
 				{#if template}
@@ -44,12 +132,19 @@
 							name="templateId"
 							value={template.id}
 						/>
+						{#if mode === 'edit' && drawing}
+							<input
+								type="hidden"
+								name="drawingId"
+								value={drawing.id}
+							/>
+						{/if}
 						<button class="btn-primary" disabled={isSaving}>
 							{#if isSaving}
 								<span class="spinner"></span>
 								Saving...
 							{:else}
-								Save Drawing
+								{mode === 'new' ? 'Create Drawing' : 'Update Drawing'}
 							{/if}
 						</button>
 					</form>
@@ -66,56 +161,44 @@
 						<path d="M19 12H5" />
 						<path d="M12 19l-7-7 7-7" />
 					</svg>
-					Back to Templates
+					Back to Drawings
 				</a>
 			</div>
 		</div>
 	</header>
 
 	<main class="templates-main">
-		{#if error}
-			<div class="error-state">
-				<span class="error-icon">⚠️</span>
-				<p>Error loading drawing: {error}</p>
-			</div>
-		{:else if !template}
-			<div class="error-state">
-				<span class="error-icon">📄</span>
-				<p>No template found</p>
-			</div>
-		{:else}
-			<section class="section-card pdf-viewer-section">
-				<div class="section-header">
-					<h2>{template.template_name}</h2>
-					{#if template.description}
-						<p class="section-description">
-							{template.description}
-						</p>
-					{/if}
-				</div>
-
-				{#if pdfUrl}
-					<!-- PDF Viewer Component -->
-					<div class="pdf-viewer-container">
-						<iframe
-							src="{pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
-							class="pdf-iframe"
-							title={template.template_name}
-							allowfullscreen
-						></iframe>
-					</div>
-				{:else}
-					<div class="empty-state">
-						<div class="empty-state-icon">📄</div>
-						<h3>No PDF Document</h3>
-						<p>
-							This template doesn't have an associated PDF
-							document.
-						</p>
-					</div>
+		<section class="section-card pdf-viewer-section">
+			<div class="section-header">
+				<h2>{template.template_name}</h2>
+				{#if template.description}
+					<p class="section-description">
+						{template.description}
+					</p>
 				{/if}
-			</section>
-		{/if}
+			</div>
+
+			{#if pdfUrl}
+				<!-- PDF Viewer Component -->
+				<div class="pdf-viewer-container">
+					<iframe
+						src="{pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
+						class="pdf-iframe"
+						title={template.template_name}
+						allowfullscreen
+					></iframe>
+				</div>
+			{:else}
+				<div class="empty-state">
+					<div class="empty-state-icon">📄</div>
+					<h3>No PDF Document</h3>
+					<p>
+						This template doesn't have an associated PDF
+						document.
+					</p>
+				</div>
+			{/if}
+		</section>
 	</main>
 </div>
 
@@ -142,6 +225,33 @@
 		gap: var(--spacing-lg);
 	}
 
+	.mode-indicator {
+		margin-bottom: var(--spacing-sm);
+	}
+
+	.mode-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.25rem 0.75rem;
+		border-radius: var(--radius-full);
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-semibold);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.mode-new {
+		background: rgba(34, 197, 94, 0.2);
+		color: #22c55e;
+		border: 1px solid rgba(34, 197, 94, 0.3);
+	}
+
+	.mode-edit {
+		background: rgba(59, 130, 246, 0.2);
+		color: #3b82f6;
+		border: 1px solid rgba(59, 130, 246, 0.3);
+	}
+
 	.title-section h1 {
 		font-size: var(--font-size-4xl);
 		font-weight: var(--font-weight-bold);
@@ -155,8 +265,29 @@
 
 	.subtitle {
 		color: var(--color-gray);
-		margin: 0;
+		margin: 0 0 var(--spacing-md) 0;
 		font-size: var(--font-size-base);
+	}
+
+	.drawing-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-md);
+		margin-top: var(--spacing-sm);
+		padding: var(--spacing-sm);
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: var(--radius-md);
+		border: var(--border-light);
+	}
+
+	.meta-item {
+		font-size: var(--font-size-sm);
+		color: var(--color-gray);
+	}
+
+	.meta-item strong {
+		color: var(--color-white);
+		margin-right: var(--spacing-xs);
 	}
 
 	.header-actions {
@@ -239,21 +370,6 @@
 		margin: 0 0 var(--spacing-lg) 0;
 	}
 
-	.error-state {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--spacing-md);
-		padding: var(--spacing-xl);
-		background: rgba(239, 68, 68, 0.1);
-		border: 1px solid rgba(239, 68, 68, 0.3);
-		border-radius: var(--radius-xl);
-		color: var(--color-error);
-	}
-
-	.error-icon {
-		font-size: 1.5rem;
-	}
 
 	.btn-primary {
 		display: inline-flex;
