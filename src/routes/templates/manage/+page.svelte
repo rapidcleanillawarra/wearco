@@ -42,7 +42,7 @@
                 let newId = field.id;
                 let counter = 1;
 
-                if (!newId) {
+                if (!newId || !newId.trim()) {
                     newId = `field_${Date.now()}`;
                 }
 
@@ -73,7 +73,7 @@
     });
 
     let selectedField = $derived(
-        selectedFieldId ? fields.find((f) => f.id === selectedFieldId) : null,
+        selectedFieldId && selectedFieldId.trim() ? fields.find((f) => f.id === selectedFieldId) : null,
     );
 
     function addField() {
@@ -102,10 +102,38 @@
         }
     }
 
+    function copyField() {
+        if (selectedField) {
+            const newId = `field_${Date.now()}`;
+            const copiedField = {
+                ...selectedField,
+                id: newId,
+                position: {
+                    ...selectedField.position,
+                    x: selectedField.position.x + 20,
+                    y: selectedField.position.y + 20,
+                },
+            };
+            fields.push(copiedField);
+            selectedFieldId = newId;
+        } else {
+            showToaster("error", "No field selected to copy");
+        }
+    }
+
     function updateFieldId(e: Event) {
         const input = e.target as HTMLInputElement;
-        const newId = input.value;
+        const newId = input.value.trim();
+
         if (selectedField) {
+            // Validate that the field ID is not empty
+            if (!newId) {
+                showToaster("error", "Field ID cannot be empty");
+                // Reset the input to the current field ID
+                input.value = selectedField.id;
+                return;
+            }
+
             // Update the ID on the object
             selectedField.id = newId;
             // Immediately update the selection pointer to match so the derived store doesn't lose it
@@ -316,6 +344,9 @@
                 <h3>Fields</h3>
                 <button type="button" class="btn-secondary" onclick={addField}
                     >+ Add Field</button
+                >
+                <button type="button" class="btn-secondary" onclick={copyField} disabled={!selectedFieldId}
+                    >📋 Copy Field</button
                 >
 
                 {#if selectedField}
