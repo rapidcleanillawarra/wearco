@@ -96,6 +96,7 @@
 
     // Container ref
     let canvasContainerEl = $state<HTMLDivElement | null>(null);
+    let svgEl = $state<SVGSVGElement | null>(null);
 
     // UI state
     let maintainAspectRatio = $state(false);
@@ -357,6 +358,61 @@
             originalAspectRatio = rectWidth / rectHeight;
         }
     }
+
+    // SVG Export logic
+    function exportSvg() {
+        if (!svgEl) return;
+
+        // Clone the SVG to manipulate it without affecting the UI
+        const clonedSvg = svgEl.cloneNode(true) as SVGSVGElement;
+
+        // Remove non-exportable UI elements from the clone
+        const gridRect = clonedSvg.querySelector('rect[fill="url(#grid)"]');
+        if (gridRect) gridRect.remove();
+
+        const handles = clonedSvg.querySelectorAll(".resize-handle");
+        handles.forEach((h) => (h as SVGElement).remove());
+
+        const dimDisplay = clonedSvg.querySelector(".dimension-display");
+        if (dimDisplay) dimDisplay.remove();
+
+        // Reset zoom for export to ensure 1:1 scale
+        const contentGroup = clonedSvg.querySelector('g[style*="transform"]');
+        if (contentGroup) {
+            (contentGroup as SVGGElement).style.transform = "";
+            (contentGroup as SVGGElement).style.transformOrigin = "";
+        }
+
+        // Ensure the cloned SVG has the correct xmlns
+        clonedSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+        // Add a white background rect to the export
+        const bgRect = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "rect",
+        );
+        bgRect.setAttribute("width", "100%");
+        bgRect.setAttribute("height", "100%");
+        bgRect.setAttribute("fill", "white");
+        clonedSvg.insertBefore(bgRect, clonedSvg.firstChild);
+
+        // Serialize the SVG to a string
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(clonedSvg);
+
+        // Create a blob and trigger download
+        const blob = new Blob([svgString], {
+            type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${diagramType.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.svg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
 </script>
 
 <div class="diagram-canvas-container">
@@ -469,6 +525,26 @@
                 >
                     Reset
                 </button>
+                <button
+                    class="export-button"
+                    onclick={exportSvg}
+                    title="Export diagram as SVG file"
+                    aria-label="Export SVG"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Export SVG
+                </button>
             </div>
         </div>
     </div>
@@ -488,6 +564,7 @@
         aria-label="Interactive diagram canvas with resize handles"
     >
         <svg
+            bind:this={svgEl}
             width="100%"
             height="100%"
             viewBox="0 0 {canvasWidth} {canvasHeight}"
@@ -982,6 +1059,33 @@
     .reset-button:hover {
         background: #334155;
         border-color: #475569;
+    }
+
+    .export-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #1e40af;
+        border: 1px solid #3b82f6;
+        border-radius: 0.375rem;
+        color: #f8fafc;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .export-button:hover {
+        background: #1d4ed8;
+        border-color: #60a5fa;
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .export-button svg {
+        flex-shrink: 0;
     }
 
     .svg-canvas-container {
