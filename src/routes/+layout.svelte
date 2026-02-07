@@ -206,8 +206,8 @@
 	</main>
 
 	<!-- Dev Only Sticky QR Footer -->
-	{#if showQrFooter && qrCodeUrl}
-		<div
+	<!-- {#if showQrFooter && qrCodeUrl} -->
+		<!-- <div
 			class="qr-footer"
 			class:expanded={isQrExpanded}
 		>
@@ -220,10 +220,10 @@
 				}}
 			>
 				×
-			</button>
+			</button> -->
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
+			<!-- <div
 				class="qr-content"
 				onclick={() => (isQrExpanded = !isQrExpanded)}
 			>
@@ -233,8 +233,8 @@
 					<span class="qr-subtitle">Scan to test on device</span>
 				</div>
 			</div>
-		</div>
-	{/if}
+		</div> -->
+	<!-- {/if} -->
 </div>
 
 <style>
