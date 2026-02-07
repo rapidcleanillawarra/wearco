@@ -54,6 +54,9 @@
         if (!template) {
             template = data.templates.find((t: any) => t.id === templateId);
         }
+        if (template?.template_data) {
+            console.log('Fetched template_data:', template.template_data);
+        }
         if (!template?.template_data?.fields) return [];
         return template.template_data.fields
             .filter((f: any) => f.type === "edge")
@@ -203,6 +206,7 @@
                 throw new Error(`Failed to fetch template: ${response.statusText}`);
             }
             const template = await response.json();
+            console.log('Fetched template_data:', template.template_data);
             return template;
         } catch (error) {
             console.error('Error fetching template:', error);
