@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -38,10 +38,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         mode = 'edit';
     } else {
         // Redirect to diagrams list if no id parameter
-        throw new Response(null, {
-            status: 302,
-            headers: { Location: '/diagrams' }
-        });
+        throw redirect(302, '/diagrams');
     }
 
     return {
