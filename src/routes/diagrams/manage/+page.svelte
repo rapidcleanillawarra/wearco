@@ -5,6 +5,8 @@
     import type { PageData } from "./$types";
     import type { WearcoTemplate } from "$lib/types/template";
     import StaticDiagramCanvas from "./components/StaticDiagramCanvas.svelte";
+    import EdgeCanvas from "./components/EdgeCanvas.svelte";
+    import TopSideCanvas from "./components/TopSideCanvas.svelte";
 
     let { data, form } = $props<{
         data: PageData;
@@ -22,6 +24,23 @@
     let diagramDimension = $state("{}");
     let diagramVariables = $state("{}");
     let initialized = $state(false);
+
+    // Get canvas type from URL parameter
+    let canvasType = $derived(() => {
+        const urlParams = $page.url.searchParams;
+        return urlParams.get('type');
+    });
+
+    // Determine which canvas component to render
+    let canvasComponent = $derived(() => {
+        const type = canvasType();
+        if (type === 'edge') {
+            return 'edge';
+        } else if (type === 'top_side') {
+            return 'top_side';
+        }
+        return null; // Invalid or missing type
+    });
 
     // Effect to initialize local state when diagram data loads or changes
     $effect(() => {
@@ -287,7 +306,19 @@
                     </div>
                 </div>
 
-                <StaticDiagramCanvas width={800} height={400} />
+                <!-- Canvas Component Rendering -->
+                {#if canvasComponent() === 'edge'}
+                    <EdgeCanvas width={800} height={400} />
+                {:else if canvasComponent() === 'top_side'}
+                    <TopSideCanvas width={800} height={400} />
+                {:else if canvasComponent() === null}
+                    <div class="canvas-error">
+                        <p>Invalid or missing canvas type parameter. Please specify "type=edge" or "type=top_side" in the URL.</p>
+                        <p>Example: <code>?type=edge</code> or <code>?type=top_side</code></p>
+                    </div>
+                {:else}
+                    <StaticDiagramCanvas width={800} height={400} />
+                {/if}
             </form>
         </div>
     </div>
@@ -536,6 +567,30 @@
 
     .toaster-close:hover {
         opacity: 1;
+    }
+
+    /* Canvas error styling */
+    .canvas-error {
+        background: #0f172a;
+        border: 1px solid #ef4444;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        text-align: center;
+        color: #f8fafc;
+    }
+
+    .canvas-error p {
+        margin: 0 0 1rem 0;
+        color: #f87171;
+    }
+
+    .canvas-error code {
+        background: #1e293b;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        color: #3b82f6;
     }
 
 </style>
