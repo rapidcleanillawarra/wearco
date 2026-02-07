@@ -4,6 +4,7 @@
     import { page } from "$app/stores";
     import type { PageData } from "./$types";
     import type { WearcoTemplate } from "$lib/types/template";
+    import SvgViewer from "./components/SvgViewer.svelte";
 
     let { data, form } = $props<{
         data: PageData;
@@ -113,7 +114,6 @@
                 class="alert"
                 class:success={form.success}
                 class:error={!form.success}
-                transition:fade
             >
                 {form.message}
             </div>
@@ -238,6 +238,13 @@
                             </div>
                         </div>
                         <small>Enter valid JSON data for the diagram configuration</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>SVG Preview</h2>
+                    <div class="svg-viewer-wrapper">
+                        <SvgViewer width={800} height={400} />
                     </div>
                 </div>
             </form>
@@ -489,5 +496,12 @@
 
     .toaster-close:hover {
         opacity: 1;
+    }
+
+    /* SVG Viewer Styles */
+    .svg-viewer-wrapper {
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
     }
 </style>
