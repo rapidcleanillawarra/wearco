@@ -15,6 +15,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         return fail(500, { error: 'Failed to load templates' });
     }
 
+    console.log('Fetched template data for searchable dropdown:', templates);
+
     let diagram = null;
     let mode: 'create' | 'edit' = 'create';
 
