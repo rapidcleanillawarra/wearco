@@ -22,10 +22,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     let mode: 'create' | 'edit' = 'create';
 
     if (id) {
-        // Fetch the diagram for editing
+        // Fetch the diagram for editing from wearco_diagrams table
         const { data: diagramData, error: diagramError } = await locals.supabase
-            .from('wearco_svg_diagrams')
-            .select('*')
+            .from('wearco_diagrams')
+            .select('id, template_id, type')
             .eq('id', id)
             .single();
 
@@ -36,6 +36,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
         diagram = diagramData;
         mode = 'edit';
+    } else {
+        // Redirect to diagrams list if no id parameter
+        throw new Response(null, {
+            status: 302,
+            headers: { Location: '/diagrams' }
+        });
     }
 
     return {

@@ -63,6 +63,13 @@
         diagramVariables = JSON.stringify(current, null, 2);
     }
 
+    // Detect edit mode from URL parameter
+    let editMode = $derived(() => {
+        const urlParams = $page.url.searchParams;
+        const id = urlParams.get("id");
+        return !!id && id.trim() !== "";
+    });
+
     // Get canvas type from URL parameter
     let canvasType = $derived(() => {
         const urlParams = $page.url.searchParams;
@@ -83,30 +90,43 @@
     // Effect to initialize local state when diagram data loads or changes
     $effect(() => {
         const diagram = data.diagram;
+        const mode = data.mode;
+
+        // Reset error state when mode changes
+        diagramLoadError = null;
+
         // Only re-initialize if diagram data identity changes and we haven't initialized yet
         // or if the diagram ID changed (navigating to different diagram)
         if (!initialized) {
-            if (data.mode === "create") {
+            if (mode === "create") {
                 // In create mode, handle template loading if template_id is provided
                 initializeCreateMode();
-            } else {
+            } else if (mode === "edit") {
                 // Edit mode - use existing diagram data
-                diagramName = diagram?.name || "";
-                templateId = diagram?.template_id || data.selectedTemplateId || "";
-                diagramType = diagram?.type || "";
-                diagramDimension = diagram?.dimension
-                    ? JSON.stringify(diagram.dimension, null, 2)
-                    : "{}";
-                diagramVariables = diagram?.variables
-                    ? JSON.stringify(diagram.variables, null, 2)
-                    : "{}";
-                initialized = true;
+                if (diagram) {
+                    isLoadingDiagram = false;
+                    diagramName = diagram.name || "";
+                    templateId = diagram.template_id || data.selectedTemplateId || "";
+                    diagramType = diagram.type || "";
+                    diagramDimension = diagram.dimension
+                        ? JSON.stringify(diagram.dimension, null, 2)
+                        : "{}";
+                    diagramVariables = diagram.variables
+                        ? JSON.stringify(diagram.variables, null, 2)
+                        : "{}";
+                    initialized = true;
+                } else {
+                    // Diagram data not available yet, show loading
+                    isLoadingDiagram = true;
+                }
             }
         }
     });
 
     let isSaving = $state(false);
     let isLoadingTemplate = $state(false);
+    let isLoadingDiagram = $state(false);
+    let diagramLoadError = $state<string | null>(null);
 
     // Toaster notification state
     let toaster = $state<{
@@ -243,7 +263,18 @@
     </header>
 
     <div class="content-layout">
-        {#if form?.message}
+        {#if isLoadingDiagram}
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading diagram data...</p>
+            </div>
+        {:else if diagramLoadError}
+            <div class="alert error">
+                <strong>Error:</strong> {diagramLoadError}
+                <br>
+                <small>Please check the diagram ID and try again.</small>
+            </div>
+        {:else if form?.message}
             <div
                 class="alert"
                 class:success={form.success}
@@ -253,8 +284,9 @@
             </div>
         {/if}
 
-        <div class="form-container">
-            <form
+        {#if !isLoadingDiagram && !diagramLoadError}
+            <div class="form-container">
+                <form
                 method="POST"
                 action="?/saveDiagram"
                 id="diagram-form"
@@ -472,6 +504,7 @@
                 {/if}
             </form>
         </div>
+        {/if}
     </div>
 </div>
 
@@ -760,5 +793,40 @@
         border-radius: 0.25rem;
         font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
         color: #3b82f6;
+    }
+
+    /* Loading states */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #334155;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-container p {
+        color: #94a3b8;
+        font-size: 1rem;
+        margin: 0;
     }
 </style>
