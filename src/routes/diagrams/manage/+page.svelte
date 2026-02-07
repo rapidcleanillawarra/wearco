@@ -505,8 +505,7 @@
                         </div>
                     </div>
 
-                    {#if canvasType === "edge"}
-                        <div class="form-section variable-config-section">
+                    <div class="form-section variable-config-section">
                             <div class="variable-header">
                                 <h2>Variable Configuration</h2>
                                 <button
@@ -609,7 +608,6 @@
                                 {/if}
                             </div>
                         </div>
-                    {/if}
 
                     <!-- Canvas Component Rendering -->
                     {#if canvasComponent === "edge"}

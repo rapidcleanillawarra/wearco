@@ -125,6 +125,12 @@ export const actions: Actions = {
             return fail(400, { invalid: true, message: 'Selected template does not exist' });
         }
 
+        // Validate type field - must be lowercase and one of the expected values or empty
+        const normalizedType = type ? type.toLowerCase().trim() : null;
+        if (normalizedType && !['edge', 'top_side'].includes(normalizedType)) {
+            return fail(400, { invalid: true, message: 'Type must be either "edge" or "top_side"' });
+        }
+
         // Parse and validate JSON data
         let diagramDimension;
         let diagramVariables;
@@ -138,7 +144,7 @@ export const actions: Actions = {
         const diagramPayload = {
             name,
             template_id: templateId,
-            type: type || null,
+            type: normalizedType,
             dimension: diagramDimension,
             variables: diagramVariables,
             updated_at: new Date().toISOString()
