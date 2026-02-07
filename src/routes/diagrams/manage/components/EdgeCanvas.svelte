@@ -9,12 +9,15 @@
         width: initialWidth = 800,
         height: initialHeight = 400,
         diagramType = "Edge Diagram",
-        onDimensionsChange
+        onDimensionsChange,
     }: {
         width?: number;
         height?: number;
         diagramType?: string;
-        onDimensionsChange?: (dimensions: { width: number; height: number }) => void;
+        onDimensionsChange?: (dimensions: {
+            width: number;
+            height: number;
+        }) => void;
     } = $props();
 
     // Minimum and maximum constraints
@@ -23,117 +26,121 @@
     const MAX_WIDTH = 2000;
     const MAX_HEIGHT = 1500;
 
-    // Reactive canvas dimensions
-    let canvasWidth = $state(800);
-    let canvasHeight = $state(400);
+    // Reactive rectangle dimensions
+    let rectWidth = $state(initialWidth);
+    let rectHeight = $state(initialHeight);
 
-    // Resize state
+    // Padding around the rectangle within the SVG viewport
+    const CANVAS_PADDING = 80;
+
+    // Viewport dimensions (reactive to content size)
+    const canvasWidth = $derived(rectWidth + CANVAS_PADDING * 2);
+    const canvasHeight = $derived(rectHeight + CANVAS_PADDING * 2);
+
+    // Positions (centered by reactive viewport size)
+    const rectangleX = $derived(CANVAS_PADDING);
+    const rectangleY = $derived(CANVAS_PADDING);
+    const circleY = $derived(rectangleY + rectHeight / 2);
+
+    const circlePositions = $derived.by(() => {
+        const horizontalSpacing = rectWidth / 4;
+        return [
+            rectangleX + horizontalSpacing,
+            rectangleX + horizontalSpacing * 2,
+            rectangleX + horizontalSpacing * 3,
+        ];
+    });
+
+    // Interaction state
     let isResizing = $state(false);
     let resizeHandle = $state<string | null>(null);
     let startDimensions = $state({ width: 0, height: 0 });
     let startMousePos = $state({ x: 0, y: 0 });
-    /** Scale from screen pixels to logical (viewBox) units at resize start */
     let resizeScale = $state({ x: 1, y: 1 });
 
-    // Container ref for converting screen deltas to logical dimension deltas
+    // Container ref
     let canvasContainerEl = $state<HTMLDivElement | null>(null);
 
     // UI state
     let maintainAspectRatio = $state(false);
-    let originalAspectRatio = $state(2.0); // Default aspect ratio
+    let originalAspectRatio = $state(initialWidth / initialHeight);
     let showResizeHandles = $state(false);
     let isHoveringCanvas = $state(false);
 
-    // Initialize canvas dimensions from props
+    // Initialize dimensions from props
     $effect(() => {
-        canvasWidth = initialWidth;
-        canvasHeight = initialHeight;
+        rectWidth = initialWidth;
+        rectHeight = initialHeight;
         originalAspectRatio = initialWidth / initialHeight;
     });
 
-    // Input field state (synced from logical dimensions in effect below)
-    let widthInputValue = $state('800');
-    let heightInputValue = $state('400');
+    // Input field state
+    let widthInputValue = $state(initialWidth.toString());
+    let heightInputValue = $state(initialHeight.toString());
 
     $effect(() => {
-        widthInputValue = canvasWidth.toString();
-        heightInputValue = canvasHeight.toString();
+        widthInputValue = rectWidth.toString();
+        heightInputValue = rectHeight.toString();
     });
 
-    // Diagram dimensions and styling (scaled relative to canvas size)
-    const diagramDimensions = $derived.by(() => {
-        const scale = Math.min(canvasWidth / 800, canvasHeight / 400);
+    // Diagram elements sizes
+    const diagramStyles = $derived.by(() => {
+        const scale = Math.min(rectWidth / 800, rectHeight / 400);
         return {
-            rectangleWidth: Math.max(150, 200 * scale),
-            rectangleHeight: Math.max(200, 300 * scale),
-            circleRadius: Math.max(12, 20 * scale)
+            circleRadius: Math.max(12, 20 * scale),
         };
-    });
-
-    // Reactive calculations for positions
-    const rectangleX = $derived.by(() => {
-        const { rectangleWidth } = diagramDimensions;
-        return (canvasWidth - rectangleWidth) / 2;
-    });
-
-    const rectangleY = $derived.by(() => {
-        const { rectangleHeight } = diagramDimensions;
-        return (canvasHeight - rectangleHeight) / 2;
-    });
-
-    const circleY = $derived.by(() => {
-        const { rectangleHeight } = diagramDimensions;
-        return rectangleY + rectangleHeight / 2;
-    });
-
-    const circlePositions = $derived.by(() => {
-        const { rectangleWidth } = diagramDimensions;
-        const horizontalSpacing = rectangleWidth / 4; // Divide into 4 equal parts
-
-        // Circle X positions: left, center, right
-        return [
-            rectangleX + horizontalSpacing,         // First circle
-            rectangleX + horizontalSpacing * 2,     // Second circle (center)
-            rectangleX + horizontalSpacing * 3      // Third circle
-        ];
     });
 
     // Notify parent of dimension changes
     $effect(() => {
         if (onDimensionsChange) {
-            onDimensionsChange({ width: canvasWidth, height: canvasHeight });
+            onDimensionsChange({ width: rectWidth, height: rectHeight });
         }
     });
 
     // Validation and constraint functions
-    function validateAndConstrainDimension(value: number, min: number, max: number): number {
+    function validateAndConstrainDimension(
+        value: number,
+        min: number,
+        max: number,
+    ): number {
         return Math.max(min, Math.min(max, Math.round(value)));
     }
 
-    function updateCanvasDimensions(newWidth: number, newHeight: number) {
-        canvasWidth = validateAndConstrainDimension(newWidth, MIN_WIDTH, MAX_WIDTH);
-        canvasHeight = validateAndConstrainDimension(newHeight, MIN_HEIGHT, MAX_HEIGHT);
+    function updateRectangleDimensions(newWidth: number, newHeight: number) {
+        rectWidth = validateAndConstrainDimension(
+            newWidth,
+            MIN_WIDTH,
+            MAX_WIDTH,
+        );
+        rectHeight = validateAndConstrainDimension(
+            newHeight,
+            MIN_HEIGHT,
+            MAX_HEIGHT,
+        );
     }
 
     // Canvas resize functions (deltas are in screen pixels; convert to logical units via container scale)
     function startResize(handle: string, event: MouseEvent) {
         isResizing = true;
         resizeHandle = handle;
-        startDimensions = { width: canvasWidth, height: canvasHeight };
+        startDimensions = { width: rectWidth, height: rectHeight };
         startMousePos = { x: event.clientX, y: event.clientY };
 
         if (canvasContainerEl) {
             const rect = canvasContainerEl.getBoundingClientRect();
+            // We use the SVG's viewBox units, so we need to account for how those map to screen pixels
+            // This is still logical width / screen width
             resizeScale = {
                 x: rect.width / canvasWidth,
-                y: rect.height / canvasHeight
+                y: rect.height / canvasHeight,
             };
         } else {
             resizeScale = { x: 1, y: 1 };
         }
 
         event.preventDefault();
-        document.body.style.userSelect = 'none';
+        document.body.style.userSelect = "none";
         document.body.style.cursor = getCursorForHandle(handle);
     }
 
@@ -142,44 +149,49 @@
 
         const pixelDeltaX = event.clientX - startMousePos.x;
         const pixelDeltaY = event.clientY - startMousePos.y;
-        const deltaX = resizeScale.x !== 0 ? pixelDeltaX / resizeScale.x : pixelDeltaX;
-        const deltaY = resizeScale.y !== 0 ? pixelDeltaY / resizeScale.y : pixelDeltaY;
+        const deltaX =
+            resizeScale.x !== 0 ? pixelDeltaX / resizeScale.x : pixelDeltaX;
+        const deltaY =
+            resizeScale.y !== 0 ? pixelDeltaY / resizeScale.y : pixelDeltaY;
 
         let newWidth = startDimensions.width;
         let newHeight = startDimensions.height;
 
         switch (resizeHandle) {
-            case 'se':
+            case "se":
                 newWidth = startDimensions.width + deltaX;
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'sw':
+            case "sw":
                 newWidth = startDimensions.width - deltaX;
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'ne':
+            case "ne":
                 newWidth = startDimensions.width + deltaX;
                 newHeight = startDimensions.height - deltaY;
                 break;
-            case 'nw':
+            case "nw":
                 newWidth = startDimensions.width - deltaX;
                 newHeight = startDimensions.height - deltaY;
                 break;
-            case 'e':
+            case "e":
                 newWidth = startDimensions.width + deltaX;
                 break;
-            case 'w':
+            case "w":
                 newWidth = startDimensions.width - deltaX;
                 break;
-            case 's':
+            case "s":
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'n':
+            case "n":
                 newHeight = startDimensions.height - deltaY;
                 break;
         }
 
-        if (maintainAspectRatio && (resizeHandle === 'se' || resizeHandle === 'nw')) {
+        if (
+            maintainAspectRatio &&
+            (resizeHandle === "se" || resizeHandle === "nw")
+        ) {
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 newHeight = newWidth / originalAspectRatio;
             } else {
@@ -187,44 +199,44 @@
             }
         }
 
-        updateCanvasDimensions(newWidth, newHeight);
+        updateRectangleDimensions(newWidth, newHeight);
     }
 
     function stopResize() {
         if (isResizing) {
             isResizing = false;
             resizeHandle = null;
-            document.body.style.userSelect = '';
-            document.body.style.cursor = '';
+            document.body.style.userSelect = "";
+            document.body.style.cursor = "";
         }
     }
 
     const RESIZE_CURSORS: Record<string, string> = {
-        'se': 'nw-resize',
-        'sw': 'ne-resize',
-        'ne': 'sw-resize',
-        'nw': 'se-resize',
-        'e': 'e-resize',
-        'w': 'w-resize',
-        's': 's-resize',
-        'n': 'n-resize'
+        se: "nw-resize",
+        sw: "ne-resize",
+        ne: "sw-resize",
+        nw: "se-resize",
+        e: "e-resize",
+        w: "w-resize",
+        s: "s-resize",
+        n: "n-resize",
     };
 
     function getCursorForHandle(handle: string): string {
-        return RESIZE_CURSORS[handle] ?? 'default';
+        return RESIZE_CURSORS[handle] ?? "default";
     }
 
     // Input field handlers
     function handleWidthInput(event: Event) {
         const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value) || canvasWidth;
-        updateCanvasDimensions(value, canvasHeight);
+        const value = parseInt(target.value) || rectWidth;
+        updateRectangleDimensions(value, rectHeight);
     }
 
     function handleHeightInput(event: Event) {
         const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value) || canvasHeight;
-        updateCanvasDimensions(canvasWidth, value);
+        const value = parseInt(target.value) || rectHeight;
+        updateRectangleDimensions(rectWidth, value);
     }
 
     // Keyboard shortcuts
@@ -234,26 +246,26 @@
         const step = event.shiftKey ? 50 : 10; // Larger steps with shift
 
         switch (event.key) {
-            case 'ArrowUp':
+            case "ArrowUp":
                 event.preventDefault();
-                updateCanvasDimensions(canvasWidth, canvasHeight - step);
+                updateRectangleDimensions(rectWidth, rectHeight - step);
                 break;
-            case 'ArrowDown':
+            case "ArrowDown":
                 event.preventDefault();
-                updateCanvasDimensions(canvasWidth, canvasHeight + step);
+                updateRectangleDimensions(rectWidth, rectHeight + step);
                 break;
-            case 'ArrowLeft':
+            case "ArrowLeft":
                 event.preventDefault();
-                updateCanvasDimensions(canvasWidth - step, canvasHeight);
+                updateRectangleDimensions(rectWidth - step, rectHeight);
                 break;
-            case 'ArrowRight':
+            case "ArrowRight":
                 event.preventDefault();
-                updateCanvasDimensions(canvasWidth + step, canvasHeight);
+                updateRectangleDimensions(rectWidth + step, rectHeight);
                 break;
-            case 'r':
+            case "r":
                 if (event.ctrlKey || event.metaKey) {
                     event.preventDefault();
-                    updateCanvasDimensions(initialWidth, initialHeight);
+                    updateRectangleDimensions(initialWidth, initialHeight);
                 }
                 break;
         }
@@ -263,7 +275,7 @@
     function toggleAspectRatio() {
         maintainAspectRatio = !maintainAspectRatio;
         if (maintainAspectRatio) {
-            originalAspectRatio = canvasWidth / canvasHeight;
+            originalAspectRatio = rectWidth / rectHeight;
         }
     }
 </script>
@@ -300,7 +312,9 @@
                     <span class="unit">px</span>
                 </label>
                 <button
-                    class="aspect-ratio-toggle {maintainAspectRatio ? 'active' : ''}"
+                    class="aspect-ratio-toggle {maintainAspectRatio
+                        ? 'active'
+                        : ''}"
                     onclick={toggleAspectRatio}
                     title="Maintain aspect ratio during resize"
                     aria-label="Toggle aspect ratio lock"
@@ -311,7 +325,8 @@
             <div class="reset-controls">
                 <button
                     class="reset-button"
-                    onclick={() => updateCanvasDimensions(initialWidth, initialHeight)}
+                    onclick={() =>
+                        updateCanvasDimensions(initialWidth, initialHeight)}
                     title="Reset to original dimensions (Ctrl+R)"
                 >
                     Reset
@@ -324,8 +339,8 @@
         bind:this={canvasContainerEl}
         class="svg-canvas-container"
         class:hovering={isHoveringCanvas}
-        onmouseenter={() => isHoveringCanvas = true}
-        onmouseleave={() => isHoveringCanvas = false}
+        onmouseenter={() => (isHoveringCanvas = true)}
+        onmouseleave={() => (isHoveringCanvas = false)}
         onmousemove={handleMouseMove}
         onmouseup={stopResize}
         onkeydown={handleKeydown}
@@ -340,141 +355,146 @@
             preserveAspectRatio="xMidYMid meet"
             class="svg-canvas"
             role="img"
-            aria-label="Interactive diagram display showing a rectangle with three circles"
+            aria-label="Interactive diagram display"
         >
-            <!-- Subtle grid background for better visualization -->
             <defs>
-                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f1f5f9" stroke-width="0.5"/>
+                <pattern
+                    id="grid"
+                    width="20"
+                    height="20"
+                    patternUnits="userSpaceOnUse"
+                >
+                    <path
+                        d="M 20 0 L 0 0 0 20"
+                        fill="none"
+                        stroke="#f1f5f9"
+                        stroke-width="0.5"
+                    />
                 </pattern>
+                <marker
+                    id="arrow-start"
+                    viewBox="0 0 10 10"
+                    refX="5"
+                    refY="5"
+                    markerWidth="6"
+                    markerHeight="6"
+                    orient="auto"
+                >
+                    <path d="M 10 0 L 0 5 L 10 10 z" fill="#374151" />
+                </marker>
+                <marker
+                    id="arrow-end"
+                    viewBox="0 0 10 10"
+                    refX="5"
+                    refY="5"
+                    markerWidth="6"
+                    markerHeight="6"
+                    orient="auto"
+                >
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151" />
+                </marker>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
 
-            <!-- Main vertical rectangle -->
+            <!-- Width Dimension Line -->
+            <g class="dimension-line">
+                <line
+                    x1={rectangleX + 5}
+                    y1={rectangleY - 20}
+                    x2={rectangleX + rectWidth - 5}
+                    y2={rectangleY - 20}
+                    stroke="#374151"
+                    stroke-width="1.5"
+                    marker-start="url(#arrow-start)"
+                    marker-end="url(#arrow-end)"
+                />
+                <text
+                    x={rectangleX + rectWidth / 2}
+                    y={rectangleY - 30}
+                    fill="#374151"
+                    font-size="12"
+                    text-anchor="middle"
+                >
+                    {rectWidth} mm
+                </text>
+            </g>
+
+            <!-- Height Dimension Line -->
+            <g class="dimension-line">
+                <line
+                    x1={rectangleX - 20}
+                    y1={rectangleY + 5}
+                    x2={rectangleX - 20}
+                    y2={rectangleY + rectHeight - 5}
+                    stroke="#374151"
+                    stroke-width="1.5"
+                    marker-start="url(#arrow-start)"
+                    marker-end="url(#arrow-end)"
+                />
+                <text
+                    x={rectangleX - 35}
+                    y={rectangleY + rectHeight / 2}
+                    fill="#374151"
+                    font-size="12"
+                    text-anchor="middle"
+                    transform="rotate(-90, {rectangleX - 35}, {rectangleY +
+                        rectHeight / 2})"
+                >
+                    {rectHeight} mm
+                </text>
+            </g>
+
+            <!-- Main Rectangle -->
             <rect
                 x={rectangleX}
                 y={rectangleY}
-                width={diagramDimensions.rectangleWidth}
-                height={diagramDimensions.rectangleHeight}
-                fill="none"
-                stroke="#3b82f6"
-                stroke-width="3"
-                rx="8"
-                ry="8"
+                width={rectWidth}
+                height={rectHeight}
+                fill="white"
+                stroke="#1e1b4b"
+                stroke-width="2"
+                rx="4"
+                ry="4"
             />
 
-            <!-- Three evenly spaced circles -->
-            {#each circlePositions as circleX, index}
+            <!-- Three centered circles -->
+            {#each circlePositions as circleX}
                 <circle
                     cx={circleX}
                     cy={circleY}
-                    r={diagramDimensions.circleRadius}
-                    fill="#10b981"
-                    stroke="#059669"
-                    stroke-width="2"
+                    r={diagramStyles.circleRadius}
+                    fill="white"
+                    stroke="#1e1b4b"
+                    stroke-width="1.5"
                 />
             {/each}
 
-            <!-- Resize handles (only visible when hovering or resizing) -->
+            <!-- Resize handles attached to the rectangle -->
             {#if isHoveringCanvas || isResizing}
-                <!-- Corner handles -->
+                <!-- Bottom-Right Corner Handle (Red as in reference) -->
                 <circle
-                    cx="0"
-                    cy="0"
-                    r="6"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="2"
-                    class="resize-handle nw"
-                    onmousedown={(e) => startResize('nw', e)}
-                    style="cursor: nw-resize"
-                />
-                <circle
-                    cx={canvasWidth}
-                    cy="0"
-                    r="6"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="2"
-                    class="resize-handle ne"
-                    onmousedown={(e) => startResize('ne', e)}
-                    style="cursor: ne-resize"
-                />
-                <circle
-                    cx="0"
-                    cy={canvasHeight}
-                    r="6"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="2"
-                    class="resize-handle sw"
-                    onmousedown={(e) => startResize('sw', e)}
-                    style="cursor: sw-resize"
-                />
-                <circle
-                    cx={canvasWidth}
-                    cy={canvasHeight}
-                    r="6"
-                    fill="#3b82f6"
+                    cx={rectangleX + rectWidth}
+                    cy={rectangleY + rectHeight}
+                    r="8"
+                    fill="#ef4444"
                     stroke="white"
                     stroke-width="2"
                     class="resize-handle se"
-                    onmousedown={(e) => startResize('se', e)}
+                    onmousedown={(e) => startResize("se", e)}
                     style="cursor: se-resize"
                 />
 
-                <!-- Edge handles -->
-                <rect
-                    x={canvasWidth / 2 - 10}
-                    y="-5"
-                    width="20"
-                    height="10"
+                <!-- Other handles (subtle blue) -->
+                <circle
+                    cx={rectangleX}
+                    cy={rectangleY}
+                    r="5"
                     fill="#3b82f6"
                     stroke="white"
-                    stroke-width="1"
-                    rx="2"
-                    class="resize-handle n"
-                    onmousedown={(e) => startResize('n', e)}
-                    style="cursor: n-resize"
-                />
-                <rect
-                    x={canvasWidth / 2 - 10}
-                    y={canvasHeight - 5}
-                    width="20"
-                    height="10"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="1"
-                    rx="2"
-                    class="resize-handle s"
-                    onmousedown={(e) => startResize('s', e)}
-                    style="cursor: s-resize"
-                />
-                <rect
-                    x="-5"
-                    y={canvasHeight / 2 - 10}
-                    width="10"
-                    height="20"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="1"
-                    rx="2"
-                    class="resize-handle w"
-                    onmousedown={(e) => startResize('w', e)}
-                    style="cursor: w-resize"
-                />
-                <rect
-                    x={canvasWidth - 5}
-                    y={canvasHeight / 2 - 10}
-                    width="10"
-                    height="20"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="1"
-                    rx="2"
-                    class="resize-handle e"
-                    onmousedown={(e) => startResize('e', e)}
-                    style="cursor: e-resize"
+                    stroke-width="1.5"
+                    class="resize-handle nw"
+                    onmousedown={(e) => startResize("nw", e)}
+                    style="cursor: nw-resize"
                 />
             {/if}
 
@@ -482,14 +502,14 @@
             {#if isResizing}
                 <text
                     x={canvasWidth / 2}
-                    y="30"
+                    y={canvasHeight - 20}
                     text-anchor="middle"
                     fill="#3b82f6"
                     font-size="14"
                     font-weight="bold"
                     class="dimension-display"
                 >
-                    {canvasWidth} × {canvasHeight}
+                    {rectWidth} × {rectHeight} mm
                 </text>
             {/if}
         </svg>
@@ -498,14 +518,17 @@
         {#if !isResizing && isHoveringCanvas}
             <div class="canvas-overlay">
                 <div class="dimension-tooltip">
-                    {canvasWidth} × {canvasHeight} px
+                    {rectWidth} × {rectHeight} mm
                 </div>
             </div>
         {/if}
     </div>
 
     <div class="canvas-info">
-        <p>Interactive diagram canvas • Drag corners/edges to resize • Use input fields or keyboard shortcuts (arrow keys, Ctrl+R to reset)</p>
+        <p>
+            Interactive diagram canvas • Drag corners/edges to resize • Use
+            input fields or keyboard shortcuts (arrow keys, Ctrl+R to reset)
+        </p>
     </div>
 </div>
 
@@ -513,12 +536,12 @@
     .diagram-canvas-container {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
         background: #0f172a;
         border: 1px solid #334155;
         border-radius: 0.5rem;
-        padding: 1.5rem;
-        height: 100%;
+        padding: 1rem;
+        height: auto;
     }
 
     .canvas-header {
@@ -637,9 +660,10 @@
 
     .svg-canvas-container {
         flex: 1;
-        min-height: 400px;
+        min-height: 250px;
         background: #ffffff;
         border-radius: 0.375rem;
+        max-height: 500px;
         overflow: hidden;
         border: 1px solid #e2e8f0;
         display: flex;
@@ -699,7 +723,7 @@
     }
 
     .dimension-display {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
