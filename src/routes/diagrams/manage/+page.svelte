@@ -31,7 +31,7 @@
     let diagramVariables = $state("{}");
     let initialized = $state(false);
 
-    // Get edge fields from selected template (prefer server template data, fallback to templates array)
+    // Get all fields from selected template (prefer server template data, fallback to templates array)
     let edgeFields = $derived.by(() => {
         // Prefer template from server data (for edit mode), fallback to finding in templates array
         let template = data.template;
@@ -43,7 +43,6 @@
         }
         if (!template?.template_data?.fields) return [];
         return template.template_data.fields
-            .filter((f: any) => f.type === "edge")
             .map((f: any) => ({ id: f.id, label: f.label }));
     });
 
@@ -74,13 +73,13 @@
 
             const result = await response.json();
 
-            if (result.type === 'success') {
-                variables = result.data.variables;
+            if (result.success) {
+                variables = result.variables;
                 newVariableName = '';
                 newVariableValue = '';
-                showToaster('success', 'Variable added successfully');
+                showToaster('success', result.message || 'Variable added successfully');
             } else {
-                showToaster('error', result.data?.message || 'Failed to add variable');
+                showToaster('error', result.message || 'Failed to add variable');
             }
         } catch (error) {
             console.error('Error adding variable:', error);
@@ -104,11 +103,11 @@
 
             const result = await response.json();
 
-            if (result.type === 'success') {
-                variables = result.data.variables;
-                showToaster('success', 'Variable updated successfully');
+            if (result.success) {
+                variables = result.variables;
+                showToaster('success', result.message || 'Variable updated successfully');
             } else {
-                showToaster('error', result.data?.message || 'Failed to update variable');
+                showToaster('error', result.message || 'Failed to update variable');
             }
         } catch (error) {
             console.error('Error updating variable:', error);
@@ -133,11 +132,11 @@
 
             const result = await response.json();
 
-            if (result.type === 'success') {
-                variables = result.data.variables;
-                showToaster('success', 'Variable deleted successfully');
+            if (result.success) {
+                variables = result.variables;
+                showToaster('success', result.message || 'Variable deleted successfully');
             } else {
-                showToaster('error', result.data?.message || 'Failed to delete variable');
+                showToaster('error', result.message || 'Failed to delete variable');
             }
         } catch (error) {
             console.error('Error deleting variable:', error);
@@ -538,6 +537,7 @@
                                         options={edgeFields}
                                         bind:value={newVariableValue}
                                         placeholder="Select field..."
+                                        onselect={(val: string) => newVariableName = val}
                                     />
                                     <button
                                         type="button"
