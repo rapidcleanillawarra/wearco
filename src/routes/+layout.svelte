@@ -1,6 +1,6 @@
 <script lang="ts">
 	import "$lib/styles/index.css";
-	import favicon from "$lib/assets/favicon.svg";
+	import favicon from "$lib/assets/wearco_favicon.png";
 	import { page } from "$app/stores";
 
 	import { enhance } from "$app/forms";
