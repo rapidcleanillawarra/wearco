@@ -33,13 +33,16 @@
     // Padding around the rectangle within the SVG viewport
     const CANVAS_PADDING = 80;
 
+    // Pan state
+    let panOffset = $state({ x: 0, y: 0 });
+
     // Viewport dimensions (reactive to content size)
     const canvasWidth = $derived(rectWidth + CANVAS_PADDING * 2);
     const canvasHeight = $derived(rectHeight + CANVAS_PADDING * 2);
 
-    // Positions (centered by reactive viewport size)
-    const rectangleX = $derived(CANVAS_PADDING);
-    const rectangleY = $derived(CANVAS_PADDING);
+    // Positions (centered by reactive viewport size + pan)
+    const rectangleX = $derived(CANVAS_PADDING + panOffset.x);
+    const rectangleY = $derived(CANVAS_PADDING + panOffset.y);
     const circleY = $derived(rectangleY + rectHeight / 2);
 
     const circlePositions = $derived.by(() => {
@@ -53,9 +56,11 @@
 
     // Interaction state
     let isResizing = $state(false);
+    let isDragging = $state(false);
     let resizeHandle = $state<string | null>(null);
     let startDimensions = $state({ width: 0, height: 0 });
     let startMousePos = $state({ x: 0, y: 0 });
+    let startPanOffset = $state({ x: 0, y: 0 });
     let resizeScale = $state({ x: 1, y: 1 });
 
     // Zoom functionality
@@ -74,6 +79,11 @@
 
     function resetZoom() {
         zoomLevel = 1;
+    }
+
+    function resetView() {
+        zoomLevel = 1;
+        panOffset = { x: 0, y: 0 };
     }
 
     function handleWheelZoom(event: WheelEvent) {
@@ -148,6 +158,7 @@
 
     // Canvas resize functions (deltas are in screen pixels; convert to logical units via container scale)
     function startResize(handle: string, event: MouseEvent) {
+        event.stopPropagation(); // Prevent drag from starting
         isResizing = true;
         resizeHandle = handle;
         startDimensions = { width: rectWidth, height: rectHeight };
@@ -169,7 +180,43 @@
         document.body.style.cursor = getCursorForHandle(handle);
     }
 
+    function startDragging(event: MouseEvent) {
+        if (isResizing) return;
+        isDragging = true;
+        startMousePos = { x: event.clientX, y: event.clientY };
+        startPanOffset = { ...panOffset };
+
+        if (canvasContainerEl) {
+            const rect = canvasContainerEl.getBoundingClientRect();
+            resizeScale = {
+                x: (rect.width * zoomLevel) / canvasWidth,
+                y: (rect.height * zoomLevel) / canvasHeight,
+            };
+        } else {
+            resizeScale = { x: 1, y: 1 };
+        }
+
+        event.preventDefault();
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "grabbing";
+    }
+
     function handleMouseMove(event: MouseEvent) {
+        if (isDragging) {
+            const pixelDeltaX = event.clientX - startMousePos.x;
+            const pixelDeltaY = event.clientY - startMousePos.y;
+            const deltaX =
+                resizeScale.x !== 0 ? pixelDeltaX / resizeScale.x : pixelDeltaX;
+            const deltaY =
+                resizeScale.y !== 0 ? pixelDeltaY / resizeScale.y : pixelDeltaY;
+
+            panOffset = {
+                x: startPanOffset.x + deltaX,
+                y: startPanOffset.y + deltaY,
+            };
+            return;
+        }
+
         if (!isResizing || !resizeHandle) return;
 
         const pixelDeltaX = event.clientX - startMousePos.x;
@@ -228,8 +275,9 @@
     }
 
     function stopResize() {
-        if (isResizing) {
+        if (isResizing || isDragging) {
             isResizing = false;
+            isDragging = false;
             resizeHandle = null;
             document.body.style.userSelect = "";
             document.body.style.cursor = "";
@@ -542,6 +590,13 @@
                     stroke-width="2"
                     rx="4"
                     ry="4"
+                    class="main-rectangle"
+                    onmousedown={startDragging}
+                    role="button"
+                    tabindex="-1"
+                    aria-label="Drawing area"
+                    aria-roledescription="draggable"
+                    style="cursor: grab"
                 />
 
                 <!-- Three centered circles -->
@@ -876,5 +931,17 @@
     .svg-canvas-container:focus {
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
+    }
+
+    .main-rectangle {
+        transition: stroke 0.2s ease;
+    }
+
+    .main-rectangle:hover {
+        stroke: #3b82f6;
+    }
+
+    :global(body[style*="grabbing"]) .main-rectangle {
+        cursor: grabbing !important;
     }
 </style>
