@@ -15,6 +15,8 @@
         };
         textPosition: "left" | "center" | "right";
         targetField?: string;
+        prefix?: string;
+        suffix?: string;
     };
 
     let {

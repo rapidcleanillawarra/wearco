@@ -91,6 +91,8 @@
             },
             textPosition: "left",
             targetField: "",
+            prefix: "",
+            suffix: "",
         });
         selectedFieldId = newId;
     }
@@ -113,6 +115,8 @@
                     x: selectedField.position.x + 20,
                     y: selectedField.position.y + 20,
                 },
+                prefix: selectedField.prefix || "",
+                suffix: selectedField.suffix || "",
             };
             fields.push(copiedField);
             selectedFieldId = newId;
@@ -425,6 +429,26 @@
                                 <option value="material">Material</option>
                                 <option value="thk">THK</option>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_prefix">Prefix</label>
+                            <input
+                                type="text"
+                                id="field_prefix"
+                                bind:value={selectedField.prefix}
+                                placeholder="Text before field value"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_suffix">Suffix</label>
+                            <input
+                                type="text"
+                                id="field_suffix"
+                                bind:value={selectedField.suffix}
+                                placeholder="Text after field value"
+                            />
                         </div>
 
                         <button
