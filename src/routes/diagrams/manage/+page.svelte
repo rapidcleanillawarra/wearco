@@ -330,12 +330,11 @@
     .content-layout {
         flex: 1;
         overflow-y: auto;
-        padding: 2rem;
+        padding: 2rem 0;
     }
 
     .form-container {
-        max-width: 800px;
-        margin: 0 auto;
+        width: 100%;
     }
 
     .form-section {
