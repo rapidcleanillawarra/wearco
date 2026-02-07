@@ -448,6 +448,7 @@
                     <span class="unit">px</span>
                 </label>
                 <button
+                    type="button"
                     class="aspect-ratio-toggle {maintainAspectRatio
                         ? 'active'
                         : ''}"
@@ -461,6 +462,7 @@
             <div class="reset-controls">
                 <div class="zoom-controls">
                     <button
+                        type="button"
                         class="zoom-btn"
                         onclick={zoomOut}
                         title="Zoom Out"
@@ -479,6 +481,7 @@
                     <span class="zoom-text">{Math.round(zoomLevel * 100)}%</span
                     >
                     <button
+                        type="button"
                         class="zoom-btn"
                         onclick={zoomIn}
                         title="Zoom In"
@@ -500,6 +503,7 @@
                         >
                     </button>
                     <button
+                        type="button"
                         class="zoom-btn reset-zoom"
                         onclick={resetZoom}
                         title="Reset Zoom"
@@ -519,6 +523,7 @@
                     </button>
                 </div>
                 <button
+                    type="button"
                     class="reset-button"
                     onclick={() =>
                         updateRectangleDimensions(initialWidth, initialHeight)}
@@ -527,6 +532,7 @@
                     Reset
                 </button>
                 <button
+                    type="button"
                     class="export-button"
                     onclick={exportSvg}
                     title="Export diagram as SVG file"
