@@ -29,6 +29,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             .eq('id', id)
             .single();
 
+        // Parse variables for easier client-side handling
+        let parsedVariables = {};
+        if (diagramData?.variables) {
+            try {
+                parsedVariables = typeof diagramData.variables === 'string'
+                    ? JSON.parse(diagramData.variables)
+                    : diagramData.variables;
+            } catch (e) {
+                console.error('Error parsing diagram variables:', e);
+                parsedVariables = {};
+            }
+        }
+
         if (diagramError) {
             console.error('Error fetching diagram:', diagramError);
             return fail(404, { error: 'Diagram not found' });
@@ -53,7 +66,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             diagram: diagramData,
             template: template,
             mode: 'edit' as const,
-            selectedTemplateId: diagramData?.template_id ?? templateIdParam
+            selectedTemplateId: diagramData?.template_id ?? templateIdParam,
+            variables: parsedVariables
         };
     }
 
@@ -90,7 +104,6 @@ export const actions: Actions = {
         const templateId = formData.get('template_id') as string;
         const type = formData.get('type') as string;
         const dimensionJson = formData.get('dimension') as string;
-        const variablesJson = formData.get('variables') as string;
 
         if (!name) {
             return fail(400, { missing: true, message: 'Diagram name is required' });
@@ -112,14 +125,7 @@ export const actions: Actions = {
         }
 
         // Parse and validate JSON data
-        let diagramVariables;
         let diagramDimension;
-        try {
-            diagramVariables = variablesJson ? JSON.parse(variablesJson) : {};
-        } catch (e) {
-            return fail(400, { invalid: true, message: 'Invalid JSON variables format' });
-        }
-
         try {
             diagramDimension = dimensionJson ? JSON.parse(dimensionJson) : null;
         } catch (e) {
@@ -131,7 +137,6 @@ export const actions: Actions = {
             template_id: templateId,
             type: type || null,
             dimension: diagramDimension,
-            variables: diagramVariables,
             updated_at: new Date().toISOString()
         };
 
@@ -171,6 +176,187 @@ export const actions: Actions = {
             success: true,
             message: id ? 'Diagram updated successfully' : 'Diagram created successfully',
             id: resultId
+        };
+    },
+
+    addVariable: async ({ request, locals }) => {
+        const formData = await request.formData();
+        const diagramId = formData.get('diagramId') as string;
+        const variableName = formData.get('variableName') as string;
+        const variableValue = formData.get('variableValue') as string;
+
+        if (!diagramId) {
+            return fail(400, { error: true, message: 'Diagram ID is required' });
+        }
+
+        if (!variableName?.trim()) {
+            return fail(400, { error: true, message: 'Variable name is required' });
+        }
+
+        // Get current diagram variables
+        const { data: diagram, error: fetchError } = await locals.supabase
+            .from('wearco_diagrams')
+            .select('variables')
+            .eq('id', diagramId)
+            .single();
+
+        if (fetchError) {
+            return fail(500, { error: true, message: 'Failed to fetch diagram' });
+        }
+
+        let currentVariables: Record<string, string> = {};
+        if (diagram?.variables) {
+            try {
+                currentVariables = typeof diagram.variables === 'string'
+                    ? JSON.parse(diagram.variables)
+                    : diagram.variables;
+            } catch (e) {
+                currentVariables = {};
+            }
+        }
+
+        // Check if variable name already exists
+        if (currentVariables[variableName.trim()]) {
+            return fail(400, { error: true, message: 'Variable name must be unique' });
+        }
+
+        // Add new variable
+        currentVariables[variableName.trim()] = variableValue || '';
+
+        // Update diagram
+        const { error: updateError } = await locals.supabase
+            .from('wearco_diagrams')
+            .update({
+                variables: currentVariables,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', diagramId);
+
+        if (updateError) {
+            return fail(500, { error: true, message: 'Failed to add variable' });
+        }
+
+        return {
+            success: true,
+            message: 'Variable added successfully',
+            variables: currentVariables
+        };
+    },
+
+    updateVariable: async ({ request, locals }) => {
+        const formData = await request.formData();
+        const diagramId = formData.get('diagramId') as string;
+        const variableName = formData.get('variableName') as string;
+        const variableValue = formData.get('variableValue') as string;
+
+        if (!diagramId) {
+            return fail(400, { error: true, message: 'Diagram ID is required' });
+        }
+
+        if (!variableName?.trim()) {
+            return fail(400, { error: true, message: 'Variable name is required' });
+        }
+
+        // Get current diagram variables
+        const { data: diagram, error: fetchError } = await locals.supabase
+            .from('wearco_diagrams')
+            .select('variables')
+            .eq('id', diagramId)
+            .single();
+
+        if (fetchError) {
+            return fail(500, { error: true, message: 'Failed to fetch diagram' });
+        }
+
+        let currentVariables: Record<string, string> = {};
+        if (diagram?.variables) {
+            try {
+                currentVariables = typeof diagram.variables === 'string'
+                    ? JSON.parse(diagram.variables)
+                    : diagram.variables;
+            } catch (e) {
+                currentVariables = {};
+            }
+        }
+
+        // Update variable value
+        currentVariables[variableName.trim()] = variableValue || '';
+
+        // Update diagram
+        const { error: updateError } = await locals.supabase
+            .from('wearco_diagrams')
+            .update({
+                variables: currentVariables,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', diagramId);
+
+        if (updateError) {
+            return fail(500, { error: true, message: 'Failed to update variable' });
+        }
+
+        return {
+            success: true,
+            message: 'Variable updated successfully',
+            variables: currentVariables
+        };
+    },
+
+    deleteVariable: async ({ request, locals }) => {
+        const formData = await request.formData();
+        const diagramId = formData.get('diagramId') as string;
+        const variableName = formData.get('variableName') as string;
+
+        if (!diagramId) {
+            return fail(400, { error: true, message: 'Diagram ID is required' });
+        }
+
+        if (!variableName?.trim()) {
+            return fail(400, { error: true, message: 'Variable name is required' });
+        }
+
+        // Get current diagram variables
+        const { data: diagram, error: fetchError } = await locals.supabase
+            .from('wearco_diagrams')
+            .select('variables')
+            .eq('id', diagramId)
+            .single();
+
+        if (fetchError) {
+            return fail(500, { error: true, message: 'Failed to fetch diagram' });
+        }
+
+        let currentVariables: Record<string, string> = {};
+        if (diagram?.variables) {
+            try {
+                currentVariables = typeof diagram.variables === 'string'
+                    ? JSON.parse(diagram.variables)
+                    : diagram.variables;
+            } catch (e) {
+                currentVariables = {};
+            }
+        }
+
+        // Remove variable
+        delete currentVariables[variableName.trim()];
+
+        // Update diagram
+        const { error: updateError } = await locals.supabase
+            .from('wearco_diagrams')
+            .update({
+                variables: currentVariables,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', diagramId);
+
+        if (updateError) {
+            return fail(500, { error: true, message: 'Failed to delete variable' });
+        }
+
+        return {
+            success: true,
+            message: 'Variable deleted successfully',
+            variables: currentVariables
         };
     }
 };

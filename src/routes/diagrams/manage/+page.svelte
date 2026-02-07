@@ -16,6 +16,13 @@
         };
     }>();
 
+    // Dynamic variables state
+    let variables = $state<Record<string, string>>({});
+    let newVariableName = $state('');
+    let newVariableValue = $state('');
+    let isAddingVariable = $state(false);
+    let variableErrors = $state<Record<string, string>>({});
+
     // Local editable state - initialized once from diagram data
     let diagramName = $state("");
     let templateId = $state("");
@@ -23,29 +30,6 @@
     let diagramDimension = $state("{}");
     let diagramVariables = $state("{}");
     let initialized = $state(false);
-
-    const EDGE_VARIABLES = [
-        "width",
-        "height",
-        "widthPx",
-        "heightPx",
-        "holeLeft",
-        "holeSize",
-        "holeType",
-        "holeCount",
-        "holeRight",
-        "holeSizePx",
-        "totalHoleDistance",
-    ];
-
-    // Helper to get variable values from JSON string
-    let parsedVariables = $derived.by(() => {
-        try {
-            return JSON.parse(diagramVariables);
-        } catch (e) {
-            return {};
-        }
-    });
 
     // Get edge fields from selected template (prefer server template data, fallback to templates array)
     let edgeFields = $derived.by(() => {
@@ -63,10 +47,102 @@
             .map((f: any) => ({ id: f.id, label: f.label }));
     });
 
-    function updateVariable(name: string, value: string) {
-        const current = { ...parsedVariables };
-        current[name] = value;
-        diagramVariables = JSON.stringify(current, null, 2);
+    // Variable CRUD functions
+    async function addVariable() {
+        if (!newVariableName.trim()) {
+            showToaster('error', 'Variable name is required');
+            return;
+        }
+
+        // Check for unique name
+        if (variables[newVariableName.trim()]) {
+            showToaster('error', 'Variable name must be unique');
+            return;
+        }
+
+        isAddingVariable = true;
+        try {
+            const formData = new FormData();
+            formData.append('diagramId', data.diagram?.id || '');
+            formData.append('variableName', newVariableName.trim());
+            formData.append('variableValue', newVariableValue);
+
+            const response = await fetch('?/addVariable', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.type === 'success') {
+                variables = result.data.variables;
+                newVariableName = '';
+                newVariableValue = '';
+                showToaster('success', 'Variable added successfully');
+            } else {
+                showToaster('error', result.data?.message || 'Failed to add variable');
+            }
+        } catch (error) {
+            console.error('Error adding variable:', error);
+            showToaster('error', 'Failed to add variable');
+        } finally {
+            isAddingVariable = false;
+        }
+    }
+
+    async function updateVariable(name: string, value: string) {
+        try {
+            const formData = new FormData();
+            formData.append('diagramId', data.diagram?.id || '');
+            formData.append('variableName', name);
+            formData.append('variableValue', value);
+
+            const response = await fetch('?/updateVariable', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.type === 'success') {
+                variables = result.data.variables;
+                showToaster('success', 'Variable updated successfully');
+            } else {
+                showToaster('error', result.data?.message || 'Failed to update variable');
+            }
+        } catch (error) {
+            console.error('Error updating variable:', error);
+            showToaster('error', 'Failed to update variable');
+        }
+    }
+
+    async function deleteVariable(name: string) {
+        if (!confirm(`Are you sure you want to delete the variable "${name}"?`)) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('diagramId', data.diagram?.id || '');
+            formData.append('variableName', name);
+
+            const response = await fetch('?/deleteVariable', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.type === 'success') {
+                variables = result.data.variables;
+                showToaster('success', 'Variable deleted successfully');
+            } else {
+                showToaster('error', result.data?.message || 'Failed to delete variable');
+            }
+        } catch (error) {
+            console.error('Error deleting variable:', error);
+            showToaster('error', 'Failed to delete variable');
+        }
     }
 
     // Reactive mode detection from URL (stays in sync when params change during navigation)
@@ -127,6 +203,13 @@
         lastInitKey = key;
     });
 
+    // Initialize variables from data when it loads
+    $effect(() => {
+        if (data.variables) {
+            variables = data.variables;
+        }
+    });
+
     // Effect to initialize local state when diagram data loads
     $effect(() => {
         const diagram = data.diagram;
@@ -147,6 +230,8 @@
                     diagramVariables = diagram.variables
                         ? JSON.stringify(diagram.variables, null, 2)
                         : '{}';
+                    // Initialize dynamic variables from server data
+                    variables = data.variables || {};
                     initialized = true;
                 } else {
                     isLoadingDiagram = true;
@@ -235,6 +320,9 @@
                     ? JSON.stringify(template.template_data.variables, null, 2)
                     : "{}";
 
+                // Initialize variables from template data
+                variables = template.template_data?.variables || {};
+
                 showToaster("success", "Template loaded successfully");
             } catch (error) {
                 console.error('Failed to load template:', error);
@@ -245,6 +333,7 @@
                 diagramType = "";
                 diagramDimension = "{}";
                 diagramVariables = "{}";
+                variables = {};
             } finally {
                 isLoadingTemplate = false;
             }
@@ -255,6 +344,7 @@
             diagramType = "";
             diagramDimension = "{}";
             diagramVariables = "{}";
+            variables = {};
         }
 
         initialized = true;
@@ -422,20 +512,86 @@
 
                 {#if canvasType === "edge"}
                     <div class="form-section variable-config-section">
-                        <h2>Variable Configuration</h2>
-                        <div class="variable-grid">
-                            {#each EDGE_VARIABLES as variable}
-                                <div class="variable-row">
-                                    <SearchableSelect
-                                        label={variable}
-                                        options={edgeFields}
-                                        value={parsedVariables[variable] || ""}
-                                        placeholder={`Select ${variable} field...`}
-                                        onselect={(val: string) =>
-                                            updateVariable(variable, val)}
+                        <div class="variable-header">
+                            <h2>Variable Configuration</h2>
+                            <button
+                                type="button"
+                                class="btn-add-variable"
+                                onclick={() => isAddingVariable = !isAddingVariable}
+                                disabled={isAddingVariable}
+                            >
+                                {isAddingVariable ? 'Cancel' : '+ Add Variable'}
+                            </button>
+                        </div>
+
+                        {#if isAddingVariable}
+                            <div class="add-variable-form">
+                                <div class="variable-row new-variable-row">
+                                    <input
+                                        type="text"
+                                        placeholder="Variable name"
+                                        bind:value={newVariableName}
+                                        class="variable-name-input"
+                                        maxlength="50"
                                     />
+                                    <SearchableSelect
+                                        options={edgeFields}
+                                        bind:value={newVariableValue}
+                                        placeholder="Select field..."
+                                    />
+                                    <button
+                                        type="button"
+                                        class="btn-save-variable"
+                                        onclick={addVariable}
+                                        disabled={isAddingVariable || !newVariableName.trim()}
+                                    >
+                                        {isAddingVariable ? 'Adding...' : 'Add'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-cancel-variable"
+                                        onclick={() => {
+                                            isAddingVariable = false;
+                                            newVariableName = '';
+                                            newVariableValue = '';
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                {#if variableErrors.newVariable}
+                                    <div class="variable-error">{variableErrors.newVariable}</div>
+                                {/if}
+                            </div>
+                        {/if}
+
+                        <div class="variable-grid">
+                            {#each Object.entries(variables) as [name, value]}
+                                <div class="variable-row existing-variable-row">
+                                    <div class="variable-name-display">
+                                        <strong>{name}</strong>
+                                    </div>
+                                    <SearchableSelect
+                                        options={edgeFields}
+                                        value={value}
+                                        placeholder={`Select ${name} field...`}
+                                        onselect={(val: string) => updateVariable(name, val)}
+                                    />
+                                    <button
+                                        type="button"
+                                        class="btn-delete-variable"
+                                        onclick={() => deleteVariable(name)}
+                                        title="Delete variable"
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
                             {/each}
+                            {#if Object.keys(variables).length === 0}
+                                <div class="no-variables">
+                                    <p>No variables configured yet. Click "Add Variable" to get started.</p>
+                                </div>
+                            {/if}
                         </div>
                     </div>
                 {/if}
@@ -791,5 +947,171 @@
         color: #94a3b8;
         font-size: 1rem;
         margin: 0;
+    }
+
+    /* Dynamic Variable Configuration Styles */
+    .variable-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-add-variable {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-add-variable:hover:not(:disabled) {
+        background: #059669;
+    }
+
+    .btn-add-variable:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .add-variable-form {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .new-variable-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr auto auto;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .variable-name-input {
+        background: #0f172a;
+        border: 1px solid #334155;
+        color: white;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+    }
+
+    .variable-name-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .btn-save-variable {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-save-variable:hover:not(:disabled) {
+        background: #059669;
+    }
+
+    .btn-save-variable:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-cancel-variable {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-cancel-variable:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .existing-variable-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr auto;
+        gap: 0.75rem;
+        align-items: center;
+        background: #1e293b;
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #334155;
+    }
+
+    .variable-name-display {
+        color: #f8fafc;
+        font-weight: 500;
+    }
+
+    .btn-delete-variable {
+        background: #ef4444;
+        color: white;
+        border: none;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: background 0.2s;
+    }
+
+    .btn-delete-variable:hover {
+        background: #dc2626;
+    }
+
+    .variable-error {
+        color: #ef4444;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    .no-variables {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .no-variables p {
+        margin: 0;
+        font-style: italic;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .new-variable-row,
+        .existing-variable-row {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .variable-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .btn-add-variable {
+            align-self: flex-start;
+        }
     }
 </style>
