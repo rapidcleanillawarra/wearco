@@ -1,7 +1,8 @@
 <script lang="ts">
-    // Enhanced Diagram Canvas Component with Resizable Dimensions
-    // Displays a vertically-oriented rectangle with three evenly-spaced circles
-    // Supports canvas-based editing and input field controls for dimension adjustment
+    // Enhanced Diagram Canvas Component with content scaling (viewBox)
+    // Displays a vertically-oriented rectangle with three evenly-spaced circles.
+    // Dimension controls adjust the drawing's logical size (viewBox); the canvas
+    // container keeps layout-appropriate dimensions and the SVG scales content to fit.
 
     // Props
     let {
@@ -31,6 +32,11 @@
     let resizeHandle = $state<string | null>(null);
     let startDimensions = $state({ width: 0, height: 0 });
     let startMousePos = $state({ x: 0, y: 0 });
+    /** Scale from screen pixels to logical (viewBox) units at resize start */
+    let resizeScale = $state({ x: 1, y: 1 });
+
+    // Container ref for converting screen deltas to logical dimension deltas
+    let canvasContainerEl = $state<HTMLDivElement | null>(null);
 
     // UI state
     let maintainAspectRatio = $state(false);
@@ -45,11 +51,10 @@
         originalAspectRatio = initialWidth / initialHeight;
     });
 
-    // Input field state
-    let widthInputValue = $state(canvasWidth.toString());
-    let heightInputValue = $state(canvasHeight.toString());
+    // Input field state (synced from logical dimensions in effect below)
+    let widthInputValue = $state('800');
+    let heightInputValue = $state('400');
 
-    // Keep input values in sync with canvas dimensions
     $effect(() => {
         widthInputValue = canvasWidth.toString();
         heightInputValue = canvasHeight.toString();
@@ -110,14 +115,23 @@
         canvasHeight = validateAndConstrainDimension(newHeight, MIN_HEIGHT, MAX_HEIGHT);
     }
 
-    // Canvas resize functions
+    // Canvas resize functions (deltas are in screen pixels; convert to logical units via container scale)
     function startResize(handle: string, event: MouseEvent) {
         isResizing = true;
         resizeHandle = handle;
         startDimensions = { width: canvasWidth, height: canvasHeight };
         startMousePos = { x: event.clientX, y: event.clientY };
 
-        // Prevent text selection during resize
+        if (canvasContainerEl) {
+            const rect = canvasContainerEl.getBoundingClientRect();
+            resizeScale = {
+                x: rect.width / canvasWidth,
+                y: rect.height / canvasHeight
+            };
+        } else {
+            resizeScale = { x: 1, y: 1 };
+        }
+
         event.preventDefault();
         document.body.style.userSelect = 'none';
         document.body.style.cursor = getCursorForHandle(handle);
@@ -126,44 +140,45 @@
     function handleMouseMove(event: MouseEvent) {
         if (!isResizing || !resizeHandle) return;
 
-        const deltaX = event.clientX - startMousePos.x;
-        const deltaY = event.clientY - startMousePos.y;
+        const pixelDeltaX = event.clientX - startMousePos.x;
+        const pixelDeltaY = event.clientY - startMousePos.y;
+        const deltaX = resizeScale.x !== 0 ? pixelDeltaX / resizeScale.x : pixelDeltaX;
+        const deltaY = resizeScale.y !== 0 ? pixelDeltaY / resizeScale.y : pixelDeltaY;
 
         let newWidth = startDimensions.width;
         let newHeight = startDimensions.height;
 
         switch (resizeHandle) {
-            case 'se': // southeast corner
+            case 'se':
                 newWidth = startDimensions.width + deltaX;
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'sw': // southwest corner
+            case 'sw':
                 newWidth = startDimensions.width - deltaX;
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'ne': // northeast corner
+            case 'ne':
                 newWidth = startDimensions.width + deltaX;
                 newHeight = startDimensions.height - deltaY;
                 break;
-            case 'nw': // northwest corner
+            case 'nw':
                 newWidth = startDimensions.width - deltaX;
                 newHeight = startDimensions.height - deltaY;
                 break;
-            case 'e': // east edge
+            case 'e':
                 newWidth = startDimensions.width + deltaX;
                 break;
-            case 'w': // west edge
+            case 'w':
                 newWidth = startDimensions.width - deltaX;
                 break;
-            case 's': // south edge
+            case 's':
                 newHeight = startDimensions.height + deltaY;
                 break;
-            case 'n': // north edge
+            case 'n':
                 newHeight = startDimensions.height - deltaY;
                 break;
         }
 
-        // Maintain aspect ratio if enabled
         if (maintainAspectRatio && (resizeHandle === 'se' || resizeHandle === 'nw')) {
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 newHeight = newWidth / originalAspectRatio;
@@ -184,18 +199,19 @@
         }
     }
 
+    const RESIZE_CURSORS: Record<string, string> = {
+        'se': 'nw-resize',
+        'sw': 'ne-resize',
+        'ne': 'sw-resize',
+        'nw': 'se-resize',
+        'e': 'e-resize',
+        'w': 'w-resize',
+        's': 's-resize',
+        'n': 'n-resize'
+    };
+
     function getCursorForHandle(handle: string): string {
-        const cursors = {
-            'se': 'nw-resize',
-            'sw': 'ne-resize',
-            'ne': 'sw-resize',
-            'nw': 'se-resize',
-            'e': 'e-resize',
-            'w': 'w-resize',
-            's': 's-resize',
-            'n': 'n-resize'
-        };
-        return cursors[handle] || 'default';
+        return RESIZE_CURSORS[handle] ?? 'default';
     }
 
     // Input field handlers
@@ -208,7 +224,7 @@
     function handleHeightInput(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = parseInt(target.value) || canvasHeight;
-        updateCanvasDimensions(value, canvasHeight);
+        updateCanvasDimensions(canvasWidth, value);
     }
 
     // Keyboard shortcuts
@@ -305,6 +321,7 @@
     </div>
 
     <div
+        bind:this={canvasContainerEl}
         class="svg-canvas-container"
         class:hovering={isHoveringCanvas}
         onmouseenter={() => isHoveringCanvas = true}
@@ -317,9 +334,10 @@
         aria-label="Interactive diagram canvas with resize handles"
     >
         <svg
-            width={canvasWidth}
-            height={canvasHeight}
+            width="100%"
+            height="100%"
             viewBox="0 0 {canvasWidth} {canvasHeight}"
+            preserveAspectRatio="xMidYMid meet"
             class="svg-canvas"
             role="img"
             aria-label="Interactive diagram display showing a rectangle with three circles"
@@ -619,13 +637,14 @@
 
     .svg-canvas-container {
         flex: 1;
+        min-height: 400px;
         background: #ffffff;
         border-radius: 0.375rem;
         overflow: hidden;
         border: 1px solid #e2e8f0;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        align-items: stretch;
+        justify-content: stretch;
         position: relative;
         cursor: default;
         transition: border-color 0.2s ease;
@@ -637,6 +656,9 @@
     }
 
     .svg-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
         background: #ffffff;
         user-select: none;
     }
