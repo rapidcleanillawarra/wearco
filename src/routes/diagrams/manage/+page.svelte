@@ -1,5 +1,4 @@
 <script lang="ts">
-
     import { enhance } from "$app/forms";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
@@ -19,9 +18,10 @@
 
     // Dynamic variables state
     let variables = $state<Record<string, string>>({});
-    let newVariableName = $state('');
-    let newVariableValue = $state('');
-    let isAddingVariable = $state(false);
+    let newVariableName = $state("");
+    let newVariableValue = $state("");
+    let showAddVariableForm = $state(false);
+    let isSubmittingVariable = $state(false);
     let variableErrors = $state<Record<string, string>>({});
 
     // Local editable state - initialized once from diagram data
@@ -40,142 +40,165 @@
             template = data.templates.find((t: any) => t.id === templateId);
         }
         if (template?.template_data) {
-           
         }
         if (!template?.template_data?.fields) return [];
-        return template.template_data.fields
-            .map((f: any) => ({ id: f.id, label: f.label }));
+        return template.template_data.fields.map((f: any) => ({
+            id: f.id,
+            label: f.label,
+        }));
     });
 
     // Variable CRUD functions
     async function addVariable() {
         // Prevent clicks when button should be disabled
-        if (isAddingVariable || !newVariableName.trim()) {
+        if (isSubmittingVariable || !newVariableName.trim()) {
             return;
         }
 
         if (!newVariableName.trim()) {
-            showToaster('error', 'Variable name is required');
+            showToaster("error", "Variable name is required");
             return;
         }
 
         // Check for unique name
         if (variables[newVariableName.trim()]) {
-            showToaster('error', 'Variable name must be unique');
+            showToaster("error", "Variable name must be unique");
             return;
         }
 
-        isAddingVariable = true;
+        isSubmittingVariable = true;
 
         // Safety timeout to reset loading state if something goes wrong
         const safetyTimeout = setTimeout(() => {
-            console.warn('Safety timeout triggered - resetting isAddingVariable');
-            isAddingVariable = false;
+            console.warn(
+                "Safety timeout triggered - resetting isSubmittingVariable",
+            );
+            isSubmittingVariable = false;
         }, 10000);
 
         try {
             const formData = new FormData();
-            formData.append('diagramId', data.diagram?.id || '');
-            formData.append('variableName', newVariableName.trim());
-            formData.append('variableValue', newVariableValue);
+            formData.append("diagramId", data.diagram?.id || "");
+            formData.append("variableName", newVariableName.trim());
+            formData.append("variableValue", newVariableValue);
 
-            const response = await fetch('?/addVariable', {
-                method: 'POST',
-                body: formData
+            const response = await fetch("?/addVariable", {
+                method: "POST",
+                body: formData,
             });
 
             let result;
             try {
                 result = await response.json();
             } catch (parseError) {
-                console.error('Failed to parse server response:', parseError);
-                throw new Error('Invalid server response');
+                console.error("Failed to parse server response:", parseError);
+                throw new Error("Invalid server response");
             }
 
             if (response.ok && result.success) {
                 variables = result.variables;
-                newVariableName = '';
-                newVariableValue = '';
-                showToaster('success', result.message || 'Variable added successfully');
+                newVariableName = "";
+                newVariableValue = "";
+                showToaster(
+                    "success",
+                    result.message || "Variable added successfully",
+                );
             } else {
-                const errorMessage = result?.message || result?.error || 'Failed to add variable';
-                showToaster('error', errorMessage);
+                const errorMessage =
+                    result?.message ||
+                    result?.error ||
+                    "Failed to add variable";
+                showToaster("error", errorMessage);
             }
         } catch (error) {
-            console.error('Error adding variable:', error);
-            showToaster('error', 'Failed to add variable');
+            console.error("Error adding variable:", error);
+            showToaster("error", "Failed to add variable");
         } finally {
             clearTimeout(safetyTimeout);
-            isAddingVariable = false;
+            isSubmittingVariable = false;
         }
     }
 
     async function updateVariable(name: string, value: string) {
         try {
             const formData = new FormData();
-            formData.append('diagramId', data.diagram?.id || '');
-            formData.append('variableName', name);
-            formData.append('variableValue', value);
+            formData.append("diagramId", data.diagram?.id || "");
+            formData.append("variableName", name);
+            formData.append("variableValue", value);
 
-            const response = await fetch('?/updateVariable', {
-                method: 'POST',
-                body: formData
+            const response = await fetch("?/updateVariable", {
+                method: "POST",
+                body: formData,
             });
 
             let result;
             try {
                 result = await response.json();
             } catch (parseError) {
-                console.error('Failed to parse server response:', parseError);
-                throw new Error('Invalid server response');
+                console.error("Failed to parse server response:", parseError);
+                throw new Error("Invalid server response");
             }
 
             if (response.ok && result.success) {
                 variables = result.variables;
-                showToaster('success', result.message || 'Variable updated successfully');
+                showToaster(
+                    "success",
+                    result.message || "Variable updated successfully",
+                );
             } else {
-                const errorMessage = result?.message || result?.error || 'Failed to update variable';
-                showToaster('error', errorMessage);
+                const errorMessage =
+                    result?.message ||
+                    result?.error ||
+                    "Failed to update variable";
+                showToaster("error", errorMessage);
             }
         } catch (error) {
-            console.error('Error updating variable:', error);
-            showToaster('error', 'Failed to update variable');
+            console.error("Error updating variable:", error);
+            showToaster("error", "Failed to update variable");
         }
     }
 
     async function deleteVariable(name: string) {
-        if (!confirm(`Are you sure you want to delete the variable "${name}"?`)) {
+        if (
+            !confirm(`Are you sure you want to delete the variable "${name}"?`)
+        ) {
             return;
         }
 
         try {
             const formData = new FormData();
-            formData.append('diagramId', data.diagram?.id || '');
-            formData.append('variableName', name);
+            formData.append("diagramId", data.diagram?.id || "");
+            formData.append("variableName", name);
 
-            const response = await fetch('?/deleteVariable', {
-                method: 'POST',
-                body: formData
+            const response = await fetch("?/deleteVariable", {
+                method: "POST",
+                body: formData,
             });
 
             let result;
             try {
                 result = await response.json();
             } catch (parseError) {
-                console.error('Failed to parse server response:', parseError);
-                throw new Error('Invalid server response');
+                console.error("Failed to parse server response:", parseError);
+                throw new Error("Invalid server response");
             }
 
             if (response.ok && result.success) {
                 variables = result.variables;
-                showToaster('success', result.message || 'Variable deleted successfully');
+                showToaster(
+                    "success",
+                    result.message || "Variable deleted successfully",
+                );
             } else {
-                const errorMessage = result?.message || result?.error || 'Failed to delete variable';
-                showToaster('error', errorMessage);
+                const errorMessage =
+                    result?.message ||
+                    result?.error ||
+                    "Failed to delete variable";
+                showToaster("error", errorMessage);
             }
         } catch (error) {
-            console.error('Error deleting variable:', error);
-            showToaster('error', 'Failed to delete variable');
+            console.error("Error deleting variable:", error);
+            showToaster("error", "Failed to delete variable");
         }
     }
 
@@ -203,7 +226,7 @@
     // Get canvas type from URL parameter, fallback to diagram column type
     let canvasType = $derived.by(() => {
         // Prefer URL type param, fallback to diagram column type
-        const urlType = $page.url.searchParams.get('type');
+        const urlType = $page.url.searchParams.get("type");
         const diagramTypeValue = diagramType;
         return urlType || diagramTypeValue || null;
     });
@@ -250,20 +273,21 @@
         const mode = data.mode;
 
         if (!initialized) {
-            if (mode === 'create') {
+            if (mode === "create") {
                 initializeCreateMode();
-            } else if (mode === 'edit') {
+            } else if (mode === "edit") {
                 if (diagram) {
                     isLoadingDiagram = false;
-                    diagramName = diagram.name || '';
-                    templateId = diagram.template_id || data.selectedTemplateId || '';
-                    diagramType = diagram.type || '';  // Column type
+                    diagramName = diagram.name || "";
+                    templateId =
+                        diagram.template_id || data.selectedTemplateId || "";
+                    diagramType = diagram.type || ""; // Column type
                     diagramDimension = diagram.dimension
                         ? JSON.stringify(diagram.dimension, null, 2)
-                        : '{}';
+                        : "{}";
                     diagramVariables = diagram.variables
                         ? JSON.stringify(diagram.variables, null, 2)
-                        : '{}';
+                        : "{}";
                     // Initialize dynamic variables from server data
                     variables = data.variables || {};
                     initialized = true;
@@ -322,13 +346,15 @@
         try {
             const response = await fetch(`/api/templates/${templateId}`);
             if (!response.ok) {
-                throw new Error(`Failed to fetch template: ${response.statusText}`);
+                throw new Error(
+                    `Failed to fetch template: ${response.statusText}`,
+                );
             }
             const template = await response.json();
-            
+
             return template;
         } catch (error) {
-            console.error('Error fetching template:', error);
+            console.error("Error fetching template:", error);
             throw error;
         }
     }
@@ -336,7 +362,7 @@
     // Initialize form data for create mode with template_id
     async function initializeCreateMode() {
         const urlParams = $page.url.searchParams;
-        const templateIdParam = urlParams.get('template_id');
+        const templateIdParam = urlParams.get("template_id");
 
         if (templateIdParam) {
             isLoadingTemplate = true;
@@ -359,7 +385,7 @@
 
                 showToaster("success", "Template loaded successfully");
             } catch (error) {
-                console.error('Failed to load template:', error);
+                console.error("Failed to load template:", error);
                 showToaster("error", "Failed to load template data");
                 // Initialize with empty values if template fetch fails
                 diagramName = "";
@@ -414,7 +440,11 @@
                 form="diagram-form"
                 disabled={isSaving || isLoadingTemplate}
             >
-                {isSaving ? "Saving..." : isLoadingTemplate ? "Loading Template..." : "Save Diagram"}
+                {isSaving
+                    ? "Saving..."
+                    : isLoadingTemplate
+                      ? "Loading Template..."
+                      : "Save Diagram"}
             </button>
         </div>
     </header>
@@ -427,8 +457,9 @@
             </div>
         {:else if diagramLoadError}
             <div class="alert error">
-                <strong>Error:</strong> {diagramLoadError}
-                <br>
+                <strong>Error:</strong>
+                {diagramLoadError}
+                <br />
                 <small>Please check the diagram ID and try again.</small>
             </div>
         {:else if form?.message}
@@ -444,223 +475,247 @@
         {#if !isLoadingDiagram && !diagramLoadError}
             <div class="form-container">
                 <form
-                method="POST"
-                action="?/saveDiagram"
-                id="diagram-form"
-                use:enhance={({ formData }) => {
-                    console.log("=== FORM SUBMITTING ===");
-                    console.log("Form data entries:");
-                    for (const [key, value] of formData.entries()) {
-                        console.log(`  ${key}:`, value);
-                    }
-                    isSaving = true;
-                    return async ({ result, update }) => {
-                        isSaving = false;
-                        console.log("Form result:", result);
-                        console.log("Result type:", result.type);
-                        if (
-                            result.type !== "redirect" &&
-                            result.type !== "error"
-                        ) {
-                            console.log("Result data:", result.data);
+                    method="POST"
+                    action="?/saveDiagram"
+                    id="diagram-form"
+                    use:enhance={({ formData }) => {
+                        console.log("=== FORM SUBMITTING ===");
+                        console.log("Form data entries:");
+                        for (const [key, value] of formData.entries()) {
+                            console.log(`  ${key}:`, value);
                         }
+                        isSaving = true;
+                        return async ({ result, update }) => {
+                            isSaving = false;
+                            console.log("Form result:", result);
+                            console.log("Result type:", result.type);
+                            if (
+                                result.type !== "redirect" &&
+                                result.type !== "error"
+                            ) {
+                                console.log("Result data:", result.data);
+                            }
 
-                        if (result.type === "success" && result.data?.success) {
-                            showToaster(
-                                "success",
-                                (result.data.message as string) ||
-                                    "Diagram saved successfully",
-                            );
-                            // Navigate back to diagrams list after a short delay
-                            setTimeout(() => {
-                                goto("/diagrams");
-                            }, 1500);
-                        } else if (result.type === "failure") {
-                            showToaster(
-                                "error",
-                                (result.data?.message as string) ||
-                                    "Failed to save diagram",
-                            );
-                        } else if (result.type === "error") {
-                            showToaster(
-                                "error",
-                                "An unexpected error occurred",
-                            );
-                        }
-                    };
-                }}
-            >
-                <input type="hidden" name="id" value={data.diagram?.id ?? ""} />
+                            if (
+                                result.type === "success" &&
+                                result.data?.success
+                            ) {
+                                showToaster(
+                                    "success",
+                                    (result.data.message as string) ||
+                                        "Diagram saved successfully",
+                                );
+                                // Navigate back to diagrams list after a short delay
+                                setTimeout(() => {
+                                    goto("/diagrams");
+                                }, 1500);
+                            } else if (result.type === "failure") {
+                                showToaster(
+                                    "error",
+                                    (result.data?.message as string) ||
+                                        "Failed to save diagram",
+                                );
+                            } else if (result.type === "error") {
+                                showToaster(
+                                    "error",
+                                    "An unexpected error occurred",
+                                );
+                            }
+                        };
+                    }}
+                >
+                    <input
+                        type="hidden"
+                        name="id"
+                        value={data.diagram?.id ?? ""}
+                    />
 
-                <div class="form-section">
-                    <h2>Diagram Details</h2>
+                    <div class="form-section">
+                        <h2>Diagram Details</h2>
 
-                    <div class="form-group">
-                        <label for="name">Diagram Name *</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            bind:value={diagramName}
-                            required
-                            placeholder="Enter diagram name"
-                        />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="template_id">Template *</label>
-                        <select
-                            id="template_id"
-                            name="template_id"
-                            bind:value={templateId}
-                            required
-                        >
-                            <option value="">Select a template...</option>
-                            {#each data.templates as template}
-                                <option value={template.id}>
-                                    {template.template_name}
-                                    {#if template.category}
-                                        ({template.category})
-                                    {/if}
-                                </option>
-                            {/each}
-                        </select>
-                        <small
-                            >Select the template this diagram is associated with</small
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="type">Type</label>
-                        <input
-                            type="text"
-                            id="type"
-                            name="type"
-                            bind:value={diagramType}
-                            placeholder="Enter diagram type"
-                        />
-                        <small>Optional diagram type classification</small>
-                    </div>
-                </div>
-
-
-                {#if canvasType === "edge"}
-                    <div class="form-section variable-config-section">
-                        <div class="variable-header">
-                            <h2>Variable Configuration</h2>
-                            <button
-                                type="button"
-                                class="btn-add-variable"
-                                onclick={(event) => {
-                                    if (event.currentTarget.disabled) return;
-                                    isAddingVariable = !isAddingVariable;
-                                }}
-                                disabled={isAddingVariable}
-                            >
-                                {isAddingVariable ? 'Cancel' : '+ Add Variable'}
-                            </button>
+                        <div class="form-group">
+                            <label for="name">Diagram Name *</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                bind:value={diagramName}
+                                required
+                                placeholder="Enter diagram name"
+                            />
                         </div>
 
-                        {#if isAddingVariable}
-                            <div class="add-variable-form">
-                                <div class="variable-row new-variable-row">
-                                    <input
-                                        type="text"
-                                        placeholder="Variable name"
-                                        bind:value={newVariableName}
-                                        class="variable-name-input"
-                                        maxlength="50"
-                                    />
-                                    <SearchableSelect
-                                        options={edgeFields}
-                                        bind:value={newVariableValue}
-                                        placeholder="Select field..."
-                                        onselect={(val: string) => newVariableName = val}
-                                    />
-                                    <button
-                                        type="button"
-                                        class="btn-save-variable"
-                                        onclick={addVariable}
-                                        disabled={isAddingVariable || !newVariableName.trim()}
-                                    >
-                                        {isAddingVariable ? 'Adding...' : 'Add'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn-cancel-variable"
-                                        onclick={() => {
-                                            isAddingVariable = false;
-                                            newVariableName = '';
-                                            newVariableValue = '';
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                                {#if variableErrors.newVariable}
-                                    <div class="variable-error">{variableErrors.newVariable}</div>
-                                {/if}
-                            </div>
-                        {/if}
+                        <div class="form-group">
+                            <label for="template_id">Template *</label>
+                            <select
+                                id="template_id"
+                                name="template_id"
+                                bind:value={templateId}
+                                required
+                            >
+                                <option value="">Select a template...</option>
+                                {#each data.templates as template}
+                                    <option value={template.id}>
+                                        {template.template_name}
+                                        {#if template.category}
+                                            ({template.category})
+                                        {/if}
+                                    </option>
+                                {/each}
+                            </select>
+                            <small
+                                >Select the template this diagram is associated
+                                with</small
+                            >
+                        </div>
 
-                        <div class="variable-grid">
-                            {#each Object.entries(variables) as [name, value]}
-                                <div class="variable-row existing-variable-row">
-                                    <div class="variable-name-display">
-                                        <strong>{name}</strong>
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <input
+                                type="text"
+                                id="type"
+                                name="type"
+                                bind:value={diagramType}
+                                placeholder="Enter diagram type"
+                            />
+                            <small>Optional diagram type classification</small>
+                        </div>
+                    </div>
+
+                    {#if canvasType === "edge"}
+                        <div class="form-section variable-config-section">
+                            <div class="variable-header">
+                                <h2>Variable Configuration</h2>
+                                <button
+                                    type="button"
+                                    class="btn-add-variable"
+                                    onclick={(event) => {
+                                        if (event.currentTarget.disabled)
+                                            return;
+                                        showAddVariableForm =
+                                            !showAddVariableForm;
+                                    }}
+                                    disabled={showAddVariableForm}
+                                >
+                                    {showAddVariableForm
+                                        ? "Cancel"
+                                        : "+ Add Variable"}
+                                </button>
+                            </div>
+
+                            {#if showAddVariableForm}
+                                <div class="add-variable-form">
+                                    <div class="variable-row new-variable-row">
+                                        <input
+                                            type="text"
+                                            placeholder="Variable name"
+                                            bind:value={newVariableName}
+                                            class="variable-name-input"
+                                            maxlength="50"
+                                        />
+                                        <SearchableSelect
+                                            options={edgeFields}
+                                            bind:value={newVariableValue}
+                                            placeholder="Select field..."
+                                            onselect={(val: string) =>
+                                                (newVariableName = val)}
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn-save-variable"
+                                            onclick={addVariable}
+                                            disabled={isSubmittingVariable ||
+                                                !newVariableName.trim()}
+                                        >
+                                            {isSubmittingVariable
+                                                ? "Adding..."
+                                                : "Add"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn-cancel-variable"
+                                            onclick={() => {
+                                                showAddVariableForm = false;
+                                                newVariableName = "";
+                                                newVariableValue = "";
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
                                     </div>
-                                    <SearchableSelect
-                                        options={edgeFields}
-                                        value={value}
-                                        placeholder={`Select ${name} field...`}
-                                        onselect={(val: string) => updateVariable(name, val)}
-                                    />
-                                    <button
-                                        type="button"
-                                        class="btn-delete-variable"
-                                        onclick={() => deleteVariable(name)}
-                                        title="Delete variable"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            {/each}
-                            {#if Object.keys(variables).length === 0}
-                                <div class="no-variables">
-                                    <p>No variables configured yet. Click "Add Variable" to get started.</p>
+                                    {#if variableErrors.newVariable}
+                                        <div class="variable-error">
+                                            {variableErrors.newVariable}
+                                        </div>
+                                    {/if}
                                 </div>
                             {/if}
-                        </div>
-                    </div>
-                {/if}
 
-                <!-- Canvas Component Rendering -->
-                {#if canvasComponent === "edge"}
-                    <EdgeCanvas
-                        width={800}
-                        height={400}
-                        diagramType={diagramType || "Edge Diagram"}
-                    />
-                {:else if canvasComponent === "top_side"}
-                    <TopSideCanvas
-                        width={800}
-                        height={400}
-                        diagramType={diagramType || "Top Side Diagram"}
-                    />
-                {:else}
-                    <div class="canvas-error">
-                        <p>
-                            Invalid or missing canvas type parameter. Please
-                            specify "type=edge" or "type=top_side" in the URL.
-                        </p>
-                        <p>
-                            Example: <code>?type=edge</code> or
-                            <code>?type=top_side</code>
-                        </p>
-                    </div>
-                {/if}
-            </form>
-        </div>
+                            <div class="variable-grid">
+                                {#each Object.entries(variables) as [name, value]}
+                                    <div
+                                        class="variable-row existing-variable-row"
+                                    >
+                                        <div class="variable-name-display">
+                                            <strong>{name}</strong>
+                                        </div>
+                                        <SearchableSelect
+                                            options={edgeFields}
+                                            {value}
+                                            placeholder={`Select ${name} field...`}
+                                            onselect={(val: string) =>
+                                                updateVariable(name, val)}
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn-delete-variable"
+                                            onclick={() => deleteVariable(name)}
+                                            title="Delete variable"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                {/each}
+                                {#if Object.keys(variables).length === 0}
+                                    <div class="no-variables">
+                                        <p>
+                                            No variables configured yet. Click
+                                            "Add Variable" to get started.
+                                        </p>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    {/if}
+
+                    <!-- Canvas Component Rendering -->
+                    {#if canvasComponent === "edge"}
+                        <EdgeCanvas
+                            width={800}
+                            height={400}
+                            diagramType={diagramType || "Edge Diagram"}
+                        />
+                    {:else if canvasComponent === "top_side"}
+                        <TopSideCanvas
+                            width={800}
+                            height={400}
+                            diagramType={diagramType || "Top Side Diagram"}
+                        />
+                    {:else}
+                        <div class="canvas-error">
+                            <p>
+                                Invalid or missing canvas type parameter. Please
+                                specify "type=edge" or "type=top_side" in the
+                                URL.
+                            </p>
+                            <p>
+                                Example: <code>?type=edge</code> or
+                                <code>?type=top_side</code>
+                            </p>
+                        </div>
+                    {/if}
+                </form>
+            </div>
         {/if}
     </div>
 </div>
@@ -977,8 +1032,12 @@
     }
 
     @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     .loading-container p {
