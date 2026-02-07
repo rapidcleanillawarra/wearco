@@ -287,12 +287,7 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2>SVG Preview</h2>
-                    <div class="svg-viewer-wrapper">
-                        <SvgViewer width={800} height={400} />
-                    </div>
-                </div>
+                <SvgViewer width={800} height={400} />
             </form>
         </div>
     </div>
@@ -543,10 +538,4 @@
         opacity: 1;
     }
 
-    /* SVG Viewer Styles */
-    .svg-viewer-wrapper {
-        min-height: 500px;
-        display: flex;
-        flex-direction: column;
-    }
 </style>
