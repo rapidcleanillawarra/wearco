@@ -13,11 +13,11 @@
         onEdit: () => void;
     }>();
 
-    const formattedDate = new Intl.DateTimeFormat("en-US", {
+    const formattedDate = $derived(new Intl.DateTimeFormat("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
-    }).format(new Date(diagram.updated_at));
+    }).format(new Date(diagram.updated_at)));
 
     let isDeleting = $state(false);
 </script>
