@@ -130,6 +130,7 @@
             circleRadius: radius,
             holeDiameter: Math.round(radius * 2), // mm
             pitch: Math.round(spacing), // mm
+            edgeDistance: Math.round(spacing), // mm
             totalDistance: Math.round(spacing * 2), // mm
         };
     });
@@ -785,6 +786,73 @@
                             text-anchor="middle"
                         >
                             {diagramStyles.pitch} mm
+                        </text>
+                    </g>
+
+                    <!-- Left Edge Distance (Left Line to Hole 1) -->
+                    <g class="dimension-line">
+                        <line
+                            x1={rectangleX + 3}
+                            y1={dimY_pitch}
+                            x2={circlePositions[0] - 5}
+                            y2={dimY_pitch}
+                            stroke="#374151"
+                            stroke-width="1.5"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <!-- Extension lines for edge distance -->
+                        <line
+                            x1={rectangleX}
+                            y1={rectangleY + rectHeight}
+                            x2={rectangleX}
+                            y2={dimY_pitch + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={(rectangleX + circlePositions[0]) / 2}
+                            y={dimY_pitch + 15}
+                            fill="#374151"
+                            font-size="12"
+                            text-anchor="middle"
+                        >
+                            {diagramStyles.edgeDistance} mm
+                        </text>
+                    </g>
+
+                    <!-- Right Edge Distance (Hole 3 to Right Line) -->
+                    <g class="dimension-line">
+                        <line
+                            x1={circlePositions[2] + 5}
+                            y1={dimY_pitch}
+                            x2={rectangleX + rectWidth - 3}
+                            y2={dimY_pitch}
+                            stroke="#374151"
+                            stroke-width="1.5"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <!-- Extension lines for edge distance -->
+                        <line
+                            x1={rectangleX + rectWidth}
+                            y1={rectangleY + rectHeight}
+                            x2={rectangleX + rectWidth}
+                            y2={dimY_pitch + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={(circlePositions[2] + (rectangleX + rectWidth)) /
+                                2}
+                            y={dimY_pitch + 15}
+                            fill="#374151"
+                            font-size="12"
+                            text-anchor="middle"
+                        >
+                            {diagramStyles.edgeDistance} mm
                         </text>
                     </g>
 
