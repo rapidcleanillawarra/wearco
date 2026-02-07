@@ -10,6 +10,7 @@
 	import SvgDiagramViewer from "./components/SvgDiagramViewer.svelte";
 	import FullSvgViewer from "./components/FullSvgViewer.svelte";
 	import { exportPdfWithOverlay } from "./utils/pdfExport";
+	import type { WearcoDiagram } from "$lib/types/svg_diagram";
 
 	let { data } = $props<{
 		data: PageData;
@@ -20,6 +21,12 @@
 	const template = $derived(data.template);
 	const drawing = $derived(data.drawing);
 	const diagrams = $derived(data.diagrams);
+	const edgeDiagrams = $derived(
+		diagrams?.filter((d: WearcoDiagram) => d.type === "edge") || [],
+	);
+	const topDiagrams = $derived(
+		diagrams?.filter((d: WearcoDiagram) => d.type === "top_side") || [],
+	);
 	const pdfUrl = $derived(data.pdfUrl);
 
 	// Parse template data for overlay fields
@@ -608,10 +615,17 @@
 		</section>
 
 		{#if diagrams && diagrams.length > 0}
-			<div class="svg-diagrams-container">
-				{#each diagrams as diagram}
-					<FullSvgViewer {diagram} />
-				{/each}
+			<div class="svg-diagrams-grid">
+				<div class="diagrams-column">
+					{#each edgeDiagrams as diagram}
+						<FullSvgViewer {diagram} />
+					{/each}
+				</div>
+				<div class="diagrams-column">
+					{#each topDiagrams as diagram}
+						<FullSvgViewer {diagram} />
+					{/each}
+				</div>
 			</div>
 		{/if}
 	</main>
@@ -766,10 +780,23 @@
 		gap: var(--spacing-md);
 	}
 
-	.svg-diagrams-container {
+	.svg-diagrams-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-xl);
+		align-items: start;
+	}
+
+	.diagrams-column {
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-xl);
+	}
+
+	@media (max-width: 1024px) {
+		.svg-diagrams-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.btn-primary {
