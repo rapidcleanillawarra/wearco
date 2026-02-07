@@ -32,6 +32,10 @@
     let diagramVariables = $state("{}");
     let initialized = $state(false);
 
+    // Dimension state variables
+    let dimensionHeight = $state("0");
+    let dimensionWidth = $state("0");
+
     // Get all fields from selected template (prefer server template data, fallback to templates array)
     let edgeFields = $derived.by(() => {
         // Prefer template from server data (for edit mode), fallback to finding in templates array
@@ -186,6 +190,13 @@
         }
     });
 
+    // Update diagramDimension JSON when height/width change
+    $effect(() => {
+        const height = parseFloat(dimensionHeight) || 0;
+        const width = parseFloat(dimensionWidth) || 0;
+        diagramDimension = JSON.stringify({ height, width }, null, 2);
+    });
+
     // Effect to initialize local state when diagram data loads
     $effect(() => {
         const diagram = data.diagram;
@@ -204,6 +215,11 @@
                     diagramDimension = diagram.dimension
                         ? JSON.stringify(diagram.dimension, null, 2)
                         : "{}";
+                    // Initialize dimension state from JSON
+                    if (diagram.dimension) {
+                        dimensionHeight = diagram.dimension.height?.toString() || "0";
+                        dimensionWidth = diagram.dimension.width?.toString() || "0";
+                    }
                     diagramVariables = diagram.variables
                         ? JSON.stringify(diagram.variables, null, 2)
                         : "{}";
@@ -295,6 +311,11 @@
                 diagramDimension = template.template_data?.dimension
                     ? JSON.stringify(template.template_data.dimension, null, 2)
                     : "{}";
+                // Initialize dimension state from template data
+                if (template.template_data?.dimension) {
+                    dimensionHeight = template.template_data.dimension.height?.toString() || "0";
+                    dimensionWidth = template.template_data.dimension.width?.toString() || "0";
+                }
                 diagramVariables = template.template_data?.variables
                     ? JSON.stringify(template.template_data.variables, null, 2)
                     : "{}";
@@ -324,6 +345,8 @@
             diagramDimension = "{}";
             diagramVariables = "{}";
             variables = {};
+            dimensionHeight = "0";
+            dimensionWidth = "0";
         }
 
         initialized = true;
@@ -406,6 +429,13 @@
 
                         // Add variables to form data
                         formData.append("variables", JSON.stringify(variables));
+
+                        // Add dimension to form data
+                        const dimension = {
+                            height: parseFloat(dimensionHeight) || 0,
+                            width: parseFloat(dimensionWidth) || 0
+                        };
+                        formData.append("dimension", JSON.stringify(dimension));
 
                         isSaving = true;
                         return async ({ result, update }) => {
@@ -502,6 +532,36 @@
                                 placeholder="Enter diagram type"
                             />
                             <small>Optional diagram type classification</small>
+                        </div>
+                    </div>
+
+                    <div class="form-section dimension-section">
+                        <h2>Dimension</h2>
+
+                        <div class="form-group">
+                            <label for="dimension_height">Height</label>
+                            <input
+                                type="number"
+                                id="dimension_height"
+                                name="dimension_height"
+                                bind:value={dimensionHeight}
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dimension_width">Width</label>
+                            <input
+                                type="number"
+                                id="dimension_width"
+                                name="dimension_width"
+                                bind:value={dimensionWidth}
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                            />
                         </div>
                     </div>
 
@@ -697,6 +757,10 @@
 
     .variable-config-section {
         border-color: #3b82f633;
+    }
+
+    .dimension-section {
+        border-color: #f59e0b33;
     }
 
     .variable-grid {
