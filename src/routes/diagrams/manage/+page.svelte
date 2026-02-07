@@ -288,7 +288,7 @@
                 type="submit"
                 class="btn-primary"
                 form="diagram-form"
-                disabled={isSaving || isLoadingTemplate || !validateJson(diagramVariables)}
+                disabled={isSaving || isLoadingTemplate}
             >
                 {isSaving ? "Saving..." : isLoadingTemplate ? "Loading Template..." : "Save Diagram"}
             </button>
@@ -419,76 +419,6 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2>Diagram Configuration</h2>
-
-                    <div class="form-group">
-                        <label for="dimension">Dimension (JSON)</label>
-                        <div class="json-editor">
-                            <textarea
-                                id="dimension"
-                                name="dimension"
-                                bind:value={diagramDimension}
-                                placeholder="Enter dimension JSON here..."
-                                rows="8"
-                                class:error={!validateJson(diagramDimension)}
-                            ></textarea>
-                            <div class="json-controls">
-                                <button
-                                    type="button"
-                                    class="btn-secondary btn-small"
-                                    onclick={() =>
-                                        (diagramDimension =
-                                            formatJson(diagramDimension))}
-                                    disabled={!validateJson(diagramDimension)}
-                                >
-                                    Format JSON
-                                </button>
-                                {#if !validateJson(diagramDimension)}
-                                    <span class="json-error"
-                                        >Invalid JSON format</span
-                                    >
-                                {/if}
-                            </div>
-                        </div>
-                        <small>Optional dimension configuration as JSON</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="variables">Variables (JSON) *</label>
-                        <div class="json-editor">
-                            <textarea
-                                id="variables"
-                                name="variables"
-                                bind:value={diagramVariables}
-                                placeholder="Enter variables JSON here..."
-                                rows="15"
-                                class:error={!validateJson(diagramVariables)}
-                            ></textarea>
-                            <div class="json-controls">
-                                <button
-                                    type="button"
-                                    class="btn-secondary btn-small"
-                                    onclick={() =>
-                                        (diagramVariables =
-                                            formatJson(diagramVariables))}
-                                    disabled={!validateJson(diagramVariables)}
-                                >
-                                    Format JSON
-                                </button>
-                                {#if !validateJson(diagramVariables)}
-                                    <span class="json-error"
-                                        >Invalid JSON format</span
-                                    >
-                                {/if}
-                            </div>
-                        </div>
-                        <small
-                            >Enter valid JSON variables for the diagram
-                            configuration</small
-                        >
-                    </div>
-                </div>
 
                 {#if canvasType === "edge"}
                     <div class="form-section variable-config-section">
