@@ -49,7 +49,7 @@
     });
 
     // Variable CRUD functions
-    async function addVariable() {
+    function addVariable() {
         // Prevent clicks when button should be disabled
         if (isSubmittingVariable || !newVariableName.trim()) {
             return;
@@ -68,97 +68,40 @@
 
         isSubmittingVariable = true;
 
-        // Safety timeout to reset loading state if something goes wrong
-        const safetyTimeout = setTimeout(() => {
-            console.warn(
-                "Safety timeout triggered - resetting isSubmittingVariable",
-            );
-            isSubmittingVariable = false;
-        }, 10000);
-
         try {
-            const formData = new FormData();
-            formData.append("diagramId", data.diagram?.id || "");
-            formData.append("variableName", newVariableName.trim());
-            formData.append("variableValue", newVariableValue);
+            // Add variable to local state
+            variables = {
+                ...variables,
+                [newVariableName.trim()]: newVariableValue
+            };
 
-            const response = await fetch("?/addVariable", {
-                method: "POST",
-                body: formData,
-            });
-
-            let result;
-            try {
-                result = await response.json();
-            } catch (parseError) {
-                console.error("Failed to parse server response:", parseError);
-                throw new Error("Invalid server response");
-            }
-
-            if (response.ok && result.success) {
-                variables = result.variables;
-                newVariableName = "";
-                newVariableValue = "";
-                showToaster(
-                    "success",
-                    result.message || "Variable added successfully",
-                );
-            } else {
-                const errorMessage =
-                    result?.message ||
-                    result?.error ||
-                    "Failed to add variable";
-                showToaster("error", errorMessage);
-            }
+            newVariableName = "";
+            newVariableValue = "";
+            showToaster("success", "Variable added successfully");
         } catch (error) {
             console.error("Error adding variable:", error);
             showToaster("error", "Failed to add variable");
         } finally {
-            clearTimeout(safetyTimeout);
             isSubmittingVariable = false;
         }
     }
 
-    async function updateVariable(name: string, value: string) {
+    function updateVariable(name: string, value: string) {
         try {
-            const formData = new FormData();
-            formData.append("diagramId", data.diagram?.id || "");
-            formData.append("variableName", name);
-            formData.append("variableValue", value);
+            // Update variable in local state
+            variables = {
+                ...variables,
+                [name]: value
+            };
 
-            const response = await fetch("?/updateVariable", {
-                method: "POST",
-                body: formData,
-            });
-
-            let result;
-            try {
-                result = await response.json();
-            } catch (parseError) {
-                console.error("Failed to parse server response:", parseError);
-                throw new Error("Invalid server response");
-            }
-
-            if (response.ok && result.success) {
-                variables = result.variables;
-                showToaster(
-                    "success",
-                    result.message || "Variable updated successfully",
-                );
-            } else {
-                const errorMessage =
-                    result?.message ||
-                    result?.error ||
-                    "Failed to update variable";
-                showToaster("error", errorMessage);
-            }
+            showToaster("success", "Variable updated successfully");
         } catch (error) {
             console.error("Error updating variable:", error);
             showToaster("error", "Failed to update variable");
         }
     }
 
-    async function deleteVariable(name: string) {
+    function deleteVariable(name: string) {
         if (
             !confirm(`Are you sure you want to delete the variable "${name}"?`)
         ) {
@@ -166,36 +109,12 @@
         }
 
         try {
-            const formData = new FormData();
-            formData.append("diagramId", data.diagram?.id || "");
-            formData.append("variableName", name);
+            // Remove variable from local state
+            const newVariables = { ...variables };
+            delete newVariables[name];
+            variables = newVariables;
 
-            const response = await fetch("?/deleteVariable", {
-                method: "POST",
-                body: formData,
-            });
-
-            let result;
-            try {
-                result = await response.json();
-            } catch (parseError) {
-                console.error("Failed to parse server response:", parseError);
-                throw new Error("Invalid server response");
-            }
-
-            if (response.ok && result.success) {
-                variables = result.variables;
-                showToaster(
-                    "success",
-                    result.message || "Variable deleted successfully",
-                );
-            } else {
-                const errorMessage =
-                    result?.message ||
-                    result?.error ||
-                    "Failed to delete variable";
-                showToaster("error", errorMessage);
-            }
+            showToaster("success", "Variable deleted successfully");
         } catch (error) {
             console.error("Error deleting variable:", error);
             showToaster("error", "Failed to delete variable");
@@ -484,6 +403,10 @@
                         for (const [key, value] of formData.entries()) {
                             console.log(`  ${key}:`, value);
                         }
+
+                        // Add variables to form data
+                        formData.append("variables", JSON.stringify(variables));
+
                         isSaving = true;
                         return async ({ result, update }) => {
                             isSaving = false;
