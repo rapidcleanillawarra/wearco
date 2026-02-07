@@ -47,9 +47,13 @@
         }
     });
 
-    // Get edge fields from selected template
+    // Get edge fields from selected template (prefer server template data, fallback to templates array)
     let edgeFields = $derived.by(() => {
-        const template = data.templates.find((t: any) => t.id === templateId);
+        // Prefer template from server data (for edit mode), fallback to finding in templates array
+        let template = data.template;
+        if (!template) {
+            template = data.templates.find((t: any) => t.id === templateId);
+        }
         if (!template?.template_data?.fields) return [];
         return template.template_data.fields
             .filter((f: any) => f.type === "edge")
@@ -83,8 +87,13 @@
     // Edit mode flag from URL (only id, no template_id/type)
     let editMode = $derived.by(() => urlMode === "edit");
 
-    // Get canvas type from URL parameter
-    let canvasType = $derived.by(() => $page.url.searchParams.get("type"));
+    // Get canvas type from URL parameter, fallback to diagram column type
+    let canvasType = $derived.by(() => {
+        // Prefer URL type param, fallback to diagram column type
+        const urlType = $page.url.searchParams.get('type');
+        const diagramTypeValue = diagramType;
+        return urlType || diagramTypeValue || null;
+    });
 
     // Determine which canvas component to render
     let canvasComponent = $derived.by(() => {
@@ -115,36 +124,28 @@
         lastInitKey = key;
     });
 
-    // Effect to initialize local state when diagram data loads or changes
+    // Effect to initialize local state when diagram data loads
     $effect(() => {
         const diagram = data.diagram;
         const mode = data.mode;
 
-        // Reset error state when mode changes
-        diagramLoadError = null;
-
-        // Only re-initialize if diagram data identity changes and we haven't initialized yet
-        // or if the diagram ID changed (navigating to different diagram)
         if (!initialized) {
-            if (mode === "create") {
-                // In create mode, handle template loading if template_id is provided
+            if (mode === 'create') {
                 initializeCreateMode();
-            } else if (mode === "edit") {
-                // Edit mode - use existing diagram data
+            } else if (mode === 'edit') {
                 if (diagram) {
                     isLoadingDiagram = false;
-                    diagramName = diagram.name || "";
-                    templateId = diagram.template_id || data.selectedTemplateId || "";
-                    diagramType = diagram.type || "";
+                    diagramName = diagram.name || '';
+                    templateId = diagram.template_id || data.selectedTemplateId || '';
+                    diagramType = diagram.type || '';  // Column type
                     diagramDimension = diagram.dimension
                         ? JSON.stringify(diagram.dimension, null, 2)
-                        : "{}";
+                        : '{}';
                     diagramVariables = diagram.variables
                         ? JSON.stringify(diagram.variables, null, 2)
-                        : "{}";
+                        : '{}';
                     initialized = true;
                 } else {
-                    // Diagram data not available yet, show loading
                     isLoadingDiagram = true;
                 }
             }

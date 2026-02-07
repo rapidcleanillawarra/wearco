@@ -34,9 +34,24 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             return fail(404, { error: 'Diagram not found' });
         }
 
+        // Fetch associated template if template_id exists
+        let template = null;
+        if (diagramData?.template_id) {
+            const { data: templateData, error: templateError } = await locals.supabase
+                .from('wearco_templates')
+                .select('*')
+                .eq('id', diagramData.template_id)
+                .single();
+
+            if (!templateError && templateData) {
+                template = templateData;
+            }
+        }
+
         return {
             templates: templates || [],
             diagram: diagramData,
+            template: template,
             mode: 'edit' as const,
             selectedTemplateId: diagramData?.template_id ?? templateIdParam
         };
@@ -57,6 +72,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         return {
             templates: templates || [],
             diagram: null,
+            template: null,
             mode: 'create' as const,
             selectedTemplateId: templateIdParam
         };
@@ -125,14 +141,14 @@ export const actions: Actions = {
         if (id) {
             // Update existing diagram
             const { error: updateError } = await locals.supabase
-                .from('wearco_svg_diagrams')
+                .from('wearco_diagrams')
                 .update(diagramPayload)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create new diagram
             const { data: newDiagram, error: insertError } = await locals.supabase
-                .from('wearco_svg_diagrams')
+                .from('wearco_diagrams')
                 .insert({
                     ...diagramPayload,
                     created_at: new Date().toISOString()
