@@ -86,20 +86,27 @@
         // Only re-initialize if diagram data identity changes and we haven't initialized yet
         // or if the diagram ID changed (navigating to different diagram)
         if (!initialized) {
-            diagramName = diagram?.name || "";
-            templateId = diagram?.template_id || data.selectedTemplateId || "";
-            diagramType = diagram?.type || "";
-            diagramDimension = diagram?.dimension
-                ? JSON.stringify(diagram.dimension, null, 2)
-                : "{}";
-            diagramVariables = diagram?.variables
-                ? JSON.stringify(diagram.variables, null, 2)
-                : "{}";
-            initialized = true;
+            if (data.mode === "create") {
+                // In create mode, handle template loading if template_id is provided
+                initializeCreateMode();
+            } else {
+                // Edit mode - use existing diagram data
+                diagramName = diagram?.name || "";
+                templateId = diagram?.template_id || data.selectedTemplateId || "";
+                diagramType = diagram?.type || "";
+                diagramDimension = diagram?.dimension
+                    ? JSON.stringify(diagram.dimension, null, 2)
+                    : "{}";
+                diagramVariables = diagram?.variables
+                    ? JSON.stringify(diagram.variables, null, 2)
+                    : "{}";
+                initialized = true;
+            }
         }
     });
 
     let isSaving = $state(false);
+    let isLoadingTemplate = $state(false);
 
     // Toaster notification state
     let toaster = $state<{
@@ -138,6 +145,67 @@
             return value;
         }
     }
+
+    // Fetch template data by ID
+    async function fetchTemplate(templateId: string) {
+        try {
+            const response = await fetch(`/api/templates/${templateId}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch template: ${response.statusText}`);
+            }
+            const template = await response.json();
+            return template;
+        } catch (error) {
+            console.error('Error fetching template:', error);
+            throw error;
+        }
+    }
+
+    // Initialize form data for create mode with template_id
+    async function initializeCreateMode() {
+        const urlParams = $page.url.searchParams;
+        const templateIdParam = urlParams.get('template_id');
+
+        if (templateIdParam) {
+            isLoadingTemplate = true;
+            try {
+                const template = await fetchTemplate(templateIdParam);
+
+                // Populate form with template data
+                diagramName = template.template_name || "";
+                templateId = template.id;
+                diagramType = template.category || "";
+                diagramDimension = template.template_data?.dimension
+                    ? JSON.stringify(template.template_data.dimension, null, 2)
+                    : "{}";
+                diagramVariables = template.template_data?.variables
+                    ? JSON.stringify(template.template_data.variables, null, 2)
+                    : "{}";
+
+                showToaster("success", "Template loaded successfully");
+            } catch (error) {
+                console.error('Failed to load template:', error);
+                showToaster("error", "Failed to load template data");
+                // Initialize with empty values if template fetch fails
+                diagramName = "";
+                templateId = "";
+                diagramType = "";
+                diagramDimension = "{}";
+                diagramVariables = "{}";
+            } finally {
+                isLoadingTemplate = false;
+            }
+        } else {
+            // No template_id provided, initialize with empty values
+            diagramName = "";
+            templateId = "";
+            diagramType = "";
+            diagramDimension = "{}";
+            diagramVariables = "{}";
+        }
+
+        initialized = true;
+    }
 </script>
 
 <div class="page-container">
@@ -167,9 +235,9 @@
                 type="submit"
                 class="btn-primary"
                 form="diagram-form"
-                disabled={isSaving || !validateJson(diagramVariables)}
+                disabled={isSaving || isLoadingTemplate || !validateJson(diagramVariables)}
             >
-                {isSaving ? "Saving..." : "Save Diagram"}
+                {isSaving ? "Saving..." : isLoadingTemplate ? "Loading Template..." : "Save Diagram"}
             </button>
         </div>
     </header>
