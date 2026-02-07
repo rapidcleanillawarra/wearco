@@ -2,30 +2,30 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-    const id = url.searchParams.get('id');
-    const templateId = url.searchParams.get('template_id');
+    const id = url.searchParams.get('id')?.trim() ?? '';
+    const templateIdParam = url.searchParams.get('template_id')?.trim() ?? '';
+    const typeParam = url.searchParams.get('type')?.trim() ?? '';
 
-    // Fetch available templates for the dropdown
-    const { data: templates, error: templatesError } = await locals.supabase
-        .from('wearco_templates')
-        .select('id, template_name, category, template_data')
-        .order('template_name');
+    // Mode detection: edit = only id (no template_id or type); create = both template_id and type; else invalid
+    const hasId = id.length > 0;
+    const hasOnlyId = hasId && !templateIdParam && !typeParam;
+    const hasTemplateIdAndType = templateIdParam.length > 0 && typeParam.length > 0;
 
-    if (templatesError) {
-        console.error('Error fetching templates:', templatesError);
-        return fail(500, { error: 'Failed to load templates' });
-    }
+    if (hasOnlyId) {
+        // Edit mode: URL has only id parameter
+        const { data: templates, error: templatesError } = await locals.supabase
+            .from('wearco_templates')
+            .select('id, template_name, category, template_data')
+            .order('template_name');
 
-    console.log('Fetched template data for searchable dropdown:', templates);
+        if (templatesError) {
+            console.error('Error fetching templates:', templatesError);
+            return fail(500, { error: 'Failed to load templates' });
+        }
 
-    let diagram = null;
-    let mode: 'create' | 'edit' = 'create';
-
-    if (id) {
-        // Fetch the diagram for editing from wearco_diagrams table
         const { data: diagramData, error: diagramError } = await locals.supabase
             .from('wearco_diagrams')
-            .select('id, template_id, type')
+            .select('id, name, template_id, type, dimension, variables')
             .eq('id', id)
             .single();
 
@@ -34,19 +34,36 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             return fail(404, { error: 'Diagram not found' });
         }
 
-        diagram = diagramData;
-        mode = 'edit';
-    } else {
-        // Redirect to diagrams list if no id parameter
-        throw redirect(302, '/diagrams');
+        return {
+            templates: templates || [],
+            diagram: diagramData,
+            mode: 'edit' as const,
+            selectedTemplateId: diagramData?.template_id ?? templateIdParam
+        };
     }
 
-    return {
-        templates: templates || [],
-        diagram,
-        mode,
-        selectedTemplateId: templateId
-    };
+    if (hasTemplateIdAndType) {
+        // Create mode: URL has both template_id and type
+        const { data: templates, error: templatesError } = await locals.supabase
+            .from('wearco_templates')
+            .select('id, template_name, category, template_data')
+            .order('template_name');
+
+        if (templatesError) {
+            console.error('Error fetching templates:', templatesError);
+            return fail(500, { error: 'Failed to load templates' });
+        }
+
+        return {
+            templates: templates || [],
+            diagram: null,
+            mode: 'create' as const,
+            selectedTemplateId: templateIdParam
+        };
+    }
+
+    // Invalid: neither edit (id only) nor create (template_id + type)
+    throw redirect(302, '/diagrams');
 };
 
 export const actions: Actions = {

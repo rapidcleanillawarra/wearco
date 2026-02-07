@@ -3,7 +3,6 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import type { PageData } from "./$types";
-    import type { WearcoTemplate } from "$lib/types/template";
     import EdgeCanvas from "./components/EdgeCanvas.svelte";
     import TopSideCanvas from "./components/TopSideCanvas.svelte";
     import SearchableSelect from "./components/SearchableSelect.svelte";
@@ -63,28 +62,57 @@
         diagramVariables = JSON.stringify(current, null, 2);
     }
 
-    // Detect edit mode from URL parameter
-    let editMode = $derived(() => {
-        const urlParams = $page.url.searchParams;
-        const id = urlParams.get("id");
-        return !!id && id.trim() !== "";
+    // Reactive mode detection from URL (stays in sync when params change during navigation)
+    // Edit = only id (no template_id or type); Create = template_id + type; else invalid
+    let urlMode = $derived.by(() => {
+        const p = $page.url.searchParams;
+        const id = (p.get("id") ?? "").trim();
+        const templateId = (p.get("template_id") ?? "").trim();
+        const typeParam = (p.get("type") ?? "").trim();
+        if (id && !templateId && !typeParam) return "edit" as const;
+        if (templateId && typeParam) return "create" as const;
+        return "invalid" as const;
     });
+
+    // Resolve current mode: use URL-derived mode when valid; server data.mode is source of truth after load
+    let currentMode = $derived.by(() => {
+        if (urlMode === "invalid") return "invalid";
+        return data.mode;
+    });
+
+    // Edit mode flag from URL (only id, no template_id/type)
+    let editMode = $derived.by(() => urlMode === "edit");
 
     // Get canvas type from URL parameter
-    let canvasType = $derived(() => {
-        const urlParams = $page.url.searchParams;
-        return urlParams.get("type");
-    });
+    let canvasType = $derived.by(() => $page.url.searchParams.get("type"));
 
     // Determine which canvas component to render
-    let canvasComponent = $derived(() => {
-        const type = canvasType();
-        if (type === "edge") {
-            return "edge";
-        } else if (type === "top_side") {
-            return "top_side";
+    let canvasComponent = $derived.by(() => {
+        const type = canvasType;
+        if (type === "edge") return "edge";
+        if (type === "top_side") return "top_side";
+        return null;
+    });
+
+    // Redirect when URL params don't match edit or create pattern
+    $effect(() => {
+        if (urlMode === "invalid") {
+            goto("/diagrams");
         }
-        return null; // Invalid or missing type
+    });
+
+    // Reset initialized when navigating to a different diagram/template so init runs again
+    let lastInitKey = $state<string | null>(null);
+    $effect(() => {
+        const mode = data.mode;
+        const key =
+            mode === "edit"
+                ? (data.diagram?.id ?? "")
+                : ($page.url.searchParams.get("template_id") ?? "");
+        if (lastInitKey !== null && lastInitKey !== key) {
+            initialized = false;
+        }
+        lastInitKey = key;
     });
 
     // Effect to initialize local state when diagram data loads or changes
@@ -457,7 +485,7 @@
                     </div>
                 </div>
 
-                {#if canvasType() === "edge"}
+                {#if canvasType === "edge"}
                     <div class="form-section variable-config-section">
                         <h2>Variable Configuration</h2>
                         <div class="variable-grid">
@@ -478,13 +506,13 @@
                 {/if}
 
                 <!-- Canvas Component Rendering -->
-                {#if canvasComponent() === "edge"}
+                {#if canvasComponent === "edge"}
                     <EdgeCanvas
                         width={800}
                         height={400}
                         diagramType={diagramType || "Edge Diagram"}
                     />
-                {:else if canvasComponent() === "top_side"}
+                {:else if canvasComponent === "top_side"}
                     <TopSideCanvas
                         width={800}
                         height={400}
