@@ -48,7 +48,9 @@ export const actions: Actions = {
         const id = formData.get('id') as string;
         const name = formData.get('name') as string;
         const templateId = formData.get('template_id') as string;
-        const dataJson = formData.get('data') as string;
+        const type = formData.get('type') as string;
+        const dimensionJson = formData.get('dimension') as string;
+        const variablesJson = formData.get('variables') as string;
 
         if (!name) {
             return fail(400, { missing: true, message: 'Diagram name is required' });
@@ -70,17 +72,26 @@ export const actions: Actions = {
         }
 
         // Parse and validate JSON data
-        let diagramData;
+        let diagramVariables;
+        let diagramDimension;
         try {
-            diagramData = dataJson ? JSON.parse(dataJson) : {};
+            diagramVariables = variablesJson ? JSON.parse(variablesJson) : {};
         } catch (e) {
-            return fail(400, { invalid: true, message: 'Invalid JSON data format' });
+            return fail(400, { invalid: true, message: 'Invalid JSON variables format' });
+        }
+
+        try {
+            diagramDimension = dimensionJson ? JSON.parse(dimensionJson) : null;
+        } catch (e) {
+            return fail(400, { invalid: true, message: 'Invalid JSON dimension format' });
         }
 
         const diagramPayload = {
             name,
             template_id: templateId,
-            data: diagramData,
+            type: type || null,
+            dimension: diagramDimension,
+            variables: diagramVariables,
             updated_at: new Date().toISOString()
         };
 

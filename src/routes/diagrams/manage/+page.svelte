@@ -18,7 +18,9 @@
     // Local editable state - initialized once from diagram data
     let diagramName = $state("");
     let templateId = $state("");
-    let diagramData = $state("{}");
+    let diagramType = $state("");
+    let diagramDimension = $state("{}");
+    let diagramVariables = $state("{}");
     let initialized = $state(false);
 
     // Effect to initialize local state when diagram data loads or changes
@@ -29,7 +31,9 @@
         if (!initialized) {
             diagramName = diagram?.name || "";
             templateId = diagram?.template_id || "";
-            diagramData = diagram?.data ? JSON.stringify(diagram.data, null, 2) : "{}";
+            diagramType = diagram?.type || "";
+            diagramDimension = diagram?.dimension ? JSON.stringify(diagram.dimension, null, 2) : "{}";
+            diagramVariables = diagram?.variables ? JSON.stringify(diagram.variables, null, 2) : "{}";
             initialized = true;
         }
     });
@@ -55,21 +59,22 @@
         }, 4000);
     }
 
-    function validateJson() {
+    function validateJson(value: string) {
         try {
-            JSON.parse(diagramData);
+            JSON.parse(value);
             return true;
         } catch (e) {
             return false;
         }
     }
 
-    function formatJson() {
+    function formatJson(value: string) {
         try {
-            const parsed = JSON.parse(diagramData);
-            diagramData = JSON.stringify(parsed, null, 2);
+            const parsed = JSON.parse(value);
+            return JSON.stringify(parsed, null, 2);
         } catch (e) {
-            // Keep as is if invalid
+            // Return original if invalid
+            return value;
         }
     }
 </script>
@@ -101,7 +106,7 @@
                 type="submit"
                 class="btn-primary"
                 form="diagram-form"
-                disabled={isSaving || !validateJson()}
+                disabled={isSaving || !validateJson(diagramVariables)}
             >
                 {isSaving ? "Saving..." : "Save Diagram"}
             </button>
@@ -208,36 +213,77 @@
                         </select>
                         <small>Select the template this diagram is associated with</small>
                     </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <input
+                            type="text"
+                            id="type"
+                            name="type"
+                            bind:value={diagramType}
+                            placeholder="Enter diagram type"
+                        />
+                        <small>Optional diagram type classification</small>
+                    </div>
                 </div>
 
                 <div class="form-section">
-                    <h2>Diagram Data</h2>
+                    <h2>Diagram Configuration</h2>
+
                     <div class="form-group">
-                        <label for="data">JSON Data *</label>
+                        <label for="dimension">Dimension (JSON)</label>
                         <div class="json-editor">
                             <textarea
-                                id="data"
-                                name="data"
-                                bind:value={diagramData}
-                                placeholder="Enter JSON data here..."
-                                rows="15"
-                                class:error={!validateJson()}
+                                id="dimension"
+                                name="dimension"
+                                bind:value={diagramDimension}
+                                placeholder="Enter dimension JSON here..."
+                                rows="8"
+                                class:error={!validateJson(diagramDimension)}
                             ></textarea>
                             <div class="json-controls">
                                 <button
                                     type="button"
                                     class="btn-secondary btn-small"
-                                    onclick={formatJson}
-                                    disabled={!validateJson()}
+                                    onclick={() => diagramDimension = formatJson(diagramDimension)}
+                                    disabled={!validateJson(diagramDimension)}
                                 >
                                     Format JSON
                                 </button>
-                                {#if !validateJson()}
+                                {#if !validateJson(diagramDimension)}
                                     <span class="json-error">Invalid JSON format</span>
                                 {/if}
                             </div>
                         </div>
-                        <small>Enter valid JSON data for the diagram configuration</small>
+                        <small>Optional dimension configuration as JSON</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="variables">Variables (JSON) *</label>
+                        <div class="json-editor">
+                            <textarea
+                                id="variables"
+                                name="variables"
+                                bind:value={diagramVariables}
+                                placeholder="Enter variables JSON here..."
+                                rows="15"
+                                class:error={!validateJson(diagramVariables)}
+                            ></textarea>
+                            <div class="json-controls">
+                                <button
+                                    type="button"
+                                    class="btn-secondary btn-small"
+                                    onclick={() => diagramVariables = formatJson(diagramVariables)}
+                                    disabled={!validateJson(diagramVariables)}
+                                >
+                                    Format JSON
+                                </button>
+                                {#if !validateJson(diagramVariables)}
+                                    <span class="json-error">Invalid JSON format</span>
+                                {/if}
+                            </div>
+                        </div>
+                        <small>Enter valid JSON variables for the diagram configuration</small>
                     </div>
                 </div>
 
