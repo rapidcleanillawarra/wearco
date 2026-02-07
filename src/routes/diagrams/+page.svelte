@@ -27,15 +27,26 @@
     let viewMode: "card" | "list" = $state("card");
     let searchQuery = $state("");
     let selectedTemplate = $state("all");
+    let showCreateModal = $state(false);
 
     // Derived state for filtering
     const uniqueTemplates = $derived([
         "all",
-        ...new Set(diagrams.map((d) => d.wearco_templates?.template_name).filter(Boolean)),
+        ...new Set(diagrams.map((d: (WearcoSvgDiagram & {
+            wearco_templates?: {
+                template_name: string;
+                category: string;
+            };
+        })) => d.wearco_templates?.template_name).filter(Boolean)),
     ]);
 
     const filteredDiagrams = $derived(
-        diagrams.filter((d) => {
+        diagrams.filter((d: (WearcoSvgDiagram & {
+            wearco_templates?: {
+                template_name: string;
+                category: string;
+            };
+        })) => {
             const matchesSearch =
                 d.name
                     .toLowerCase()
@@ -50,7 +61,16 @@
     );
 
     function openCreateModal() {
-        goto("/diagrams/manage");
+        showCreateModal = true;
+    }
+
+    function selectDiagramType(type: "edge" | "top_side") {
+        showCreateModal = false;
+        goto(`/diagrams/manage?type=${type}`);
+    }
+
+    function closeCreateModal() {
+        showCreateModal = false;
     }
 
     function openEditModal(diagram: WearcoSvgDiagram) {
@@ -242,6 +262,58 @@
         </div>
     {/if}
 </div>
+
+{#if showCreateModal}
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" onclick={closeCreateModal} onkeydown={(e) => { if (e.key === 'Escape') closeCreateModal(); }} role="presentation" tabindex="-1"></div>
+
+    <!-- Modal Dialog -->
+    <div class="modal-dialog" role="dialog" aria-labelledby="modal-title" aria-describedby="modal-description">
+        <div class="modal-header">
+            <h2 id="modal-title">Create New Diagram</h2>
+            <button class="modal-close" onclick={closeCreateModal} aria-label="Close modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <p id="modal-description" class="modal-description">
+                Choose the type of diagram you want to create:
+            </p>
+
+            <div class="diagram-type-options">
+                <button class="diagram-type-option" onclick={() => selectDiagramType('edge')}>
+                    <div class="option-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h3>Edge Diagram</h3>
+                    <p>Create a diagram for edge configurations and layouts</p>
+                </button>
+
+                <button class="diagram-type-option" onclick={() => selectDiagramType('top_side')}>
+                    <div class="option-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <rect x="7" y="7" width="3" height="3"></rect>
+                            <rect x="14" y="7" width="3" height="3"></rect>
+                            <rect x="7" y="14" width="3" height="3"></rect>
+                            <rect x="14" y="14" width="3" height="3"></rect>
+                        </svg>
+                    </div>
+                    <h3>Top Side Diagram</h3>
+                    <p>Create a diagram for top-side layouts and designs</p>
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
 
 <style>
     /* Reuse global styles and specific page styles similar to Templates page */
@@ -482,6 +554,165 @@
 
         .list-header {
             display: none;
+        }
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--color-bg-primary);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        max-width: 500px;
+        width: 90vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        z-index: 1001;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-white);
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--color-gray);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        color: var(--color-white);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .modal-description {
+        color: var(--color-gray);
+        margin-bottom: 2rem;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .diagram-type-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .diagram-type-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .diagram-type-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--color-gold);
+        transform: translateY(-2px);
+    }
+
+    .option-icon {
+        margin-bottom: 1rem;
+        color: var(--color-gold);
+    }
+
+    .diagram-type-option h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-white);
+    }
+
+    .diagram-type-option p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--color-gray);
+        line-height: 1.4;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -40%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .modal-dialog {
+            width: 95vw;
+            margin: 1rem;
+        }
+
+        .modal-header {
+            padding: 1rem;
+        }
+
+        .modal-content {
+            padding: 1rem;
+        }
+
+        .diagram-type-options {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .diagram-type-option {
+            padding: 1.5rem 1rem;
         }
     }
 </style>
