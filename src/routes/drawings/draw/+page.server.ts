@@ -85,7 +85,20 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
             console.error('Error fetching diagrams:', diagramsErr);
             // Don't throw error, just log it and continue with empty diagrams array
         } else {
-            diagrams = diagramsData || [];
+            const rawDiagrams = diagramsData || [];
+            // Generate signed URLs for each diagram
+            diagrams = await Promise.all(rawDiagrams.map(async (diagram) => {
+                if (diagram.file) {
+                    const { data: signedUrlData, error: signedUrlError } = await locals.supabase.storage
+                        .from('wearco')
+                        .createSignedUrl(diagram.file, 3600); // 1 hour expiry
+
+                    if (!signedUrlError && signedUrlData) {
+                        return { ...diagram, signedUrl: signedUrlData.signedUrl };
+                    }
+                }
+                return diagram;
+            }));
         }
 
         // Generate PDF URL from storage if visual_document is set

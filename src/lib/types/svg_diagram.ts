@@ -10,6 +10,7 @@ export interface WearcoDiagram {
     file: string | null;
     created_at: string;
     updated_at: string;
+    signedUrl?: string;
 }
 
 // Backward compatibility alias

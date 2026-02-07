@@ -7,6 +7,8 @@
 	import { page } from "$app/stores";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
+	import SvgDiagramViewer from "./components/SvgDiagramViewer.svelte";
+	import FullSvgViewer from "./components/FullSvgViewer.svelte";
 	import { exportPdfWithOverlay } from "./utils/pdfExport";
 
 	let { data } = $props<{
@@ -121,7 +123,10 @@
 	});
 
 	// Resolve target field: support both targetField and targetFieldf (legacy typo from template editor)
-	function getTargetField(field: { targetField?: string; targetFieldf?: string }): string {
+	function getTargetField(field: {
+		targetField?: string;
+		targetFieldf?: string;
+	}): string {
 		const t = field.targetField || field.targetFieldf || "";
 		return (typeof t === "string" ? t : "").trim();
 	}
@@ -135,12 +140,15 @@
 			const targetField = getTargetField(field);
 			// If field has a targetField, read from drawingFormData
 			if (targetField !== "") {
-				const targetValue = drawingFormData[targetField as keyof DrawingFormData];
+				const targetValue =
+					drawingFormData[targetField as keyof DrawingFormData];
 				// Handle different types (string, number)
 				if (typeof targetValue === "string") {
-					values[field.id] = fieldUpdateState[field.id] ?? targetValue ?? "";
+					values[field.id] =
+						fieldUpdateState[field.id] ?? targetValue ?? "";
 				} else if (typeof targetValue === "number") {
-					values[field.id] = fieldUpdateState[field.id] ?? String(targetValue ?? "");
+					values[field.id] =
+						fieldUpdateState[field.id] ?? String(targetValue ?? "");
 				} else {
 					values[field.id] = fieldUpdateState[field.id] ?? "";
 				}
@@ -148,7 +156,8 @@
 				// No targetField - use value from additional_data
 				values[field.id] =
 					fieldUpdateState[field.id] ??
-					((drawingFormData.additional_data?.[field.id] as string) || "");
+					((drawingFormData.additional_data?.[field.id] as string) ||
+						"");
 			}
 		});
 		return values;
@@ -216,7 +225,7 @@
 			// Check the type of the target field to handle conversion
 			if (targetField === "quantity") {
 				// Convert to number for quantity field
-				drawingFormData[targetField] = Number(value) || 0 as any;
+				drawingFormData[targetField] = Number(value) || (0 as any);
 			} else if (
 				targetField === "job_number" ||
 				targetField === "work_order" ||
@@ -243,12 +252,12 @@
 		const field = templateData?.fields.find((f) => f.id === fieldId);
 		const targetFieldName = field ? getTargetField(field) : "";
 
-		console.log('Blur debug:', {
+		console.log("Blur debug:", {
 			fieldId,
 			field,
 			targetFieldName,
 			currentOverlayValue: overlayFieldValues[fieldId],
-			drawingFormDataBefore: { ...drawingFormData }
+			drawingFormDataBefore: { ...drawingFormData },
 		});
 
 		// If field has a targetField (and it's not empty), update drawingFormData
@@ -259,7 +268,8 @@
 			// Check the type of the target field to handle conversion
 			if (targetField === "quantity") {
 				// Convert to number for quantity field
-				drawingFormData[targetField] = Number(currentValue) || 0 as any;
+				drawingFormData[targetField] =
+					Number(currentValue) || (0 as any);
 			} else if (
 				targetField === "job_number" ||
 				targetField === "work_order" ||
@@ -280,20 +290,23 @@
 		}
 
 		// Create overlay values with targetTo property
-		const overlayValuesWithTargets: Record<string, { value: string; targetTo: string }> = {};
+		const overlayValuesWithTargets: Record<
+			string,
+			{ value: string; targetTo: string }
+		> = {};
 		if (templateData?.fields) {
 			templateData.fields.forEach((field) => {
 				const targetField = getTargetField(field);
 				overlayValuesWithTargets[field.id] = {
 					value: overlayFieldValues[field.id] || "",
-					targetTo: targetField
+					targetTo: targetField,
 				};
 			});
 		}
 
-		console.log('Overlay field blur:', {
+		console.log("Overlay field blur:", {
 			overlayValues: overlayValuesWithTargets,
-			drawingData: { ...drawingFormData }
+			drawingData: { ...drawingFormData },
 		});
 	}
 </script>
@@ -375,51 +388,70 @@
 							if (isSaving) return;
 
 							isSaving = true;
-							console.log('Saving to database:', {
+							console.log("Saving to database:", {
 								mode,
 								templateId: template?.id,
 								drawingId: drawing?.id,
-								drawingFormData
+								drawingFormData,
 							});
 
 							try {
 								const formElement = e.target as HTMLFormElement;
 								const formData = new FormData(formElement);
 
-								const response = await fetch(formElement.action, {
-									method: 'POST',
-									body: formData,
-									headers: {
-										'x-sveltekit-action': 'true'
-									}
-								});
+								const response = await fetch(
+									formElement.action,
+									{
+										method: "POST",
+										body: formData,
+										headers: {
+											"x-sveltekit-action": "true",
+										},
+									},
+								);
 
 								const result = await response.json();
 
-								if (result.type === 'success') {
+								if (result.type === "success") {
 									// Parse the actual action data from the result.data string
 									const actionData = JSON.parse(result.data);
 
 									// Handle URL redirection for new drawings
-									if (mode === 'new' && actionData?.drawingId) {
+									if (
+										mode === "new" &&
+										actionData?.drawingId
+									) {
 										// Preserve existing query parameters except template_id
-										const url = new URL(window.location.href);
-										url.searchParams.set('id', actionData.drawingId);
-										url.searchParams.delete('template_id');
+										const url = new URL(
+											window.location.href,
+										);
+										url.searchParams.set(
+											"id",
+											actionData.drawingId,
+										);
+										url.searchParams.delete("template_id");
 
 										// Update URL without page reload, maintaining history
-										goto(url.toString(), { replaceState: false });
+										goto(url.toString(), {
+											replaceState: false,
+										});
 									} else {
 										// For updates, just show success message
-										console.log('Drawing updated successfully');
+										console.log(
+											"Drawing updated successfully",
+										);
 									}
 								} else {
-									console.error('Server error:', result);
-									alert(`Failed to save drawing: ${result?.error?.message || 'Unknown error'}`);
+									console.error("Server error:", result);
+									alert(
+										`Failed to save drawing: ${result?.error?.message || "Unknown error"}`,
+									);
 								}
 							} catch (error) {
-								console.error('Network error:', error);
-								alert('Failed to save drawing. Please check your connection and try again.');
+								console.error("Network error:", error);
+								alert(
+									"Failed to save drawing. Please check your connection and try again.",
+								);
 							} finally {
 								isSaving = false;
 							}
@@ -438,18 +470,66 @@
 							/>
 						{/if}
 						<!-- Hidden inputs for drawingFormData fields -->
-						<input type="hidden" name="job_number" value={drawingFormData.job_number} />
-						<input type="hidden" name="work_order" value={drawingFormData.work_order} />
-						<input type="hidden" name="drawing_number" value={drawingFormData.drawing_number} />
-						<input type="hidden" name="name" value={drawingFormData.name} />
-						<input type="hidden" name="customer" value={drawingFormData.customer} />
-						<input type="hidden" name="customer_source" value={drawingFormData.customer_source} />
-						<input type="hidden" name="quantity" value={drawingFormData.quantity} />
-						<input type="hidden" name="dl" value={drawingFormData.dl} />
-						<input type="hidden" name="checked_by" value={drawingFormData.checked_by} />
-						<input type="hidden" name="prog_by" value={drawingFormData.prog_by} />
-						<input type="hidden" name="material" value={drawingFormData.material} />
-						<input type="hidden" name="thk" value={drawingFormData.thk} />
+						<input
+							type="hidden"
+							name="job_number"
+							value={drawingFormData.job_number}
+						/>
+						<input
+							type="hidden"
+							name="work_order"
+							value={drawingFormData.work_order}
+						/>
+						<input
+							type="hidden"
+							name="drawing_number"
+							value={drawingFormData.drawing_number}
+						/>
+						<input
+							type="hidden"
+							name="name"
+							value={drawingFormData.name}
+						/>
+						<input
+							type="hidden"
+							name="customer"
+							value={drawingFormData.customer}
+						/>
+						<input
+							type="hidden"
+							name="customer_source"
+							value={drawingFormData.customer_source}
+						/>
+						<input
+							type="hidden"
+							name="quantity"
+							value={drawingFormData.quantity}
+						/>
+						<input
+							type="hidden"
+							name="dl"
+							value={drawingFormData.dl}
+						/>
+						<input
+							type="hidden"
+							name="checked_by"
+							value={drawingFormData.checked_by}
+						/>
+						<input
+							type="hidden"
+							name="prog_by"
+							value={drawingFormData.prog_by}
+						/>
+						<input
+							type="hidden"
+							name="material"
+							value={drawingFormData.material}
+						/>
+						<input
+							type="hidden"
+							name="thk"
+							value={drawingFormData.thk}
+						/>
 						<!-- Hidden inputs for overlay field values (fields without targetField go to additional_data) -->
 						<input
 							type="hidden"
@@ -457,15 +537,27 @@
 							value={JSON.stringify({
 								...drawingFormData.additional_data,
 								...Object.fromEntries(
-									Object.entries(fieldUpdateState).filter(([fieldId]) => {
-										const field = templateData?.fields.find((f) => f.id === fieldId);
-										// Only include fields without targetField or with empty targetField
-										return !field || getTargetField(field) === "";
-									})
+									Object.entries(fieldUpdateState).filter(
+										([fieldId]) => {
+											const field =
+												templateData?.fields.find(
+													(f) => f.id === fieldId,
+												);
+											// Only include fields without targetField or with empty targetField
+											return (
+												!field ||
+												getTargetField(field) === ""
+											);
+										},
+									),
 								),
 							})}
 						/>
-						<button class="btn-primary" disabled={isSaving} type="submit">
+						<button
+							class="btn-primary"
+							disabled={isSaving}
+							type="submit"
+						>
 							{#if isSaving}
 								<span class="spinner"></span>
 								Saving...
@@ -516,40 +608,11 @@
 		</section>
 
 		{#if diagrams && diagrams.length > 0}
-			<section class="section-card diagrams-section">
-				<div class="section-header">
-					<h3 class="section-title">Template Diagrams</h3>
-					<p class="section-subtitle">Associated diagrams for this template</p>
-				</div>
-				<div class="diagrams-grid">
-					{#each diagrams as diagram}
-						<div class="diagram-card">
-							<div class="diagram-header">
-								<h4 class="diagram-name">{diagram.name}</h4>
-								{#if diagram.type}
-									<span class="diagram-type">{diagram.type}</span>
-								{/if}
-							</div>
-							{#if diagram.file}
-								<div class="diagram-file">
-									<strong>File:</strong> {diagram.file}
-								</div>
-							{/if}
-							{#if diagram.dimension}
-								<div class="diagram-dimensions">
-									<strong>Dimensions:</strong>
-									{#if diagram.dimension.width && diagram.dimension.height}
-										{diagram.dimension.width} × {diagram.dimension.height}
-									{/if}
-								</div>
-							{/if}
-							<div class="diagram-date">
-								<strong>Created:</strong> {new Date(diagram.created_at).toLocaleDateString()}
-							</div>
-						</div>
-					{/each}
-				</div>
-			</section>
+			<div class="svg-diagrams-container">
+				{#each diagrams as diagram}
+					<FullSvgViewer {diagram} />
+				{/each}
+			</div>
 		{/if}
 	</main>
 </div>
@@ -703,61 +766,10 @@
 		gap: var(--spacing-md);
 	}
 
-	.diagram-card {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: var(--radius-lg);
-		padding: var(--spacing-md);
-		transition: var(--transition-smooth);
-	}
-
-	.diagram-card:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.2);
-		transform: translateY(-2px);
-	}
-
-	.diagram-header {
+	.svg-diagrams-container {
 		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: var(--spacing-sm);
-	}
-
-	.diagram-name {
-		font-size: var(--font-size-base);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-white);
-		margin: 0;
-		flex: 1;
-	}
-
-	.diagram-type {
-		background: rgba(34, 197, 94, 0.2);
-		color: #22c55e;
-		padding: 0.25rem 0.5rem;
-		border-radius: var(--radius-sm);
-		font-size: var(--font-size-xs);
-		font-weight: var(--font-weight-medium);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		white-space: nowrap;
-		margin-left: var(--spacing-sm);
-	}
-
-	.diagram-file,
-	.diagram-dimensions,
-	.diagram-date {
-		font-size: var(--font-size-sm);
-		color: var(--color-gray);
-		margin-bottom: var(--spacing-xs);
-	}
-
-	.diagram-file strong,
-	.diagram-dimensions strong,
-	.diagram-date strong {
-		color: var(--color-white);
-		margin-right: var(--spacing-xs);
+		flex-direction: column;
+		gap: var(--spacing-xl);
 	}
 
 	.btn-primary {
