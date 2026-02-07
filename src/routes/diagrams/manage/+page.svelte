@@ -1,4 +1,5 @@
 <script lang="ts">
+
     import { enhance } from "$app/forms";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
@@ -39,7 +40,7 @@
             template = data.templates.find((t: any) => t.id === templateId);
         }
         if (template?.template_data) {
-            console.log('Fetched template_data:', template.template_data);
+           
         }
         if (!template?.template_data?.fields) return [];
         return template.template_data.fields
@@ -48,6 +49,11 @@
 
     // Variable CRUD functions
     async function addVariable() {
+        // Prevent clicks when button should be disabled
+        if (isAddingVariable || !newVariableName.trim()) {
+            return;
+        }
+
         if (!newVariableName.trim()) {
             showToaster('error', 'Variable name is required');
             return;
@@ -60,6 +66,13 @@
         }
 
         isAddingVariable = true;
+
+        // Safety timeout to reset loading state if something goes wrong
+        const safetyTimeout = setTimeout(() => {
+            console.warn('Safety timeout triggered - resetting isAddingVariable');
+            isAddingVariable = false;
+        }, 10000);
+
         try {
             const formData = new FormData();
             formData.append('diagramId', data.diagram?.id || '');
@@ -71,20 +84,28 @@
                 body: formData
             });
 
-            const result = await response.json();
+            let result;
+            try {
+                result = await response.json();
+            } catch (parseError) {
+                console.error('Failed to parse server response:', parseError);
+                throw new Error('Invalid server response');
+            }
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 variables = result.variables;
                 newVariableName = '';
                 newVariableValue = '';
                 showToaster('success', result.message || 'Variable added successfully');
             } else {
-                showToaster('error', result.message || 'Failed to add variable');
+                const errorMessage = result?.message || result?.error || 'Failed to add variable';
+                showToaster('error', errorMessage);
             }
         } catch (error) {
             console.error('Error adding variable:', error);
             showToaster('error', 'Failed to add variable');
         } finally {
+            clearTimeout(safetyTimeout);
             isAddingVariable = false;
         }
     }
@@ -101,13 +122,20 @@
                 body: formData
             });
 
-            const result = await response.json();
+            let result;
+            try {
+                result = await response.json();
+            } catch (parseError) {
+                console.error('Failed to parse server response:', parseError);
+                throw new Error('Invalid server response');
+            }
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 variables = result.variables;
                 showToaster('success', result.message || 'Variable updated successfully');
             } else {
-                showToaster('error', result.message || 'Failed to update variable');
+                const errorMessage = result?.message || result?.error || 'Failed to update variable';
+                showToaster('error', errorMessage);
             }
         } catch (error) {
             console.error('Error updating variable:', error);
@@ -130,13 +158,20 @@
                 body: formData
             });
 
-            const result = await response.json();
+            let result;
+            try {
+                result = await response.json();
+            } catch (parseError) {
+                console.error('Failed to parse server response:', parseError);
+                throw new Error('Invalid server response');
+            }
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 variables = result.variables;
                 showToaster('success', result.message || 'Variable deleted successfully');
             } else {
-                showToaster('error', result.message || 'Failed to delete variable');
+                const errorMessage = result?.message || result?.error || 'Failed to delete variable';
+                showToaster('error', errorMessage);
             }
         } catch (error) {
             console.error('Error deleting variable:', error);
@@ -290,7 +325,7 @@
                 throw new Error(`Failed to fetch template: ${response.statusText}`);
             }
             const template = await response.json();
-            console.log('Fetched template_data:', template.template_data);
+            
             return template;
         } catch (error) {
             console.error('Error fetching template:', error);
@@ -516,7 +551,10 @@
                             <button
                                 type="button"
                                 class="btn-add-variable"
-                                onclick={() => isAddingVariable = !isAddingVariable}
+                                onclick={(event) => {
+                                    if (event.currentTarget.disabled) return;
+                                    isAddingVariable = !isAddingVariable;
+                                }}
                                 disabled={isAddingVariable}
                             >
                                 {isAddingVariable ? 'Cancel' : '+ Add Variable'}
