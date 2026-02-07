@@ -5,10 +5,12 @@
     // Props
     let {
         width = 800,
-        height = 400
+        height = 400,
+        diagramType = "Edge Diagram"
     }: {
         width?: number;
         height?: number;
+        diagramType?: string;
     } = $props();
 
     // Diagram dimensions and styling
@@ -42,7 +44,7 @@
 
 <div class="diagram-canvas-container">
     <div class="canvas-header">
-        <h3>Diagram Preview</h3>
+        <h3>{diagramType} Preview</h3>
     </div>
 
     <div class="svg-canvas-container">

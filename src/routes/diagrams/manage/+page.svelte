@@ -4,7 +4,6 @@
     import { page } from "$app/stores";
     import type { PageData } from "./$types";
     import type { WearcoTemplate } from "$lib/types/template";
-    import StaticDiagramCanvas from "./components/StaticDiagramCanvas.svelte";
     import EdgeCanvas from "./components/EdgeCanvas.svelte";
     import TopSideCanvas from "./components/TopSideCanvas.svelte";
 
@@ -308,16 +307,14 @@
 
                 <!-- Canvas Component Rendering -->
                 {#if canvasComponent() === 'edge'}
-                    <EdgeCanvas width={800} height={400} />
+                    <EdgeCanvas width={800} height={400} diagramType={diagramType || "Edge Diagram"} />
                 {:else if canvasComponent() === 'top_side'}
-                    <TopSideCanvas width={800} height={400} />
-                {:else if canvasComponent() === null}
+                    <TopSideCanvas width={800} height={400} diagramType={diagramType || "Top Side Diagram"} />
+                {:else}
                     <div class="canvas-error">
                         <p>Invalid or missing canvas type parameter. Please specify "type=edge" or "type=top_side" in the URL.</p>
                         <p>Example: <code>?type=edge</code> or <code>?type=top_side</code></p>
                     </div>
-                {:else}
-                    <StaticDiagramCanvas width={800} height={400} />
                 {/if}
             </form>
         </div>
