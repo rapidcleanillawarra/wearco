@@ -4,7 +4,7 @@
     import { page } from "$app/stores";
     import type { PageData } from "./$types";
     import type { WearcoTemplate } from "$lib/types/template";
-    import SvgViewer from "./components/SvgViewer.svelte";
+    import StaticDiagramCanvas from "./components/StaticDiagramCanvas.svelte";
 
     let { data, form } = $props<{
         data: PageData;
@@ -287,7 +287,7 @@
                     </div>
                 </div>
 
-                <SvgViewer width={800} height={400} />
+                <StaticDiagramCanvas width={800} height={400} />
             </form>
         </div>
     </div>
