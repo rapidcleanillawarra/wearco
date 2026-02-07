@@ -6,6 +6,7 @@
     import type { WearcoTemplate } from "$lib/types/template";
     import EdgeCanvas from "./components/EdgeCanvas.svelte";
     import TopSideCanvas from "./components/TopSideCanvas.svelte";
+    import SearchableSelect from "./components/SearchableSelect.svelte";
 
     let { data, form } = $props<{
         data: PageData;
@@ -24,19 +25,57 @@
     let diagramVariables = $state("{}");
     let initialized = $state(false);
 
+    const EDGE_VARIABLES = [
+        "width",
+        "height",
+        "widthPx",
+        "heightPx",
+        "holeLeft",
+        "holeSize",
+        "holeType",
+        "holeCount",
+        "holeRight",
+        "holeSizePx",
+        "totalHoleDistance",
+    ];
+
+    // Helper to get variable values from JSON string
+    let parsedVariables = $derived.by(() => {
+        try {
+            return JSON.parse(diagramVariables);
+        } catch (e) {
+            return {};
+        }
+    });
+
+    // Get edge fields from selected template
+    let edgeFields = $derived.by(() => {
+        const template = data.templates.find((t: any) => t.id === templateId);
+        if (!template?.template_data?.fields) return [];
+        return template.template_data.fields
+            .filter((f: any) => f.type === "edge")
+            .map((f: any) => ({ id: f.id, label: f.label }));
+    });
+
+    function updateVariable(name: string, value: string) {
+        const current = { ...parsedVariables };
+        current[name] = value;
+        diagramVariables = JSON.stringify(current, null, 2);
+    }
+
     // Get canvas type from URL parameter
     let canvasType = $derived(() => {
         const urlParams = $page.url.searchParams;
-        return urlParams.get('type');
+        return urlParams.get("type");
     });
 
     // Determine which canvas component to render
     let canvasComponent = $derived(() => {
         const type = canvasType();
-        if (type === 'edge') {
-            return 'edge';
-        } else if (type === 'top_side') {
-            return 'top_side';
+        if (type === "edge") {
+            return "edge";
+        } else if (type === "top_side") {
+            return "top_side";
         }
         return null; // Invalid or missing type
     });
@@ -50,8 +89,12 @@
             diagramName = diagram?.name || "";
             templateId = diagram?.template_id || "";
             diagramType = diagram?.type || "";
-            diagramDimension = diagram?.dimension ? JSON.stringify(diagram.dimension, null, 2) : "{}";
-            diagramVariables = diagram?.variables ? JSON.stringify(diagram.variables, null, 2) : "{}";
+            diagramDimension = diagram?.dimension
+                ? JSON.stringify(diagram.dimension, null, 2)
+                : "{}";
+            diagramVariables = diagram?.variables
+                ? JSON.stringify(diagram.variables, null, 2)
+                : "{}";
             initialized = true;
         }
     });
@@ -190,11 +233,7 @@
                     };
                 }}
             >
-                <input
-                    type="hidden"
-                    name="id"
-                    value={data.diagram?.id ?? ""}
-                />
+                <input type="hidden" name="id" value={data.diagram?.id ?? ""} />
 
                 <div class="form-section">
                     <h2>Diagram Details</h2>
@@ -229,7 +268,9 @@
                                 </option>
                             {/each}
                         </select>
-                        <small>Select the template this diagram is associated with</small>
+                        <small
+                            >Select the template this diagram is associated with</small
+                        >
                     </div>
 
                     <div class="form-group">
@@ -263,13 +304,17 @@
                                 <button
                                     type="button"
                                     class="btn-secondary btn-small"
-                                    onclick={() => diagramDimension = formatJson(diagramDimension)}
+                                    onclick={() =>
+                                        (diagramDimension =
+                                            formatJson(diagramDimension))}
                                     disabled={!validateJson(diagramDimension)}
                                 >
                                     Format JSON
                                 </button>
                                 {#if !validateJson(diagramDimension)}
-                                    <span class="json-error">Invalid JSON format</span>
+                                    <span class="json-error"
+                                        >Invalid JSON format</span
+                                    >
                                 {/if}
                             </div>
                         </div>
@@ -291,29 +336,70 @@
                                 <button
                                     type="button"
                                     class="btn-secondary btn-small"
-                                    onclick={() => diagramVariables = formatJson(diagramVariables)}
+                                    onclick={() =>
+                                        (diagramVariables =
+                                            formatJson(diagramVariables))}
                                     disabled={!validateJson(diagramVariables)}
                                 >
                                     Format JSON
                                 </button>
                                 {#if !validateJson(diagramVariables)}
-                                    <span class="json-error">Invalid JSON format</span>
+                                    <span class="json-error"
+                                        >Invalid JSON format</span
+                                    >
                                 {/if}
                             </div>
                         </div>
-                        <small>Enter valid JSON variables for the diagram configuration</small>
+                        <small
+                            >Enter valid JSON variables for the diagram
+                            configuration</small
+                        >
                     </div>
                 </div>
 
+                {#if canvasType() === "edge"}
+                    <div class="form-section variable-config-section">
+                        <h2>Variable Configuration</h2>
+                        <div class="variable-grid">
+                            {#each EDGE_VARIABLES as variable}
+                                <div class="variable-row">
+                                    <SearchableSelect
+                                        label={variable}
+                                        options={edgeFields}
+                                        value={parsedVariables[variable] || ""}
+                                        placeholder={`Select ${variable} field...`}
+                                        onselect={(val: string) =>
+                                            updateVariable(variable, val)}
+                                    />
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
                 <!-- Canvas Component Rendering -->
-                {#if canvasComponent() === 'edge'}
-                    <EdgeCanvas width={800} height={400} diagramType={diagramType || "Edge Diagram"} />
-                {:else if canvasComponent() === 'top_side'}
-                    <TopSideCanvas width={800} height={400} diagramType={diagramType || "Top Side Diagram"} />
+                {#if canvasComponent() === "edge"}
+                    <EdgeCanvas
+                        width={800}
+                        height={400}
+                        diagramType={diagramType || "Edge Diagram"}
+                    />
+                {:else if canvasComponent() === "top_side"}
+                    <TopSideCanvas
+                        width={800}
+                        height={400}
+                        diagramType={diagramType || "Top Side Diagram"}
+                    />
                 {:else}
                     <div class="canvas-error">
-                        <p>Invalid or missing canvas type parameter. Please specify "type=edge" or "type=top_side" in the URL.</p>
-                        <p>Example: <code>?type=edge</code> or <code>?type=top_side</code></p>
+                        <p>
+                            Invalid or missing canvas type parameter. Please
+                            specify "type=edge" or "type=top_side" in the URL.
+                        </p>
+                        <p>
+                            Example: <code>?type=edge</code> or
+                            <code>?type=top_side</code>
+                        </p>
                     </div>
                 {/if}
             </form>
@@ -375,6 +461,25 @@
         color: #f8fafc;
     }
 
+    .variable-config-section {
+        border-color: #3b82f633;
+    }
+
+    .variable-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .variable-row {
+        display: flex;
+        align-items: center;
+        background: #1e293b;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #334155;
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -405,11 +510,10 @@
     .form-group textarea:focus {
         outline: none;
         border-color: #3b82f6;
-        ring: 2px solid rgba(59, 130, 246, 0.2);
     }
 
     .form-group textarea {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
         resize: vertical;
         min-height: 200px;
     }
@@ -586,8 +690,7 @@
         background: #1e293b;
         padding: 0.25rem 0.5rem;
         border-radius: 0.25rem;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
         color: #3b82f6;
     }
-
 </style>

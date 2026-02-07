@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     // Fetch available templates for the dropdown
     const { data: templates, error: templatesError } = await locals.supabase
         .from('wearco_templates')
-        .select('id, template_name, category')
+        .select('id, template_name, category, template_data')
         .order('template_name');
 
     if (templatesError) {
