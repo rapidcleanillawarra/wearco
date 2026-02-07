@@ -138,7 +138,7 @@
                 role="button"
                 tabindex="0"
             >
-                {#each fields as field (field.id)}
+                {#each fields as field, i (field.id + '--' + i)}
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <div
                         class="field-box"

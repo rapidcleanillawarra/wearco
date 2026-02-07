@@ -22,6 +22,8 @@
     let selectedFieldId = $state<string | null>(null);
     let duplicateWarning = $state(false);
     let initialized = $state(false);
+    /** Local value for Field ID input; only committed on blur to avoid duplicate-key crashes */
+    let fieldIdDisplay = $state("");
 
     // Effect to initialize local state when template data loads or changes
     $effect(() => {
@@ -76,6 +78,16 @@
         selectedFieldId && selectedFieldId.trim() ? fields.find((f) => f.id === selectedFieldId) : null,
     );
 
+    // Sync Field ID input display when selection changes (so we show the right id when switching fields)
+    $effect(() => {
+        const sel = selectedField;
+        if (sel) {
+            fieldIdDisplay = sel.id;
+        } else {
+            fieldIdDisplay = "";
+        }
+    });
+
     function addField() {
         const newId = `field_${Date.now()}`;
         fields.push({
@@ -125,24 +137,26 @@
         }
     }
 
-    function updateFieldId(e: Event) {
-        const input = e.target as HTMLInputElement;
-        const newId = input.value.trim();
+    /** Validate and commit Field ID only on blur (avoids duplicate key errors during typing/paste) */
+    function handleFieldIdBlur() {
+        const raw = fieldIdDisplay.trim();
+        if (!selectedField) return;
 
-        if (selectedField) {
-            // Validate that the field ID is not empty
-            if (!newId) {
-                showToaster("error", "Field ID cannot be empty");
-                // Reset the input to the current field ID
-                input.value = selectedField.id;
-                return;
-            }
-
-            // Update the ID on the object
-            selectedField.id = newId;
-            // Immediately update the selection pointer to match so the derived store doesn't lose it
-            selectedFieldId = newId;
+        if (!raw) {
+            showToaster("error", "Field ID cannot be empty");
+            fieldIdDisplay = selectedField.id;
+            return;
         }
+
+        const isDuplicate = fields.some((f) => f !== selectedField && f.id === raw);
+        if (isDuplicate) {
+            showToaster("error", "This ID is already used by another field. Choose a unique ID.");
+            fieldIdDisplay = selectedField.id;
+            return;
+        }
+
+        selectedField.id = raw;
+        selectedFieldId = raw;
     }
 
     let isSaving = $state(false);
@@ -362,9 +376,11 @@
                             <input
                                 type="text"
                                 id="field_id"
-                                value={selectedField.id}
-                                oninput={updateFieldId}
+                                bind:value={fieldIdDisplay}
+                                onblur={handleFieldIdBlur}
+                                aria-describedby="field_id_hint"
                             />
+                            <small id="field_id_hint">Unique ID; validated when you leave the field.</small>
                         </div>
 
                         <div class="form-group">
