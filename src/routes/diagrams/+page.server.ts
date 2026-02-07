@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
     // Fetch diagrams with their associated template information
     const { data: diagrams, error: diagramsError } = await locals.supabase
-        .from('wearco_svg_diagrams')
+        .from('wearco_diagrams')
         .select(`
             *,
             wearco_templates (
@@ -83,14 +83,14 @@ export const actions: Actions = {
         if (id) {
             // Update existing diagram
             const { error: updateError } = await locals.supabase
-                .from('wearco_svg_diagrams')
+                .from('wearco_diagrams')
                 .update(diagramPayload)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create new diagram
             const { error: insertError } = await locals.supabase
-                .from('wearco_svg_diagrams')
+                .from('wearco_diagrams')
                 .insert({
                     ...diagramPayload,
                     created_at: new Date().toISOString()
@@ -115,7 +115,7 @@ export const actions: Actions = {
         }
 
         const { error } = await locals.supabase
-            .from('wearco_svg_diagrams')
+            .from('wearco_diagrams')
             .delete()
             .eq('id', id);
 
