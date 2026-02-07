@@ -14,13 +14,25 @@ export const load: PageServerLoad = async ({ locals }) => {
         `)
         .order('updated_at', { ascending: false });
 
+    // Fetch available templates for the create modal dropdown
+    const { data: templates, error: templatesError } = await locals.supabase
+        .from('wearco_templates')
+        .select('id, template_name, category')
+        .order('template_name');
+
     if (diagramsError) {
         console.error('Error fetching diagrams:', diagramsError);
-        return { diagrams: [], error: 'Failed to load diagrams' };
+        return { diagrams: [], templates: [], error: 'Failed to load diagrams' };
+    }
+
+    if (templatesError) {
+        console.error('Error fetching templates:', templatesError);
+        return { diagrams: diagrams || [], templates: [], error: 'Failed to load templates' };
     }
 
     return {
-        diagrams: diagrams || []
+        diagrams: diagrams || [],
+        templates: templates || []
     };
 };
 

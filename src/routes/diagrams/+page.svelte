@@ -5,6 +5,8 @@
     import DiagramRow from "./components/DiagramRow.svelte";
     import { fade } from "svelte/transition";
 
+    import type { WearcoTemplate } from '$lib/types/template';
+
     let { data, form } = $props<{
         data: {
             diagrams: (WearcoSvgDiagram & {
@@ -13,6 +15,7 @@
                     category: string;
                 };
             })[];
+            templates: WearcoTemplate[];
             error?: string;
         };
         form?: {
@@ -28,6 +31,8 @@
     let searchQuery = $state("");
     let selectedTemplate = $state("all");
     let showCreateModal = $state(false);
+    let selectedTemplateId = $state<string>("");
+    let selectedDiagramType = $state<"edge" | "top_side" | "">("");
 
     // Derived state for filtering
     const uniqueTemplates = $derived([
@@ -62,15 +67,22 @@
 
     function openCreateModal() {
         showCreateModal = true;
+        selectedTemplateId = "";
+        selectedDiagramType = "";
     }
 
-    function selectDiagramType(type: "edge" | "top_side") {
+    function confirmCreateDiagram() {
+        if (!selectedTemplateId || !selectedDiagramType) {
+            return; // Don't close modal if selections are incomplete
+        }
         showCreateModal = false;
-        goto(`/diagrams/manage?type=${type}`);
+        goto(`/diagrams/manage?template_id=${selectedTemplateId}&type=${selectedDiagramType}`);
     }
 
     function closeCreateModal() {
         showCreateModal = false;
+        selectedTemplateId = "";
+        selectedDiagramType = "";
     }
 
     function openEditModal(diagram: WearcoSvgDiagram) {
@@ -281,36 +293,105 @@
 
         <div class="modal-content">
             <p id="modal-description" class="modal-description">
-                Choose the type of diagram you want to create:
+                Choose a template and diagram type to create your new diagram:
             </p>
 
-            <div class="diagram-type-options">
-                <button class="diagram-type-option" onclick={() => selectDiagramType('edge')}>
-                    <div class="option-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                        </svg>
+            {#if data.templates && data.templates.length > 0}
+                <div class="selections-container">
+                    <div class="template-selector">
+                        <label for="template-select" class="template-label">Template:</label>
+                        <select
+                            id="template-select"
+                            bind:value={selectedTemplateId}
+                            class="template-dropdown"
+                        >
+                            <option value="">Select a template...</option>
+                            {#each data.templates as template}
+                                <option value={template.id}>
+                                    {template.template_name}
+                                    {#if template.category}
+                                        ({template.category})
+                                    {/if}
+                                </option>
+                            {/each}
+                        </select>
                     </div>
-                    <h3>Edge Diagram</h3>
-                    <p>Create a diagram for edge configurations and layouts</p>
-                </button>
 
-                <button class="diagram-type-option" onclick={() => selectDiagramType('top_side')}>
-                    <div class="option-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <rect x="7" y="7" width="3" height="3"></rect>
-                            <rect x="14" y="7" width="3" height="3"></rect>
-                            <rect x="7" y="14" width="3" height="3"></rect>
-                            <rect x="14" y="14" width="3" height="3"></rect>
-                        </svg>
+                    <div class="type-selector">
+                        <div class="type-label" id="type-label">Diagram Type:</div>
+                        <div class="diagram-type-options" role="radiogroup" aria-labelledby="type-label">
+                            <button
+                                class="diagram-type-option"
+                                class:selected={selectedDiagramType === 'edge'}
+                                onclick={() => selectedDiagramType = 'edge'}
+                                role="radio"
+                                aria-checked={selectedDiagramType === 'edge'}
+                                aria-label="Edge Diagram"
+                            >
+                                <div class="option-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    </svg>
+                                </div>
+                                <h3>Edge Diagram</h3>
+                                <p>Create a diagram for edge configurations and layouts</p>
+                            </button>
+
+                            <button
+                                class="diagram-type-option"
+                                class:selected={selectedDiagramType === 'top_side'}
+                                onclick={() => selectedDiagramType = 'top_side'}
+                                role="radio"
+                                aria-checked={selectedDiagramType === 'top_side'}
+                                aria-label="Top Side Diagram"
+                            >
+                                <div class="option-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <rect x="7" y="7" width="3" height="3"></rect>
+                                        <rect x="14" y="7" width="3" height="3"></rect>
+                                        <rect x="7" y="14" width="3" height="3"></rect>
+                                        <rect x="14" y="14" width="3" height="3"></rect>
+                                    </svg>
+                                </div>
+                                <h3>Top Side Diagram</h3>
+                                <p>Create a diagram for top-side layouts and designs</p>
+                            </button>
+                        </div>
                     </div>
-                    <h3>Top Side Diagram</h3>
-                    <p>Create a diagram for top-side layouts and designs</p>
-                </button>
-            </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button
+                        class="cancel-btn"
+                        onclick={closeCreateModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        class="confirm-btn"
+                        onclick={confirmCreateDiagram}
+                        disabled={!selectedTemplateId || !selectedDiagramType}
+                    >
+                        Create Diagram
+                    </button>
+                </div>
+            {:else}
+                <div class="loading-error">
+                    <p class="error-message">
+                        {#if data.error && data.error.includes('templates')}
+                            Failed to load templates. Please try again.
+                        {:else}
+                            No templates available. Please create a template first.
+                        {/if}
+                    </p>
+                    <button class="retry-btn" onclick={() => window.location.reload()}>
+                        Retry
+                    </button>
+                </div>
+            {/if}
         </div>
     </div>
 {/if}
@@ -628,6 +709,129 @@
         font-size: 1rem;
     }
 
+    .selections-container {
+        margin-bottom: 2rem;
+    }
+
+    .template-selector {
+        margin-bottom: 2rem;
+    }
+
+    .template-label {
+        display: block;
+        color: var(--color-white);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .template-dropdown {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--color-white);
+        font-size: 1rem;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.7rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+
+    .template-dropdown:focus {
+        border-color: var(--color-gold);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(250, 194, 17, 0.1);
+    }
+
+    .template-dropdown option {
+        background: var(--color-bg-primary);
+        color: var(--color-white);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .cancel-btn,
+    .confirm-btn,
+    .retry-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .cancel-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-white);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cancel-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .confirm-btn {
+        background: var(--color-gold);
+        color: var(--color-black);
+    }
+
+    .confirm-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(250, 194, 17, 0.3);
+    }
+
+    .confirm-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .retry-btn {
+        background: var(--color-gold);
+        color: var(--color-black);
+        margin: 1rem auto 0;
+        display: block;
+    }
+
+    .retry-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(250, 194, 17, 0.3);
+    }
+
+    .loading-error {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .error-message {
+        color: #f87171;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .type-selector {
+        margin-bottom: 1rem;
+    }
+
+    .type-label {
+        display: block;
+        color: var(--color-white);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
     .diagram-type-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -645,6 +849,7 @@
         cursor: pointer;
         transition: all 0.2s;
         text-align: center;
+        position: relative;
     }
 
     .diagram-type-option:hover {
@@ -653,8 +858,23 @@
         transform: translateY(-2px);
     }
 
+    .diagram-type-option.selected {
+        background: rgba(250, 194, 17, 0.1);
+        border-color: var(--color-gold);
+        box-shadow: 0 0 0 2px rgba(250, 194, 17, 0.2);
+    }
+
+    .diagram-type-option.selected .option-icon {
+        color: var(--color-gold);
+    }
+
     .option-icon {
         margin-bottom: 1rem;
+        color: var(--color-gray);
+        transition: color 0.2s;
+    }
+
+    .diagram-type-option.selected .option-icon {
         color: var(--color-gold);
     }
 
@@ -671,6 +891,7 @@
         color: var(--color-gray);
         line-height: 1.4;
     }
+
 
     @keyframes fadeIn {
         from {
@@ -704,6 +925,16 @@
 
         .modal-content {
             padding: 1rem;
+        }
+
+
+        .modal-actions {
+            flex-direction: column;
+        }
+
+        .cancel-btn,
+        .confirm-btn {
+            width: 100%;
         }
 
         .diagram-type-options {

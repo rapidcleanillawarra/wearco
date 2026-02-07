@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
     const id = url.searchParams.get('id');
+    const templateId = url.searchParams.get('template_id');
 
     // Fetch available templates for the dropdown
     const { data: templates, error: templatesError } = await locals.supabase
@@ -40,7 +41,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     return {
         templates: templates || [],
         diagram,
-        mode
+        mode,
+        selectedTemplateId: templateId
     };
 };
 

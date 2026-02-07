@@ -87,7 +87,7 @@
         // or if the diagram ID changed (navigating to different diagram)
         if (!initialized) {
             diagramName = diagram?.name || "";
-            templateId = diagram?.template_id || "";
+            templateId = diagram?.template_id || data.selectedTemplateId || "";
             diagramType = diagram?.type || "";
             diagramDimension = diagram?.dimension
                 ? JSON.stringify(diagram.dimension, null, 2)
