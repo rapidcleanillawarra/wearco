@@ -122,8 +122,14 @@
     // Diagram elements sizes
     const diagramStyles = $derived.by(() => {
         const scale = Math.min(rectWidth / 800, rectHeight / 400);
+        const radius = Math.max(12, 20 * scale);
+        const spacing = rectWidth / 4;
+
         return {
-            circleRadius: Math.max(12, 20 * scale),
+            circleRadius: radius,
+            holeDiameter: Math.round(radius * 2), // mm
+            pitch: Math.round(spacing), // mm
+            totalDistance: Math.round(spacing * 2), // mm
         };
     });
 
@@ -610,6 +616,143 @@
                         stroke-width="1.5"
                     />
                 {/each}
+
+                <!-- Hole Diameter Dimension (above first hole) -->
+                {#if true}
+                    {@const firstHoleX = circlePositions[0]}
+                    {@const lastHoleX = circlePositions[2]}
+                    {@const holeRadius = diagramStyles.circleRadius}
+                    {@const dimY_hole = circleY - holeRadius - 25}
+
+                    <g class="dimension-line">
+                        <line
+                            x1={firstHoleX - holeRadius + 3}
+                            y1={dimY_hole}
+                            x2={firstHoleX + holeRadius - 3}
+                            y2={dimY_hole}
+                            stroke="#374151"
+                            stroke-width="1.5"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <!-- Extension lines -->
+                        <line
+                            x1={firstHoleX - holeRadius}
+                            y1={circleY - holeRadius - 5}
+                            x2={firstHoleX - holeRadius}
+                            y2={dimY_hole - 5}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <line
+                            x1={firstHoleX + holeRadius}
+                            y1={circleY - holeRadius - 5}
+                            x2={firstHoleX + holeRadius}
+                            y2={dimY_hole - 5}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={firstHoleX}
+                            y={dimY_hole - 8}
+                            fill="#374151"
+                            font-size="12"
+                            text-anchor="middle"
+                        >
+                            Ø{diagramStyles.holeDiameter} mm
+                        </text>
+                    </g>
+
+                    <!-- Pitch and Total Distance Dimensions (below holes) -->
+                    {@const dimY_pitch = circleY + holeRadius + 25}
+                    {@const dimY_total = dimY_pitch + 40}
+
+                    <!-- Pitch (Hole 1 to Hole 2) -->
+                    <g class="dimension-line">
+                        <line
+                            x1={circlePositions[0] + 5}
+                            y1={dimY_pitch}
+                            x2={circlePositions[1] - 5}
+                            y2={dimY_pitch}
+                            stroke="#374151"
+                            stroke-width="1.5"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <!-- Extension lines for pitch -->
+                        <line
+                            x1={circlePositions[0]}
+                            y1={circleY + holeRadius + 5}
+                            x2={circlePositions[0]}
+                            y2={dimY_pitch + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <line
+                            x1={circlePositions[1]}
+                            y1={circleY + holeRadius + 5}
+                            x2={circlePositions[1]}
+                            y2={dimY_pitch + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={(circlePositions[0] + circlePositions[1]) / 2}
+                            y={dimY_pitch + 15}
+                            fill="#374151"
+                            font-size="12"
+                            text-anchor="middle"
+                        >
+                            {diagramStyles.pitch} mm
+                        </text>
+                    </g>
+
+                    <!-- Total Hole Distance (Hole 1 to Last Hole) -->
+                    <g class="dimension-line">
+                        <line
+                            x1={firstHoleX + 5}
+                            y1={dimY_total}
+                            x2={lastHoleX - 5}
+                            y2={dimY_total}
+                            stroke="#374151"
+                            stroke-width="1.5"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <!-- Extension lines for total distance -->
+                        <line
+                            x1={firstHoleX}
+                            y1={circleY + holeRadius + 5}
+                            x2={firstHoleX}
+                            y2={dimY_total + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <line
+                            x1={lastHoleX}
+                            y1={circleY + holeRadius + 5}
+                            x2={lastHoleX}
+                            y2={dimY_total + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={(firstHoleX + lastHoleX) / 2}
+                            y={dimY_total + 15}
+                            fill="#374151"
+                            font-size="12"
+                            text-anchor="middle"
+                        >
+                            {diagramStyles.totalDistance} mm
+                        </text>
+                    </g>
+                {/if}
 
                 <!-- Resize handles attached to the rectangle -->
                 {#if isHoveringCanvas || isResizing}
