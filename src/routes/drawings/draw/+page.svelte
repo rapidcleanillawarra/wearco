@@ -17,6 +17,7 @@
 	const mode = $derived(data.mode);
 	const template = $derived(data.template);
 	const drawing = $derived(data.drawing);
+	const diagrams = $derived(data.diagrams);
 	const pdfUrl = $derived(data.pdfUrl);
 
 	// Parse template data for overlay fields
@@ -513,6 +514,43 @@
 				</PdfViewer>
 			</div>
 		</section>
+
+		{#if diagrams && diagrams.length > 0}
+			<section class="section-card diagrams-section">
+				<div class="section-header">
+					<h3 class="section-title">Template Diagrams</h3>
+					<p class="section-subtitle">Associated diagrams for this template</p>
+				</div>
+				<div class="diagrams-grid">
+					{#each diagrams as diagram}
+						<div class="diagram-card">
+							<div class="diagram-header">
+								<h4 class="diagram-name">{diagram.name}</h4>
+								{#if diagram.type}
+									<span class="diagram-type">{diagram.type}</span>
+								{/if}
+							</div>
+							{#if diagram.file}
+								<div class="diagram-file">
+									<strong>File:</strong> {diagram.file}
+								</div>
+							{/if}
+							{#if diagram.dimension}
+								<div class="diagram-dimensions">
+									<strong>Dimensions:</strong>
+									{#if diagram.dimension.width && diagram.dimension.height}
+										{diagram.dimension.width} × {diagram.dimension.height}
+									{/if}
+								</div>
+							{/if}
+							<div class="diagram-date">
+								<strong>Created:</strong> {new Date(diagram.created_at).toLocaleDateString()}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</section>
+		{/if}
 	</main>
 </div>
 
@@ -638,6 +676,90 @@
 		min-height: 600px;
 	}
 
+	.diagrams-section {
+		padding: var(--spacing-lg);
+	}
+
+	.section-header {
+		margin-bottom: var(--spacing-lg);
+	}
+
+	.section-title {
+		font-size: var(--font-size-xl);
+		font-weight: var(--font-weight-semibold);
+		margin: 0 0 var(--spacing-xs) 0;
+		color: var(--color-white);
+	}
+
+	.section-subtitle {
+		color: var(--color-gray);
+		margin: 0;
+		font-size: var(--font-size-sm);
+	}
+
+	.diagrams-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: var(--spacing-md);
+	}
+
+	.diagram-card {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-md);
+		transition: var(--transition-smooth);
+	}
+
+	.diagram-card:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
+
+	.diagram-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: var(--spacing-sm);
+	}
+
+	.diagram-name {
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-white);
+		margin: 0;
+		flex: 1;
+	}
+
+	.diagram-type {
+		background: rgba(34, 197, 94, 0.2);
+		color: #22c55e;
+		padding: 0.25rem 0.5rem;
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-medium);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
+		margin-left: var(--spacing-sm);
+	}
+
+	.diagram-file,
+	.diagram-dimensions,
+	.diagram-date {
+		font-size: var(--font-size-sm);
+		color: var(--color-gray);
+		margin-bottom: var(--spacing-xs);
+	}
+
+	.diagram-file strong,
+	.diagram-dimensions strong,
+	.diagram-date strong {
+		color: var(--color-white);
+		margin-right: var(--spacing-xs);
+	}
+
 	.btn-primary {
 		display: inline-flex;
 		align-items: center;
@@ -756,6 +878,21 @@
 
 		.section-content {
 			min-height: 400px;
+		}
+
+		.diagrams-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.diagram-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: var(--spacing-xs);
+		}
+
+		.diagram-type {
+			align-self: flex-start;
+			margin-left: 0;
 		}
 	}
 </style>

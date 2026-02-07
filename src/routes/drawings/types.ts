@@ -1,4 +1,5 @@
 import type { WearcoTemplate, WearcoDrawing } from '$lib/types/template';
+import type { WearcoDiagram } from '$lib/types/svg_diagram';
 
 export type DrawingView = {
   id: string
@@ -32,5 +33,6 @@ export interface DrawingPageData {
   mode: 'new' | 'edit';
   template: WearcoTemplate;
   drawing: WearcoDrawing | null;
+  diagrams: WearcoDiagram[];
   pdfUrl: string | undefined;
 }

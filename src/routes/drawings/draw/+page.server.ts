@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import type { DrawingPageData } from '../types';
+import type { WearcoDiagram } from '$lib/types/svg_diagram';
 
 export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPageData> => {
     const templateId = url.searchParams.get('template_id');
@@ -24,6 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
     try {
         let template;
         let drawing = null;
+        let diagrams: WearcoDiagram[] = [];
         let pdfUrl: string | undefined;
 
         if (mode === 'edit') {
@@ -72,6 +74,20 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
             template = templateData;
         }
 
+        // Fetch diagrams associated with the template
+        const { data: diagramsData, error: diagramsErr } = await locals.supabase
+            .from('wearco_diagrams')
+            .select('*')
+            .eq('template_id', template.id)
+            .order('created_at', { ascending: false });
+
+        if (diagramsErr) {
+            console.error('Error fetching diagrams:', diagramsErr);
+            // Don't throw error, just log it and continue with empty diagrams array
+        } else {
+            diagrams = diagramsData || [];
+        }
+
         // Generate PDF URL from storage if visual_document is set
         if (template.visual_document) {
             const { data: signedUrlData, error: signedUrlError } = await locals.supabase.storage
@@ -87,6 +103,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
             mode,
             template,
             drawing,
+            diagrams,
             pdfUrl
         };
     } catch (err) {

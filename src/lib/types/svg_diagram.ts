@@ -7,6 +7,7 @@ export interface WearcoDiagram {
     type: string | null;
     dimension: Record<string, any> | null;
     variables: Record<string, any>;
+    file: string | null;
     created_at: string;
     updated_at: string;
 }
