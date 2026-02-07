@@ -58,6 +58,32 @@
     let startMousePos = $state({ x: 0, y: 0 });
     let resizeScale = $state({ x: 1, y: 1 });
 
+    // Zoom functionality
+    let zoomLevel = $state(1);
+    const MIN_ZOOM = 0.5;
+    const MAX_ZOOM = 3;
+    const ZOOM_STEP = 0.1;
+
+    function zoomIn() {
+        zoomLevel = Math.min(MAX_ZOOM, zoomLevel + ZOOM_STEP);
+    }
+
+    function zoomOut() {
+        zoomLevel = Math.max(MIN_ZOOM, zoomLevel - ZOOM_STEP);
+    }
+
+    function resetZoom() {
+        zoomLevel = 1;
+    }
+
+    function handleWheelZoom(event: WheelEvent) {
+        if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            if (event.deltaY < 0) zoomIn();
+            else zoomOut();
+        }
+    }
+
     // Container ref
     let canvasContainerEl = $state<HTMLDivElement | null>(null);
 
@@ -129,11 +155,10 @@
 
         if (canvasContainerEl) {
             const rect = canvasContainerEl.getBoundingClientRect();
-            // We use the SVG's viewBox units, so we need to account for how those map to screen pixels
-            // This is still logical width / screen width
+            // account for both SVG viewBox mapping and UI zoomLevel
             resizeScale = {
-                x: rect.width / canvasWidth,
-                y: rect.height / canvasHeight,
+                x: (rect.width * zoomLevel) / canvasWidth,
+                y: (rect.height * zoomLevel) / canvasHeight,
             };
         } else {
             resizeScale = { x: 1, y: 1 };
@@ -323,10 +348,69 @@
                 </button>
             </div>
             <div class="reset-controls">
+                <div class="zoom-controls">
+                    <button
+                        class="zoom-btn"
+                        onclick={zoomOut}
+                        title="Zoom Out"
+                        aria-label="Zoom Out"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            ><line x1="5" y1="12" x2="19" y2="12" /></svg
+                        >
+                    </button>
+                    <span class="zoom-text">{Math.round(zoomLevel * 100)}%</span
+                    >
+                    <button
+                        class="zoom-btn"
+                        onclick={zoomIn}
+                        title="Zoom In"
+                        aria-label="Zoom In"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            ><line x1="12" y1="5" x2="12" y2="19" /><line
+                                x1="5"
+                                y1="12"
+                                x2="19"
+                                y2="12"
+                            /></svg
+                        >
+                    </button>
+                    <button
+                        class="zoom-btn reset-zoom"
+                        onclick={resetZoom}
+                        title="Reset Zoom"
+                        aria-label="Reset Zoom"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            ><path
+                                d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                            /><path d="M3 3v5h5" /></svg
+                        >
+                    </button>
+                </div>
                 <button
                     class="reset-button"
                     onclick={() =>
-                        updateCanvasDimensions(initialWidth, initialHeight)}
+                        updateRectangleDimensions(initialWidth, initialHeight)}
                     title="Reset to original dimensions (Ctrl+R)"
                 >
                     Reset
@@ -344,6 +428,7 @@
         onmousemove={handleMouseMove}
         onmouseup={stopResize}
         onkeydown={handleKeydown}
+        onwheel={handleWheelZoom}
         tabindex="0"
         role="application"
         aria-label="Interactive diagram canvas with resize handles"
@@ -396,107 +481,110 @@
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
 
-            <!-- Width Dimension Line -->
-            <g class="dimension-line">
-                <line
-                    x1={rectangleX + 5}
-                    y1={rectangleY - 20}
-                    x2={rectangleX + rectWidth - 5}
-                    y2={rectangleY - 20}
-                    stroke="#374151"
-                    stroke-width="1.5"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <text
-                    x={rectangleX + rectWidth / 2}
-                    y={rectangleY - 30}
-                    fill="#374151"
-                    font-size="12"
-                    text-anchor="middle"
-                >
-                    {rectWidth} mm
-                </text>
-            </g>
+            <!-- Zoomable Content Group -->
+            <g style="transform: scale({zoomLevel}); transform-origin: center;">
+                <!-- Width Dimension Line -->
+                <g class="dimension-line">
+                    <line
+                        x1={rectangleX + 5}
+                        y1={rectangleY - 20}
+                        x2={rectangleX + rectWidth - 5}
+                        y2={rectangleY - 20}
+                        stroke="#374151"
+                        stroke-width="1.5"
+                        marker-start="url(#arrow-start)"
+                        marker-end="url(#arrow-end)"
+                    />
+                    <text
+                        x={rectangleX + rectWidth / 2}
+                        y={rectangleY - 30}
+                        fill="#374151"
+                        font-size="12"
+                        text-anchor="middle"
+                    >
+                        {rectWidth} mm
+                    </text>
+                </g>
 
-            <!-- Height Dimension Line -->
-            <g class="dimension-line">
-                <line
-                    x1={rectangleX - 20}
-                    y1={rectangleY + 5}
-                    x2={rectangleX - 20}
-                    y2={rectangleY + rectHeight - 5}
-                    stroke="#374151"
-                    stroke-width="1.5"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <text
-                    x={rectangleX - 35}
-                    y={rectangleY + rectHeight / 2}
-                    fill="#374151"
-                    font-size="12"
-                    text-anchor="middle"
-                    transform="rotate(-90, {rectangleX - 35}, {rectangleY +
-                        rectHeight / 2})"
-                >
-                    {rectHeight} mm
-                </text>
-            </g>
+                <!-- Height Dimension Line -->
+                <g class="dimension-line">
+                    <line
+                        x1={rectangleX - 20}
+                        y1={rectangleY + 5}
+                        x2={rectangleX - 20}
+                        y2={rectangleY + rectHeight - 5}
+                        stroke="#374151"
+                        stroke-width="1.5"
+                        marker-start="url(#arrow-start)"
+                        marker-end="url(#arrow-end)"
+                    />
+                    <text
+                        x={rectangleX - 35}
+                        y={rectangleY + rectHeight / 2}
+                        fill="#374151"
+                        font-size="12"
+                        text-anchor="middle"
+                        transform="rotate(-90, {rectangleX - 35}, {rectangleY +
+                            rectHeight / 2})"
+                    >
+                        {rectHeight} mm
+                    </text>
+                </g>
 
-            <!-- Main Rectangle -->
-            <rect
-                x={rectangleX}
-                y={rectangleY}
-                width={rectWidth}
-                height={rectHeight}
-                fill="white"
-                stroke="#1e1b4b"
-                stroke-width="2"
-                rx="4"
-                ry="4"
-            />
-
-            <!-- Three centered circles -->
-            {#each circlePositions as circleX}
-                <circle
-                    cx={circleX}
-                    cy={circleY}
-                    r={diagramStyles.circleRadius}
+                <!-- Main Rectangle -->
+                <rect
+                    x={rectangleX}
+                    y={rectangleY}
+                    width={rectWidth}
+                    height={rectHeight}
                     fill="white"
                     stroke="#1e1b4b"
-                    stroke-width="1.5"
-                />
-            {/each}
-
-            <!-- Resize handles attached to the rectangle -->
-            {#if isHoveringCanvas || isResizing}
-                <!-- Bottom-Right Corner Handle (Red as in reference) -->
-                <circle
-                    cx={rectangleX + rectWidth}
-                    cy={rectangleY + rectHeight}
-                    r="8"
-                    fill="#ef4444"
-                    stroke="white"
                     stroke-width="2"
-                    class="resize-handle se"
-                    onmousedown={(e) => startResize("se", e)}
-                    style="cursor: se-resize"
+                    rx="4"
+                    ry="4"
                 />
 
-                <!-- Other handles (subtle blue) -->
-                <circle
-                    cx={rectangleX}
-                    cy={rectangleY}
-                    r="5"
-                    fill="#3b82f6"
-                    stroke="white"
-                    stroke-width="1.5"
-                    class="resize-handle nw"
-                    onmousedown={(e) => startResize("nw", e)}
-                    style="cursor: nw-resize"
-                />
-            {/if}
+                <!-- Three centered circles -->
+                {#each circlePositions as circleX}
+                    <circle
+                        cx={circleX}
+                        cy={circleY}
+                        r={diagramStyles.circleRadius}
+                        fill="white"
+                        stroke="#1e1b4b"
+                        stroke-width="1.5"
+                    />
+                {/each}
+
+                <!-- Resize handles attached to the rectangle -->
+                {#if isHoveringCanvas || isResizing}
+                    <!-- Bottom-Right Corner Handle (Red as in reference) -->
+                    <circle
+                        cx={rectangleX + rectWidth}
+                        cy={rectangleY + rectHeight}
+                        r="8"
+                        fill="#ef4444"
+                        stroke="white"
+                        stroke-width="2"
+                        class="resize-handle se"
+                        onmousedown={(e) => startResize("se", e)}
+                        style="cursor: se-resize"
+                    />
+
+                    <!-- Other handles (subtle blue) -->
+                    <circle
+                        cx={rectangleX}
+                        cy={rectangleY}
+                        r="5"
+                        fill="#3b82f6"
+                        stroke="white"
+                        stroke-width="1.5"
+                        class="resize-handle nw"
+                        onmousedown={(e) => startResize("nw", e)}
+                        style="cursor: nw-resize"
+                    />
+                {/if}
+            </g>
 
             <!-- Dimension display during resize -->
             {#if isResizing}
@@ -526,8 +614,10 @@
 
     <div class="canvas-info">
         <p>
-            Interactive diagram canvas • Drag corners/edges to resize • Use
-            input fields or keyboard shortcuts (arrow keys, Ctrl+R to reset)
+            Interactive diagram canvas • Drag corners to resize • <b
+                >Ctrl + Scroll</b
+            > to zoom • Use input fields or keyboard shortcuts (arrow keys, Ctrl+R
+            to reset)
         </p>
     </div>
 </div>
@@ -639,7 +729,45 @@
 
     .reset-controls {
         display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .zoom-controls {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
+        background: #1e293b;
+        border: 1px solid #334155;
+        padding: 0.25rem;
+        border-radius: 0.375rem;
+    }
+
+    .zoom-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+    }
+
+    .zoom-btn:hover {
+        background: #334155;
+        color: #cbd5e1;
+    }
+
+    .zoom-text {
+        font-size: 0.8rem;
+        color: #cbd5e1;
+        min-width: 4ch;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
     }
 
     .reset-button {
