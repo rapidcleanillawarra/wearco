@@ -618,12 +618,18 @@
 			<div class="svg-diagrams-grid">
 				<div class="diagrams-column">
 					{#each edgeDiagrams as diagram}
-						<FullSvgViewer {diagram} />
+						<FullSvgViewer
+							{diagram}
+							fieldValues={overlayFieldValues}
+						/>
 					{/each}
 				</div>
 				<div class="diagrams-column">
 					{#each topDiagrams as diagram}
-						<FullSvgViewer {diagram} />
+						<FullSvgViewer
+							{diagram}
+							fieldValues={overlayFieldValues}
+						/>
 					{/each}
 				</div>
 			</div>

@@ -1,9 +1,90 @@
 <script lang="ts">
     import type { WearcoDiagram } from "$lib/types/svg_diagram";
 
-    let { diagram } = $props<{
+    let { diagram, fieldValues = {} } = $props<{
         diagram: WearcoDiagram | null;
+        fieldValues?: Record<string, string>;
     }>();
+
+    // SVG Content State
+    let originalSvgContent = $state<string>("");
+    let isLoadingSvg = $state(false);
+
+    // Fetch SVG content whenever the diagram changes
+    $effect(() => {
+        if (!diagram?.signedUrl) {
+            originalSvgContent = "";
+            return;
+        }
+
+        const fetchSvg = async () => {
+            isLoadingSvg = true;
+            try {
+                const response = await fetch(diagram.signedUrl!);
+                if (response.ok) {
+                    originalSvgContent = await response.text();
+                }
+            } catch (err) {
+                console.error("Failed to fetch SVG:", err);
+            } finally {
+                isLoadingSvg = false;
+            }
+        };
+
+        fetchSvg();
+    });
+
+    // Reactive SVG content based on fieldValues
+    const updatedSvgContent = $derived.by(() => {
+        if (!originalSvgContent) return "";
+        if (Object.keys(fieldValues).length === 0) return originalSvgContent;
+
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(
+                originalSvgContent,
+                "image/svg+xml",
+            );
+
+            // Update elements by ID
+            Object.entries(fieldValues).forEach(([id, val]) => {
+                const value = String(val);
+                const element = doc.getElementById(id);
+                if (element) {
+                    const tag = element.tagName.toLowerCase();
+                    if (tag === "text" || tag === "tspan") {
+                        // If it's a <text> element, it might have nested <tspan>s.
+                        // We want to update the text content but preserve the structure.
+                        const tspans = element.querySelectorAll("tspan");
+
+                        if (tag === "text" && tspans.length > 0) {
+                            // Update the first tspan (usually the one with the value)
+                            const firstTspan = tspans[0];
+                            const originalText = firstTspan.textContent || "";
+                            const hasMM = originalText
+                                .toLowerCase()
+                                .includes("mm");
+                            firstTspan.textContent = hasMM
+                                ? `${value} mm`
+                                : value;
+                        } else {
+                            // No tspans or it's a tspan itself
+                            const originalText = element.textContent || "";
+                            const hasMM = originalText
+                                .toLowerCase()
+                                .includes("mm");
+                            element.textContent = hasMM ? `${value} mm` : value;
+                        }
+                    }
+                }
+            });
+
+            return new XMLSerializer().serializeToString(doc);
+        } catch (err) {
+            console.error("Error updating SVG text:", err);
+            return originalSvgContent;
+        }
+    });
 
     // Zoom and Pan State
     let zoomLevel = $state(1);
@@ -66,15 +147,16 @@
     }
 
     async function handleDownload() {
-        if (!diagram?.signedUrl) return;
+        if (!updatedSvgContent) return;
 
         try {
-            const response = await fetch(diagram.signedUrl);
-            const blob = await response.blob();
+            const blob = new Blob([updatedSvgContent], {
+                type: "image/svg+xml",
+            });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${diagram.name.toLowerCase().replace(/\s+/g, "_")}.svg`;
+            a.download = `${diagram?.name.toLowerCase().replace(/\s+/g, "_") || "diagram"}.svg`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -174,7 +256,6 @@
             onmouseup={stopDragging}
             onmouseleave={stopDragging}
             role="application"
-            tabindex="0"
             aria-label="SVG Viewer Stage"
             style="cursor: {isDragging
                 ? 'grabbing'
@@ -186,11 +267,16 @@
                 class="svg-canvas"
                 style="transform: translate({panOffset.x}px, {panOffset.y}px) scale({zoomLevel}); transform-origin: center;"
             >
-                <img
-                    src={diagram.signedUrl}
-                    alt={diagram.name}
-                    draggable="false"
-                />
+                {#if isLoadingSvg}
+                    <div class="loading-overlay">
+                        <span class="spinner"></span>
+                        <span>Loading SVG...</span>
+                    </div>
+                {:else if updatedSvgContent}
+                    <div class="inline-svg-container" draggable="false">
+                        {@html updatedSvgContent}
+                    </div>
+                {/if}
             </div>
         </div>
     </section>
@@ -342,18 +428,49 @@
         align-items: center;
         justify-content: center;
         user-select: none;
-        transition: transform 0.05s ease-out; /* Smooth transition for zooming */
+        transition: transform 0.05s ease-out;
+        position: relative;
     }
 
-    /* Disable transition while dragging for performance */
-    .svg-stage[style*="grabbing"] .svg-canvas {
-        transition: none;
+    .inline-svg-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
     }
 
-    .svg-canvas img {
+    .inline-svg-container :global(svg) {
         max-width: 100%;
         max-height: 100%;
-        object-fit: contain;
-        pointer-events: none; /* Let the stage handle events */
+        width: auto;
+        height: auto;
+    }
+
+    .loading-overlay {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-sm);
+        color: var(--color-gray);
+    }
+
+    .spinner {
+        width: 32px;
+        height: 32px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid var(--color-gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
