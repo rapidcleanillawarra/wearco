@@ -44,9 +44,9 @@
 
     // Dynamic Diagram Parameters derived from fieldValues
     // We try to match common names used in the templates
-    let plateWidth = $derived(getVal(["width", "plate_w"], 1300));
+    let plateWidth = $derived(getVal(["width", "centerEdge-width"], 2000));
     let plateHeight = $derived(getVal(["height", "plate_h"], 400));
-    let holeCount = $derived(getVal(["hole_count", "holes", "qty"], 3));
+    let holeCount = $derived(getVal(["hole_count", "holes", "qty"], 20));
     let holeDiameter = $derived(getVal(["dia", "hole_size"], 40));
     let holeType = $derived(getVal(["hole_type", "shape"], "Circle")); // 'Circle' or 'Square'
 
