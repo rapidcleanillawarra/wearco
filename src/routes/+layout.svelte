@@ -1,7 +1,7 @@
 <script lang="ts">
 	import "$lib/styles/index.css";
 	import favicon from "$lib/assets/wearco_favicon.png";
-	import { page } from "$app/stores";
+	import { page, navigating } from "$app/stores";
 
 	import { enhance } from "$app/forms";
 
@@ -204,7 +204,20 @@
 	<main class="main-content">
 		{@render children()}
 	</main>
-
+	{#if $navigating}
+		<div class="loading-overlay">
+			<div class="loader-content">
+				<div class="spinner"></div>
+				<div class="loading-logo">
+					<img
+						src="https://wearco.com.au/wp-content/uploads/2024/08/logo-1.png"
+						alt="Wearco Logo"
+					/>
+				</div>
+				<div class="loading-text">Loading...</div>
+			</div>
+		</div>
+	{/if}
 	<!-- Dev Only Sticky QR Footer -->
 	{#if showQrFooter && qrCodeUrl}
 		<div class="qr-footer" class:expanded={isQrExpanded}>
@@ -634,6 +647,100 @@
 		to {
 			opacity: 1;
 			transform: translateY(0);
+		}
+	}
+
+	/* Loading Overlay */
+	.loading-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.7);
+		backdrop-filter: blur(10px);
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		animation: fadeIn 0.3s ease;
+	}
+
+	.loader-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2rem;
+		padding: 3rem;
+		background: rgba(15, 15, 15, 0.8);
+		border: 1px solid rgba(250, 194, 17, 0.2);
+		border-radius: 24px;
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+	}
+
+	.spinner {
+		width: 80px;
+		height: 80px;
+		border: 4px solid rgba(250, 194, 17, 0.1);
+		border-top: 4px solid var(--color-gold);
+		border-radius: 50%;
+		animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+		position: relative;
+	}
+
+	.spinner::after {
+		content: "";
+		position: absolute;
+		top: -4px;
+		left: -4px;
+		right: -4px;
+		bottom: -4px;
+		border: 4px solid transparent;
+		border-bottom: 4px solid var(--color-gold);
+		border-radius: 50%;
+		opacity: 0.3;
+		animation: spin 2s linear infinite reverse;
+	}
+
+	.loading-logo img {
+		height: 40px;
+		width: auto;
+		filter: brightness(1.2);
+	}
+
+	.loading-text {
+		color: var(--color-gold);
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		font-size: 0.9rem;
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes pulse {
+		0%,
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.6;
+			transform: scale(0.98);
 		}
 	}
 </style>
