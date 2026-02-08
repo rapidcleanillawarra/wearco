@@ -42,53 +42,56 @@
         return defaultValue;
     }
 
-    // Dynamic Diagram Parameters derived from fieldValues
-    // We try to match common names used in the templates
-    let plateWidth = $derived(getVal(["width", "centerEdge-width"], 2000));
-    let plateHeight = $derived(getVal(["height", "plate_h"], 400));
+    // --- Dynamic Parameters from fieldValues (USED FOR LABELS ONLY) ---
+    let labelPlateWidth = $derived(getVal(["width", "centerEdge-width"], 2000));
+    let labelPlateHeight = $derived(getVal(["height", "plate_h"], 400));
     let holeCount = $derived(getVal(["hole_count", "holes", "qty"], 20));
-    let holeDiameter = $derived(getVal(["dia", "hole_size"], 40));
-    let holeType = $derived(getVal(["hole_type", "shape"], "Circle")); // 'Circle' or 'Square'
+    let labelHoleDiameter = $derived(getVal(["diameter", "hole_size"], 20));
+    let holeType = $derived(getVal(["hole_type", "shape"], "circle")); // 'Circle' or 'Square'
 
-    // Layout Constants (mm)
-    const CANVAS_PADDING = 80;
+    // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
+    // We use a fixed visual scale so the diagram remains readable regardless of the label values.
+    const VISUAL_HOLE_SPACING = 60; // Pixels between holes visually
+    const VISUAL_EDGE_PADDING = 80; // Padding from plate edge to first/last hole
+    const VISUAL_PLATE_HEIGHT = 200; // Fixed visual height of the plate
+    const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
+    const CANVAS_PADDING = 80; // Padding around the plate for dimensions
 
-    // ViewBox Calculations
-    const vbWidth = $derived(plateWidth + CANVAS_PADDING * 2);
-    const vbHeight = $derived(plateHeight + CANVAS_PADDING * 4); // Extra space for labels
+    // Calculate visual plate width based on hole count
+    let visualPlateWidth = $derived.by(() => {
+        if (holeCount <= 1)
+            return VISUAL_EDGE_PADDING * 2 + VISUAL_HOLE_SPACING;
+        return VISUAL_EDGE_PADDING * 2 + (holeCount - 1) * VISUAL_HOLE_SPACING;
+    });
 
-    // Position Calculations
+    // Position Calculations (Visual Coordinates)
     const rectX = CANVAS_PADDING;
     const rectY = CANVAS_PADDING * 2;
-    const centerY = $derived(rectY + plateHeight / 2);
+    const centerY = rectY + VISUAL_PLATE_HEIGHT / 2;
 
-    // Hole Positions (Simplified: evenly spaced)
+    // ViewBox Calculations
+    let vbWidth = $derived(visualPlateWidth + CANVAS_PADDING * 2);
+    let vbHeight = $derived(VISUAL_PLATE_HEIGHT + CANVAS_PADDING * 4);
+
+    // Hole Positions (Visual Coordinates)
     const holePositions = $derived.by(() => {
         if (holeCount <= 0) return [];
-        if (holeCount === 1) return [rectX + plateWidth / 2];
+        if (holeCount === 1) return [rectX + visualPlateWidth / 2];
 
-        // Calculate pitch based on 4 segments for 3 holes, or N+1 segments for N holes
-        const pitchMm = plateWidth / (holeCount + 1);
         return Array.from(
             { length: holeCount },
-            (_, i) => rectX + (i + 1) * pitchMm,
+            (_, i) => rectX + VISUAL_EDGE_PADDING + i * VISUAL_HOLE_SPACING,
         );
     });
 
-    const pitch = $derived(
-        holePositions.length > 1 ? holePositions[1] - holePositions[0] : 0,
-    );
-    const edgeDistLeft = $derived(
-        holePositions.length > 0 ? holePositions[0] - rectX : 0,
-    );
-    const edgeDistRight = $derived(
-        holePositions.length > 0
-            ? rectX + plateWidth - holePositions[holePositions.length - 1]
-            : 0,
-    );
-    const totalHoleDistance = $derived(
-        holePositions.length > 1
-            ? holePositions[holePositions.length - 1] - holePositions[0]
+    // Label Value Calculations (Proportional mapping for sub-dimensions)
+    let labelPitch = $derived(
+        holeCount > 1 ? labelPlateWidth / (holeCount + 1) : 0,
+    ); // Simplified pitch label
+    let labelEdgeDist = $derived(labelPlateWidth / (holeCount + 1)); // Simplified edge dist label
+    let labelTotalHoleDist = $derived(
+        holeCount > 1
+            ? (labelPlateWidth / (holeCount + 1)) * (holeCount - 1)
             : 0,
     );
 
@@ -140,8 +143,8 @@
         <rect
             x={rectX}
             y={rectY}
-            width={plateWidth}
-            height={plateHeight}
+            width={visualPlateWidth}
+            height={VISUAL_PLATE_HEIGHT}
             fill="none"
             stroke="#1e1b4b"
             stroke-width="2"
@@ -152,7 +155,7 @@
             <line
                 x1={rectX}
                 y1={rectY - 20}
-                x2={rectX + plateWidth}
+                x2={rectX + visualPlateWidth}
                 y2={rectY - 20}
                 stroke="#1e1b4b"
                 stroke-width="1"
@@ -160,11 +163,11 @@
                 marker-end="url(#arrow-end)"
             />
             <text
-                x={rectX + plateWidth / 2}
+                x={rectX + visualPlateWidth / 2}
                 y={rectY - 30}
                 text-anchor="middle"
                 font-size="20"
-                fill="#1e1b4b">{Math.round(plateWidth)} mm</text
+                fill="#1e1b4b">{Math.round(labelPlateWidth)} mm</text
             >
         </g>
 
@@ -174,7 +177,7 @@
                 x1={rectX - 20}
                 y1={rectY}
                 x2={rectX - 20}
-                y2={rectY + plateHeight}
+                y2={rectY + VISUAL_PLATE_HEIGHT}
                 stroke="#1e1b4b"
                 stroke-width="1"
                 marker-start="url(#arrow-start)"
@@ -187,7 +190,7 @@
                 font-size="20"
                 fill="#1e1b4b"
                 transform="rotate(-90, {rectX - 30}, {centerY})"
-                >{Math.round(plateHeight)} mm</text
+                >{Math.round(labelPlateHeight)} mm</text
             >
         </g>
 
@@ -195,10 +198,10 @@
         {#each holePositions as hx}
             {#if holeType.toLowerCase().includes("square")}
                 <rect
-                    x={hx - holeDiameter / 2}
-                    y={centerY - holeDiameter / 2}
-                    width={holeDiameter}
-                    height={holeDiameter}
+                    x={hx - VISUAL_HOLE_SIZE / 2}
+                    y={centerY - VISUAL_HOLE_SIZE / 2}
+                    width={VISUAL_HOLE_SIZE}
+                    height={VISUAL_HOLE_SIZE}
                     fill="none"
                     stroke="#1e1b4b"
                     stroke-width="2"
@@ -207,7 +210,7 @@
                 <circle
                     cx={hx}
                     cy={centerY}
-                    r={holeDiameter / 2}
+                    r={VISUAL_HOLE_SIZE / 2}
                     fill="none"
                     stroke="#1e1b4b"
                     stroke-width="2"
@@ -218,12 +221,12 @@
         <!-- Hole Diameter Dimension (Above first hole) -->
         {#if holePositions.length > 0}
             {@const firstHx = holePositions[0]}
-            {@const dimY_hole = centerY - holeDiameter / 2 - 40}
+            {@const dimY_hole = centerY - VISUAL_HOLE_SIZE / 2 - 40}
             <g class="dim-label">
                 <line
-                    x1={firstHx - holeDiameter / 2}
+                    x1={firstHx - VISUAL_HOLE_SIZE / 2}
                     y1={dimY_hole}
-                    x2={firstHx + holeDiameter / 2}
+                    x2={firstHx + VISUAL_HOLE_SIZE / 2}
                     y2={dimY_hole}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -231,18 +234,18 @@
                     marker-end="url(#arrow-end)"
                 />
                 <line
-                    x1={firstHx - holeDiameter / 2}
-                    y1={centerY - holeDiameter / 2 - 5}
-                    x2={firstHx - holeDiameter / 2}
+                    x1={firstHx - VISUAL_HOLE_SIZE / 2}
+                    y1={centerY - VISUAL_HOLE_SIZE / 2 - 5}
+                    x2={firstHx - VISUAL_HOLE_SIZE / 2}
                     y2={dimY_hole - 5}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <line
-                    x1={firstHx + holeDiameter / 2}
-                    y1={centerY - holeDiameter / 2 - 5}
-                    x2={firstHx + holeDiameter / 2}
+                    x1={firstHx + VISUAL_HOLE_SIZE / 2}
+                    y1={centerY - VISUAL_HOLE_SIZE / 2 - 5}
+                    x2={firstHx + VISUAL_HOLE_SIZE / 2}
                     y2={dimY_hole - 5}
                     stroke="#9ca3af"
                     stroke-width="1"
@@ -253,14 +256,14 @@
                     y={dimY_hole - 10}
                     text-anchor="middle"
                     font-size="18"
-                    fill="#1e1b4b">Ø{Math.round(holeDiameter)} mm</text
+                    fill="#1e1b4b">Ø{Math.round(labelHoleDiameter)} mm</text
                 >
             </g>
         {/if}
 
         <!-- Edge Distance Left -->
         {#if holePositions.length > 0}
-            {@const dimY_left = centerY + plateHeight / 6}
+            {@const dimY_left = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
                     x1={rectX}
@@ -273,18 +276,18 @@
                     marker-end="url(#arrow-end)"
                 />
                 <text
-                    x={rectX + edgeDistLeft / 2}
+                    x={rectX + (holePositions[0] - rectX) / 2}
                     y={dimY_left + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(edgeDistLeft)} mm</text
+                    fill="#1e1b4b">{Math.round(labelEdgeDist)} mm</text
                 >
             </g>
         {/if}
 
         <!-- Pitch (Between first two holes) -->
         {#if holePositions.length > 1}
-            {@const dimY_pitch = centerY + plateHeight / 6}
+            {@const dimY_pitch = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
                     x1={holePositions[0]}
@@ -315,23 +318,23 @@
                     stroke-dasharray="4 2"
                 />
                 <text
-                    x={holePositions[0] + pitch / 2}
+                    x={holePositions[0] + VISUAL_HOLE_SPACING / 2}
                     y={dimY_pitch + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(pitch)} mm</text
+                    fill="#1e1b4b">{Math.round(labelPitch)} mm</text
                 >
             </g>
         {/if}
 
         <!-- Edge Distance Right -->
         {#if holePositions.length > 0}
-            {@const dimY_right = centerY + plateHeight / 6}
+            {@const dimY_right = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
                     x1={holePositions[holePositions.length - 1]}
                     y1={dimY_right}
-                    x2={rectX + plateWidth}
+                    x2={rectX + visualPlateWidth}
                     y2={dimY_right}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -339,18 +342,23 @@
                     marker-end="url(#arrow-end)"
                 />
                 <text
-                    x={rectX + plateWidth - edgeDistRight / 2}
+                    x={rectX +
+                        visualPlateWidth -
+                        (rectX +
+                            visualPlateWidth -
+                            holePositions[holePositions.length - 1]) /
+                            2}
                     y={dimY_right + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(edgeDistRight)} mm</text
+                    fill="#1e1b4b">{Math.round(labelEdgeDist)} mm</text
                 >
             </g>
         {/if}
 
         <!-- Total Hole Distance -->
         {#if holePositions.length > 1}
-            {@const dimY_total = centerY + plateHeight / 3}
+            {@const dimY_total = centerY + VISUAL_PLATE_HEIGHT / 3}
             <g class="dim-label">
                 <line
                     x1={holePositions[0]}
@@ -381,11 +389,14 @@
                     stroke-dasharray="4 2"
                 />
                 <text
-                    x={holePositions[0] + totalHoleDistance / 2}
+                    x={holePositions[0] +
+                        (holePositions[holePositions.length - 1] -
+                            holePositions[0]) /
+                            2}
                     y={dimY_total + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(totalHoleDistance)} mm</text
+                    fill="#1e1b4b">{Math.round(labelTotalHoleDist)} mm</text
                 >
             </g>
         {/if}
