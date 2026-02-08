@@ -206,11 +206,8 @@
 	</main>
 
 	<!-- Dev Only Sticky QR Footer -->
-	<!-- {#if showQrFooter && qrCodeUrl} -->
-		<!-- <div
-			class="qr-footer"
-			class:expanded={isQrExpanded}
-		>
+	{#if showQrFooter && qrCodeUrl}
+		<div class="qr-footer" class:expanded={isQrExpanded}>
 			<button
 				class="qr-close-btn"
 				aria-label="Close QR code"
@@ -220,12 +217,14 @@
 				}}
 			>
 				×
-			</button> -->
+			</button>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<!-- <div
+			<div
 				class="qr-content"
-				onclick={() => (isQrExpanded = !isQrExpanded)}
+				onclick={() => {
+					if (!isQrExpanded) isQrExpanded = true;
+				}}
 			>
 				<img src={qrCodeUrl} alt="Localhost QR Code" class="qr-code" />
 				<div class="qr-text">
@@ -233,8 +232,8 @@
 					<span class="qr-subtitle">Scan to test on device</span>
 				</div>
 			</div>
-		</div> -->
-	<!-- {/if} -->
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -481,20 +480,19 @@
 	/* QR Code Footer - Only visible on wide screens in Dev mode */
 	.qr-footer {
 		position: fixed;
-		bottom: 2rem;
-		left: 2rem;
-		z-index: 2000; /* High z-index to stay on top */
-		background: rgba(20, 20, 20, 0.95);
+		bottom: 1.5rem;
+		left: 1.5rem;
+		z-index: var(--z-max);
+		background: rgba(15, 15, 15, 0.9);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		padding: 0.75rem;
-		border-radius: 12px;
-		backdrop-filter: blur(10px);
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-		animation: slideUp 0.5s ease-out;
-		display: none; /* Hidden by default, shown via media query */
+		border-radius: var(--radius-xl);
+		backdrop-filter: blur(8px);
+		box-shadow: var(--shadow-lg);
+		animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+		display: none; /* Hidden on mobile by default */
 		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-		position: relative;
+		transition: all 0.3s var(--transition-smooth);
 	}
 
 	.qr-close-btn {
@@ -574,8 +572,8 @@
 	}
 
 	.qr-footer.expanded .qr-subtitle {
-		font-size: 1.2rem;
-		opacity: 0.8;
+		font-size: 1.1rem;
+		opacity: 0.7;
 	}
 
 	.qr-footer.expanded .qr-close-btn {
