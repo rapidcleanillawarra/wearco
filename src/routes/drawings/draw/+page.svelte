@@ -340,6 +340,61 @@
 			drawingData: { ...drawingFormData },
 		});
 	}
+
+	async function sendPdfToPowerAutomate() {
+		if (
+			!pdfUrl ||
+			!templateData?.fields ||
+			!templateData.pageWidth ||
+			!templateData.pageHeight
+		) {
+			console.warn("Missing data for Power Automate export", {
+				pdfUrl: !!pdfUrl,
+				fields: !!templateData?.fields,
+				dimensions: !!(
+					templateData?.pageWidth && templateData?.pageHeight
+				),
+			});
+			return;
+		}
+
+		try {
+			console.log("Exporting PDF for Power Automate...");
+			const base64Pdf = await generatePdfAsBase64({
+				pdfUrl,
+				fieldValues: overlayFieldValues,
+				fields: templateData.fields,
+				pageWidth: templateData.pageWidth,
+				pageHeight: templateData.pageHeight,
+			});
+
+			console.log("Sending PDF to Power Automate...");
+			const powerAutomateUrl =
+				"https://default61576f99244849ec8803974b47673f.57.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dee13aab7f5d404f96eaf27662d6804c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=oGaWVW5WMyxfegKCQqJ-Z0uANoxF7Pv-pl3RoskO8Hs";
+
+			const paResponse = await fetch(powerAutomateUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					pdf: base64Pdf,
+					job_number: drawingFormData.work_order,
+				}),
+			});
+
+			if (paResponse.ok) {
+				console.log("PDF sent to Power Automate successfully");
+			} else {
+				console.error(
+					"Failed to send PDF to Power Automate:",
+					paResponse.status,
+				);
+			}
+		} catch (exportErr) {
+			console.error("Error during Power Automate PDF export:", exportErr);
+		}
+	}
 </script>
 
 <div class="page-container-dark drawings-page">
@@ -457,6 +512,18 @@
 
 							if (isSaving) return;
 
+							// Validation: job_number is required
+							if (
+								!drawingFormData.job_number ||
+								drawingFormData.job_number.trim() === ""
+							) {
+								showToaster(
+									"error",
+									"Job Number is required before saving.",
+								);
+								return;
+							}
+
 							isSaving = true;
 							console.log("Saving to database:", {
 								mode,
@@ -495,6 +562,9 @@
 											: "Drawing updated successfully",
 									);
 
+									// Trigger Power Automate export for both modes
+									sendPdfToPowerAutomate();
+
 									// Handle URL redirection for new drawings
 									if (
 										mode === "new" &&
@@ -514,72 +584,6 @@
 										goto(url.toString(), {
 											replaceState: false,
 										});
-									} else {
-										// For updates, just show success message
-										console.log(
-											"Drawing updated successfully",
-										);
-
-										// Export PDF and send to Power Automate
-										if (
-											pdfUrl &&
-											templateData?.fields &&
-											templateData.pageWidth &&
-											templateData.pageHeight
-										) {
-											try {
-												console.log(
-													"Exporting PDF for Power Automate...",
-												);
-												const base64Pdf =
-													await generatePdfAsBase64({
-														pdfUrl,
-														fieldValues:
-															overlayFieldValues,
-														fields: templateData.fields,
-														pageWidth:
-															templateData.pageWidth,
-														pageHeight:
-															templateData.pageHeight,
-													});
-
-												console.log(
-													"Sending PDF to Power Automate...",
-												);
-												const powerAutomateUrl =
-													"https://default61576f99244849ec8803974b47673f.57.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dee13aab7f5d404f96eaf27662d6804c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=oGaWVW5WMyxfegKCQqJ-Z0uANoxF7Pv-pl3RoskO8Hs";
-
-												const paResponse = await fetch(
-													powerAutomateUrl,
-													{
-														method: "POST",
-														headers: {
-															"Content-Type":
-																"application/json",
-														},
-														body: JSON.stringify({
-															pdf: base64Pdf,
-														}),
-													},
-												);
-
-												if (paResponse.ok) {
-													console.log(
-														"PDF sent to Power Automate successfully",
-													);
-												} else {
-													console.error(
-														"Failed to send PDF to Power Automate:",
-														paResponse.status,
-													);
-												}
-											} catch (exportErr) {
-												console.error(
-													"Error during Power Automate PDF export:",
-													exportErr,
-												);
-											}
-										}
 									}
 								} else {
 									console.error("Server error:", result);
