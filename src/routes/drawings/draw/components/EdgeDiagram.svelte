@@ -109,6 +109,19 @@
     let svgElement = $state<SVGSVGElement | null>(null);
 
     $effect(() => {
+        // Dependencies to trigger serialization on any change
+        const _deps = [
+            labelPlateWidth,
+            labelPlateLength,
+            holeCount,
+            labelHoleDiameter,
+            holeType,
+            labelPitch,
+            labelEdgeLeft,
+            labelEdgeRight,
+            holesSpread,
+        ];
+
         if (svgElement) {
             const serializer = new XMLSerializer();
             svgString = serializer.serializeToString(svgElement);
@@ -123,8 +136,23 @@
         xmlns="http://www.w3.org/2000/svg"
         class="dynamic-svg"
     >
-        <!-- Definitions for arrows -->
+        <!-- Definitions for arrows or styles -->
         <defs>
+            <style>
+                .dim-label text {
+                    font-family:
+                        "Inter",
+                        -apple-system,
+                        BlinkMacSystemFont,
+                        "Segoe UI",
+                        Roboto,
+                        sans-serif;
+                    font-weight: 500;
+                }
+                line {
+                    stroke-linecap: round;
+                }
+            </style>
             <marker
                 id="arrow-start"
                 viewBox="0 0 10 10"
