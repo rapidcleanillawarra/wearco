@@ -57,7 +57,8 @@
                 seenIds.add(newId);
 
                 // Normalize targetField (support legacy targetFieldf)
-                const targetField = field.targetField ?? field.targetFieldf ?? "";
+                const targetField =
+                    field.targetField ?? field.targetFieldf ?? "";
                 const { targetFieldf: _tf, ...rest } = field;
                 return { ...rest, id: newId, targetField };
             });
@@ -75,7 +76,9 @@
     });
 
     let selectedField = $derived(
-        selectedFieldId && selectedFieldId.trim() ? fields.find((f) => f.id === selectedFieldId) : null,
+        selectedFieldId && selectedFieldId.trim()
+            ? fields.find((f) => f.id === selectedFieldId)
+            : null,
     );
 
     // Sync Field ID input display when selection changes (so we show the right id when switching fields)
@@ -148,9 +151,14 @@
             return;
         }
 
-        const isDuplicate = fields.some((f) => f !== selectedField && f.id === raw);
+        const isDuplicate = fields.some(
+            (f) => f !== selectedField && f.id === raw,
+        );
         if (isDuplicate) {
-            showToaster("error", "This ID is already used by another field. Choose a unique ID.");
+            showToaster(
+                "error",
+                "This ID is already used by another field. Choose a unique ID.",
+            );
             fieldIdDisplay = selectedField.id;
             return;
         }
@@ -321,16 +329,37 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="visual_document">PDF URL</label>
+                    <label for="pdf_upload">Upload PDF Template</label>
                     <input
-                        type="text"
-                        id="visual_document"
-                        name="visual_document"
-                        bind:value={visualDocument}
-                        placeholder="/path/to/template.pdf"
+                        type="file"
+                        id="pdf_upload"
+                        name="pdf_file"
+                        accept=".pdf"
+                        onchange={(e) => {
+                            const file = e.currentTarget.files?.[0];
+                            if (file) {
+                                // We don't bind visualDocument directly to the file input,
+                                // but we can show the filename for feedback if needed.
+                                console.log("Selected file:", file.name);
+                            }
+                        }}
                     />
+                    {#if visualDocument}
+                        <div class="current-file">
+                            <small
+                                >Current file: {visualDocument
+                                    .split("/")
+                                    .pop()}</small
+                            >
+                            <input
+                                type="hidden"
+                                name="visual_document"
+                                value={visualDocument}
+                            />
+                        </div>
+                    {/if}
                     <small
-                        >Path to the PDF file in public directory or URL</small
+                        >Upload a PDF file to use as the drawing template</small
                     >
                 </div>
 
@@ -363,8 +392,11 @@
                 <button type="button" class="btn-secondary" onclick={addField}
                     >+ Add Field</button
                 >
-                <button type="button" class="btn-secondary" onclick={copyField} disabled={!selectedFieldId}
-                    >📋 Copy Field</button
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    onclick={copyField}
+                    disabled={!selectedFieldId}>📋 Copy Field</button
                 >
 
                 {#if selectedField}
@@ -380,7 +412,9 @@
                                 onblur={handleFieldIdBlur}
                                 aria-describedby="field_id_hint"
                             />
-                            <small id="field_id_hint">Unique ID; validated when you leave the field.</small>
+                            <small id="field_id_hint"
+                                >Unique ID; validated when you leave the field.</small
+                            >
                         </div>
 
                         <div class="form-group">
@@ -434,10 +468,14 @@
                                 <option value="">None</option>
                                 <option value="job_number">Job Number</option>
                                 <option value="work_order">Work Order</option>
-                                <option value="drawing_number">Drawing Number</option>
+                                <option value="drawing_number"
+                                    >Drawing Number</option
+                                >
                                 <option value="name">Name</option>
                                 <option value="customer">Customer</option>
-                                <option value="customer_source">Customer Source</option>
+                                <option value="customer_source"
+                                    >Customer Source</option
+                                >
                                 <option value="quantity">Quantity</option>
                                 <option value="dl">DL</option>
                                 <option value="checked_by">Checked By</option>
@@ -573,7 +611,7 @@
     .form-group textarea:focus {
         outline: none;
         border-color: #3b82f6;
-        ring: 2px solid rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
     .form-group small {

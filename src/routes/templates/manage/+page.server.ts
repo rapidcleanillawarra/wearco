@@ -71,12 +71,35 @@ export const actions: Actions = {
         const name = formData.get('template_name') as string;
         const category = formData.get('category') as string;
         const description = formData.get('description') as string;
-        const visual_document = formData.get('visual_document') as string;
+        let visual_document = formData.get('visual_document') as string;
         const image_display = formData.get('image_display') as string;
         const template_data_str = formData.get('template_data') as string;
+        const pdfFile = formData.get('pdf_file') as File;
 
         if (!name) {
             return fail(400, { missing: true, message: 'Template name is required' });
+        }
+
+        // Handle PDF upload if a new file is provided
+        if (pdfFile && pdfFile.size > 0 && pdfFile.name) {
+            console.log('Uploading new PDF file:', pdfFile.name);
+            const fileName = `${Date.now()}_${pdfFile.name.replace(/\s+/g, '_')}`;
+            const filePath = `templates/${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await locals.supabase.storage
+                .from('wearco')
+                .upload(filePath, pdfFile, {
+                    upsert: true,
+                    contentType: 'application/pdf'
+                });
+
+            if (uploadError) {
+                console.error('Error uploading PDF:', uploadError);
+                return fail(500, { success: false, message: 'Failed to upload PDF file' });
+            }
+
+            console.log('PDF uploaded successfully to:', filePath);
+            visual_document = filePath;
         }
 
         let template_data = {};
