@@ -21,11 +21,11 @@
 	const template = $derived(data.template);
 	const drawing = $derived(data.drawing);
 	const diagrams = $derived(data.diagrams);
-	const edgeDiagrams = $derived(
-		diagrams?.filter((d: WearcoDiagram) => d.type === "edge") || [],
-	);
-	const topDiagrams = $derived(
-		diagrams?.filter((d: WearcoDiagram) => d.type === "top_side") || [],
+	const orderedDiagrams = $derived(
+		[...(diagrams || [])].sort(
+			(a: WearcoDiagram, b: WearcoDiagram) =>
+				(a.layout_order ?? 0) - (b.layout_order ?? 0),
+		),
 	);
 	const pdfUrl = $derived(data.pdfUrl);
 
@@ -614,24 +614,16 @@
 			</div>
 		</section>
 
-		{#if diagrams && diagrams.length > 0}
-			<div class="svg-diagrams-grid">
-				<div class="diagrams-column">
-					{#each edgeDiagrams as diagram}
+		{#if orderedDiagrams && orderedDiagrams.length > 0}
+			<div class="svg-diagrams-container">
+				{#each orderedDiagrams as diagram}
+					<div class="diagram-item">
 						<FullSvgViewer
 							{diagram}
 							fieldValues={overlayFieldValues}
 						/>
-					{/each}
-				</div>
-				<div class="diagrams-column">
-					{#each topDiagrams as diagram}
-						<FullSvgViewer
-							{diagram}
-							fieldValues={overlayFieldValues}
-						/>
-					{/each}
-				</div>
+					</div>
+				{/each}
 			</div>
 		{/if}
 	</main>
@@ -786,17 +778,15 @@
 		gap: var(--spacing-md);
 	}
 
-	.svg-diagrams-grid {
+	.svg-diagrams-container {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(2, 1fr);
 		gap: var(--spacing-xl);
 		align-items: start;
 	}
 
-	.diagrams-column {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-xl);
+	.diagram-item {
+		width: 100%;
 	}
 
 	@media (max-width: 1024px) {
