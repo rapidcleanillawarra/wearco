@@ -400,10 +400,12 @@
     }
 
     .viewer-header {
-        padding: var(--spacing-lg) var(--spacing-xl);
+        padding: var(--spacing-md) var(--spacing-lg);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         background: rgba(0, 0, 0, 0.2);
     }
@@ -428,8 +430,9 @@
 
     .header-actions {
         display: flex;
-        gap: var(--spacing-xl);
+        gap: var(--spacing-md);
         align-items: center;
+        flex-wrap: wrap;
     }
 
     .zoom-controls {
@@ -485,6 +488,7 @@
     .btn-download {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         padding: 8px 16px;
         background: var(--color-gold);
@@ -494,6 +498,8 @@
         font-weight: bold;
         cursor: pointer;
         transition: all 0.2s;
+        flex: 1;
+        min-width: 120px;
     }
 
     .btn-download:hover {
@@ -513,12 +519,12 @@
     }
 
     .svg-stage {
-        padding: var(--spacing-2xl);
+        padding: var(--spacing-lg);
         background: rgba(0, 0, 0, 0.4);
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 500px;
+        min-height: 400px;
         overflow: hidden;
         position: relative;
     }
@@ -528,7 +534,7 @@
         width: 100%;
         max-width: 1200px;
         aspect-ratio: 16/9;
-        padding: var(--spacing-2xl);
+        padding: var(--spacing-lg);
         border-radius: var(--radius-lg);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         display: flex;
@@ -572,12 +578,28 @@
         animation: spin 1s linear infinite;
     }
 
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
+    @media (max-width: 640px) {
+        .viewer-header {
+            flex-direction: column;
+            align-items: flex-start;
         }
-        100% {
-            transform: rotate(360deg);
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .zoom-controls {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .btn-download {
+            width: 100%;
+        }
+
+        .svg-stage {
+            padding: var(--spacing-sm);
+            min-height: 300px;
         }
     }
 </style>
