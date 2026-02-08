@@ -9,6 +9,9 @@ export type DrawingView = {
   customer: string
   material: string
   thickness: string
+  drawingNumber: string
+  progBy: string
+  checkedBy: string
   updatedLabel: string
   quantity: number
 }

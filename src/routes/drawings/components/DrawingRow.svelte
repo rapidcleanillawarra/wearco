@@ -12,12 +12,21 @@
 		<span class="row-icon">📐</span>
 		<span class="row-name">{drawing.title}</span>
 	</span>
-	<span class="list-col code-col">{drawing.workOrder}</span>
-	<span class="list-col customer-col">{drawing.customer}</span>
-	<span class="list-col category-col">
-		<span class="category-badge">{drawing.material}</span>
+	<span class="list-col dwg-col" data-label="Dwg #"
+		>{drawing.drawingNumber}</span
+	>
+	<span class="list-col code-col" data-label="Job/Work Order"
+		>{drawing.workOrder}</span
+	>
+	<span class="list-col customer-col" data-label="Customer"
+		>{drawing.customer}</span
+	>
+	<span class="list-col category-col" data-label="Prog by">
+		<span class="category-badge">{drawing.progBy}</span>
 	</span>
-	<span class="list-col dimensions-col">{drawing.thickness}</span>
+	<span class="list-col dimensions-col" data-label="Checked by"
+		>{drawing.checkedBy}</span
+	>
 	<span class="list-col date-col">{drawing.updatedLabel}</span>
 	<span class="list-col actions-col">
 		<a
@@ -62,7 +71,7 @@
 <style>
 	.list-row {
 		display: grid;
-		grid-template-columns: 2fr 1fr 1.2fr 0.8fr 1fr 1fr 0.8fr;
+		grid-template-columns: 1.8fr 1fr 1.2fr 1.2fr 0.8fr 0.8fr 1fr 0.6fr;
 		gap: var(--spacing-md);
 		padding: var(--spacing-md) var(--spacing-lg);
 		align-items: center;

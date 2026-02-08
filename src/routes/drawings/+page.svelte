@@ -51,6 +51,9 @@
 			customer: drawing.customer || "No Customer",
 			material: drawing.material || "No Material",
 			thickness: drawing.thk || "No Thickness",
+			drawingNumber: drawing.drawing_number || "No Dwg #",
+			progBy: drawing.prog_by || "---",
+			checkedBy: drawing.checked_by || "---",
 			updatedLabel: formatDate(drawing.updated_at),
 			quantity: drawing.quantity || 1,
 		};
@@ -78,6 +81,15 @@
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase()) ||
 					item.customer
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.drawingNumber
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.progBy
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.checkedBy
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase()) ||
 					item.material
@@ -147,10 +159,11 @@
 				<div class="list-container">
 					<div class="list-header">
 						<span class="list-col name-col">Drawing</span>
+						<span class="list-col dwg-col">Dwg #</span>
 						<span class="list-col code-col">Job/Work Order</span>
 						<span class="list-col customer-col">Customer</span>
-						<span class="list-col category-col">Material</span>
-						<span class="list-col dimensions-col">Thickness</span>
+						<span class="list-col category-col">Prog by</span>
+						<span class="list-col dimensions-col">Checked by</span>
 						<span class="list-col date-col">Last Updated</span>
 						<span class="list-col actions-col">Actions</span>
 					</div>
@@ -196,7 +209,7 @@
 
 	.list-header {
 		display: grid;
-		grid-template-columns: 2fr 1fr 1.2fr 0.8fr 1fr 1fr 0.8fr;
+		grid-template-columns: 1.8fr 1fr 1.2fr 1.2fr 0.8fr 0.8fr 1fr 0.6fr;
 		gap: var(--spacing-md);
 		padding: var(--spacing-md) var(--spacing-lg);
 		background: rgba(0, 0, 0, 0.3);

@@ -14,7 +14,7 @@
 	</div>
 	<div class="card-content">
 		<h3 class="card-title">{drawing.title}</h3>
-		<p class="card-code">{drawing.workOrder}</p>
+		<p class="card-code">{drawing.drawingNumber} | {drawing.workOrder}</p>
 		<div class="card-meta">
 			<span class="meta-item">
 				<svg
@@ -48,9 +48,9 @@
 			</span>
 		</div>
 		<div class="card-dimensions">
-			<span class="dimension">{drawing.material}</span>
+			<span class="dimension">{drawing.progBy}</span>
 			<span class="separator">&bull;</span>
-			<span class="holes">{drawing.thickness}</span>
+			<span class="holes">{drawing.checkedBy}</span>
 		</div>
 	</div>
 	<div class="card-actions">
