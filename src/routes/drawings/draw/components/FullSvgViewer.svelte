@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { WearcoDiagram } from "$lib/types/svg_diagram";
+    import EdgeDiagram from "./EdgeDiagram.svelte";
 
     let { diagram, fieldValues = {} } = $props<{
         diagram: WearcoDiagram | null;
@@ -8,6 +9,7 @@
 
     // SVG Content State
     let originalSvgContent = $state<string>("");
+    let dynamicSvgContent = $state<string>("");
     let isLoadingSvg = $state(false);
 
     // Fetch SVG content whenever the diagram changes
@@ -147,10 +149,12 @@
     }
 
     async function handleDownload() {
-        if (!updatedSvgContent) return;
+        const content =
+            diagram?.type === "edge" ? dynamicSvgContent : updatedSvgContent;
+        if (!content) return;
 
         try {
-            const blob = new Blob([updatedSvgContent], {
+            const blob = new Blob([content], {
                 type: "image/svg+xml",
             });
             const url = window.URL.createObjectURL(blob);
@@ -271,6 +275,14 @@
                     <div class="loading-overlay">
                         <span class="spinner"></span>
                         <span>Loading SVG...</span>
+                    </div>
+                {:else if diagram?.type === "edge"}
+                    <div class="inline-svg-container" draggable="false">
+                        <EdgeDiagram
+                            {fieldValues}
+                            name={diagram.name}
+                            bind:svgString={dynamicSvgContent}
+                        />
                     </div>
                 {:else if updatedSvgContent}
                     <div class="inline-svg-container" draggable="false">
