@@ -43,13 +43,17 @@
     }
 
     // --- Dynamic Parameters from fieldValues (USED FOR LABELS ONLY) ---
-    let labelPlateWidth = $derived(getVal(["width", "centerEdge-width"], 2000));
-    let labelPlateHeight = $derived(getVal(["height", "plate_h"], 400));
-    let holeCount = $derived(getVal(["hole_count", "holes", "qty"], 20));
-    let labelHoleDiameter = $derived(
-        getVal(["diameter", "dia", "hole_size"], 20),
+    let labelPlateWidth = $derived(getVal(["width", "centerEdge-width"], 0));
+    let labelPlateLength = $derived(getVal(["height", "centerEdge-length"], 0));
+    let holeCount = $derived(
+        getVal(["hole_count", "centerEdge-holeCount", "qty"], 0),
     );
-    let holeType = $derived(getVal(["hole_type", "shape"], "circle")); // 'Circle' or 'Square'
+    let labelHoleDiameter = $derived(
+        getVal(["diameter", "dia", "hole_size"], 0),
+    );
+    let holeType = $derived(
+        getVal(["hole_type", "centerEdge-holeType", "shape"], "circle"),
+    ); // 'Circle' or 'Square'
 
     // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
@@ -192,7 +196,7 @@
                 font-size="20"
                 fill="#1e1b4b"
                 transform="rotate(-90, {rectX - 30}, {centerY})"
-                >{Math.round(labelPlateHeight)} mm</text
+                >{Math.round(labelPlateLength)} mm</text
             >
         </g>
 
