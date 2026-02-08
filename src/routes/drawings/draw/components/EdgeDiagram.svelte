@@ -2,58 +2,50 @@
     /**
      * EdgeDiagram.svelte
      * Generates a dynamic SVG for "edge" type diagrams.
-     * Logic is driven by fieldValues from the PDF overlay.
+     * Logic is driven strictly by mapped variables from the database.
      */
 
     let {
         fieldValues = {},
+        variables = {},
         name = "Edge Diagram",
         svgString = $bindable(""),
     } = $props<{
         fieldValues?: Record<string, string>;
+        variables?: Record<string, string>;
         name?: string;
         svgString?: string;
     }>();
 
-    // Helper to find field values by searching labels or common patterns
-    function getVal(keywords: string[], defaultValue: any): any {
-        // In a real scenario, we might have a mapping of field IDs to types.
-        // For now, we'll scan the values for common naming patterns or just use a default.
-        // We can also assume specific field IDs if they are standard across templates.
+    /**
+     * Helper to find field values strictly using the mapping.
+     */
+    function getVal(internalKey: string, defaultValue: any): any {
+        const sourceKey = variables[internalKey];
+        if (!sourceKey) return defaultValue;
 
-        // Let's look for keys that contain any of the keywords (case insensitive)
-        const entry = (Object.entries(fieldValues) as [string, string][]).find(
-            ([id, val]) => {
-                const lowerId = id.toLowerCase();
-                return keywords.some((k: string) =>
-                    lowerId.includes(k.toLowerCase()),
-                );
-            },
-        );
-
-        if (entry) {
-            const [_, val] = entry;
+        const val = fieldValues[sourceKey];
+        if (val !== undefined) {
             if (typeof defaultValue === "number") {
                 const num = parseFloat(val);
                 return isNaN(num) ? defaultValue : num;
             }
             return val;
         }
+
         return defaultValue;
     }
 
-    // --- Dynamic Parameters from fieldValues (USED FOR LABELS ONLY) ---
-    let labelPlateWidth = $derived(getVal(["width", "centerEdge-width"], 0));
-    let labelPlateLength = $derived(getVal(["height", "centerEdge-length"], 0));
-    let holeCount = $derived(
-        getVal(["hole_count", "centerEdge-holeCount", "qty"], 0),
-    );
-    let labelHoleDiameter = $derived(
-        getVal(["diameter", "dia", "hole_size"], 0),
-    );
-    let holeType = $derived(
-        getVal(["hole_type", "centerEdge-holeType", "shape"], "circle"),
-    ); // 'Circle' or 'Square'
+    // --- Static Internal Keys (Map to variables column in database) ---
+    let labelPlateWidth = $derived(getVal("width", 0));
+    let labelPlateLength = $derived(getVal("length", 0));
+    let holeCount = $derived(getVal("hole_count", 0));
+    let labelHoleDiameter = $derived(getVal("hole_diameter", 0));
+    let holeType = $derived(getVal("hole_type", "circle")); // 'Circle' or 'Square'
+    let labelPitch = $derived(getVal("pitch", 0));
+    let labelEdgeLeft = $derived(getVal("edge_left", 0));
+    let labelEdgeRight = $derived(getVal("edge_right", 0));
+    let holesSpread = $derived(getVal("holes_spread", 0));
 
     // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
@@ -89,21 +81,6 @@
             (_, i) => rectX + VISUAL_EDGE_PADDING + i * VISUAL_HOLE_SPACING,
         );
     });
-
-    // Label Value Calculations (Direct lookups from fieldValues)
-    let labelPitch = $derived(getVal(["pitch", "centerEdge-pitch"], 0));
-    let labelEdgeLeft = $derived(
-        getVal(["edge_left", "left_dist", "centerEdge-leftEdge"], 0),
-    );
-    let labelEdgeRight = $derived(
-        getVal(["edge_right", "right_dist", "centerEdge-rightEdge"], 0),
-    );
-    let holesSpread = $derived(
-        getVal(
-            ["total_dist", "span", "holes_spread", "centerEdge-totalHoleDist"],
-            0,
-        ),
-    );
 
     // Expose the SVG string for downloading or other uses
     let svgElement = $state<SVGSVGElement | null>(null);

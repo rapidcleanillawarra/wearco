@@ -280,6 +280,7 @@
                     <div class="inline-svg-container" draggable="false">
                         <EdgeDiagram
                             {fieldValues}
+                            variables={diagram.variables}
                             name={diagram.name}
                             bind:svgString={dynamicSvgContent}
                         />
