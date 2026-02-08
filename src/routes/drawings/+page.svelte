@@ -22,6 +22,8 @@
 
 	let showModal = $state(false);
 	let selectedTemplateId: string | null = $state(null);
+	let searchQuery = $state("");
+	let selectedCustomer = $state("All Customers");
 
 	const dateFormatter = new Intl.DateTimeFormat("en-US", {
 		month: "short",
@@ -40,11 +42,12 @@
 	function formatDrawing(drawing: WearcoDrawing): DrawingView {
 		return {
 			id: drawing.id,
-			title:
-				drawing.name ||
-				drawing.drawing_number ||
-				`Drawing ${drawing.id.slice(0, 8)}`,
-			jobNumber: drawing.job_number || drawing.work_order || "No Job #",
+			title: drawing.job_number || "No Job #",
+			workOrder:
+				drawing.work_order ||
+				drawing.customer_source ||
+				"No Work Order",
+			jobNumber: drawing.job_number || "No Job #",
 			customer: drawing.customer || "No Customer",
 			material: drawing.material || "No Material",
 			thickness: drawing.thk || "No Thickness",
@@ -53,8 +56,40 @@
 		};
 	}
 
+	const allCustomers = $derived([
+		"All Customers",
+		...new Set(
+			drawings
+				.map((d: WearcoDrawing) => d.customer)
+				.filter((c: string | null): c is string => Boolean(c))
+				.sort(),
+		),
+	] as string[]);
+
 	const drawingItems = $derived(
-		drawings.map((drawing: WearcoDrawing) => formatDrawing(drawing)),
+		drawings
+			.map((drawing: WearcoDrawing) => formatDrawing(drawing))
+			.filter((item: DrawingView) => {
+				const matchesSearch =
+					item.title
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.workOrder
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.customer
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					item.material
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase());
+
+				const matchesCustomer =
+					selectedCustomer === "All Customers" ||
+					item.customer === selectedCustomer;
+
+				return matchesSearch && matchesCustomer;
+			}),
 	);
 
 	function openModal() {
@@ -87,7 +122,13 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="page-container-dark drawings-page">
-	<DrawingsHeader bind:viewMode onOpenModal={openModal} />
+	<DrawingsHeader
+		bind:viewMode
+		bind:searchQuery
+		bind:selectedCustomer
+		customers={allCustomers}
+		onOpenModal={openModal}
+	/>
 
 	<main class="templates-main">
 		{#if loadError}

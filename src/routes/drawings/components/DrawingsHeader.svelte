@@ -1,11 +1,23 @@
 <script lang="ts">
+	import SearchableSelect from "$lib/components/SearchableSelect.svelte";
+
 	let {
 		viewMode = $bindable(),
+		searchQuery = $bindable(),
+		selectedCustomer = $bindable(),
+		customers = [],
 		onOpenModal,
 	} = $props<{
 		viewMode: "card" | "list";
+		searchQuery: string;
+		selectedCustomer: string;
+		customers: string[];
 		onOpenModal: () => void;
 	}>();
+
+	const customerOptions = $derived(
+		customers.map((c) => ({ id: c, label: c })),
+	);
 </script>
 
 <header class="page-header">
@@ -14,6 +26,36 @@
 			<h1 class="title-gradient">Drawings</h1>
 			<p class="subtitle">Manage your drawings and work orders</p>
 		</div>
+
+		<div class="filters-section">
+			<div class="search-box">
+				<svg
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<circle cx="11" cy="11" r="8" />
+					<line x1="21" y1="21" x2="16.65" y2="16.65" />
+				</svg>
+				<input
+					type="text"
+					placeholder="Search drawings..."
+					bind:value={searchQuery}
+				/>
+			</div>
+
+			<div class="customer-filter">
+				<SearchableSelect
+					bind:value={selectedCustomer}
+					options={customerOptions}
+					placeholder="All Customers"
+				/>
+			</div>
+		</div>
+
 		<div class="header-actions">
 			<div class="view-toggle">
 				<button
@@ -76,6 +118,50 @@
 </header>
 
 <style>
+	.filters-section {
+		display: flex;
+		gap: var(--spacing-md);
+		flex: 1;
+		max-width: 600px;
+	}
+
+	.search-box {
+		position: relative;
+		flex: 1.5;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-box svg {
+		position: absolute;
+		left: 12px;
+		color: var(--color-gray);
+		pointer-events: none;
+	}
+
+	.search-box input {
+		width: 100%;
+		padding: 10px 12px 10px 40px;
+		background: rgba(255, 255, 255, 0.05);
+		border: var(--border-light);
+		border-radius: var(--radius-lg);
+		color: var(--color-white);
+		font-size: var(--font-size-sm);
+		transition: var(--transition-smooth);
+	}
+
+	.search-box input:focus {
+		outline: none;
+		background: rgba(255, 255, 255, 0.08);
+		border-color: var(--color-gold);
+		box-shadow: 0 0 0 3px rgba(250, 194, 17, 0.1);
+	}
+
+	.customer-filter {
+		flex: 1;
+		min-width: 200px;
+	}
+
 	.view-toggle {
 		display: flex;
 		background: rgba(255, 255, 255, 0.05);
@@ -107,5 +193,27 @@
 		background: var(--color-gold);
 		color: var(--color-black);
 		box-shadow: var(--shadow-gold);
+	}
+
+	@media (max-width: 1024px) {
+		.header-content {
+			flex-direction: column;
+			align-items: stretch;
+			gap: var(--spacing-lg);
+		}
+
+		.filters-section {
+			max-width: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.filters-section {
+			flex-direction: column;
+		}
+
+		.customer-filter {
+			min-width: 0;
+		}
 	}
 </style>

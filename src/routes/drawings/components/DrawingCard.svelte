@@ -14,7 +14,7 @@
 	</div>
 	<div class="card-content">
 		<h3 class="card-title">{drawing.title}</h3>
-		<p class="card-code">{drawing.jobNumber}</p>
+		<p class="card-code">{drawing.workOrder}</p>
 		<div class="card-meta">
 			<span class="meta-item">
 				<svg
@@ -72,22 +72,6 @@
 			</svg>
 			Edit
 		</a>
-		<button class="action-btn duplicate-btn">
-			<svg
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-				<path
-					d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-				/>
-			</svg>
-			Duplicate
-		</button>
 	</div>
 </article>
 
@@ -142,7 +126,6 @@
 
 	.thumbnail-icon {
 		font-size: 3rem;
-		filter: grayscale(20%);
 		transition: var(--transition-normal);
 	}
 

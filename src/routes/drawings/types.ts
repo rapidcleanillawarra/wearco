@@ -4,6 +4,7 @@ import type { WearcoDiagram } from '$lib/types/svg_diagram';
 export type DrawingView = {
   id: string
   title: string
+  workOrder: string
   jobNumber: string
   customer: string
   material: string
