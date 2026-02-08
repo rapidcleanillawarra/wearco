@@ -95,6 +95,32 @@
     let startMousePos = $state({ x: 0, y: 0 });
     let startPanOffset = $state({ x: 0, y: 0 });
 
+    // Touch State
+    let initialPinchDistance = $state(0);
+    let initialZoom = $state(1);
+    let isTouching = $state(false);
+    let startTouchPos = $state({ x: 0, y: 0 });
+    let stageElement = $state<HTMLElement | null>(null);
+
+    $effect(() => {
+        const el = stageElement;
+        if (!el) return;
+
+        el.addEventListener("touchstart", handleTouchStart, {
+            passive: false,
+        });
+        el.addEventListener("touchmove", handleTouchMove, {
+            passive: false,
+        });
+        el.addEventListener("touchend", handleTouchEnd);
+
+        return () => {
+            el.removeEventListener("touchstart", handleTouchStart);
+            el.removeEventListener("touchmove", handleTouchMove);
+            el.removeEventListener("touchend", handleTouchEnd);
+        };
+    });
+
     const MIN_ZOOM = 0.5;
     const MAX_ZOOM = 5;
     const ZOOM_STEP = 0.1;
@@ -146,6 +172,64 @@
 
     function stopDragging() {
         isDragging = false;
+    }
+
+    // Touch Handlers
+    function handleTouchStart(event: TouchEvent) {
+        isTouching = true;
+        if (event.touches.length === 1) {
+            // Single touch for panning
+            const touch = event.touches[0];
+            startTouchPos = { x: touch.clientX, y: touch.clientY };
+            startPanOffset = { ...panOffset };
+        } else if (event.touches.length === 2) {
+            // Two touches for pinching
+            const dist = Math.hypot(
+                event.touches[0].clientX - event.touches[1].clientX,
+                event.touches[0].clientY - event.touches[1].clientY,
+            );
+            initialPinchDistance = dist;
+            initialZoom = zoomLevel;
+        }
+    }
+
+    function handleTouchMove(event: TouchEvent) {
+        if (!isTouching) return;
+
+        if (event.touches.length === 1) {
+            // Pan
+            const touch = event.touches[0];
+            const dx = touch.clientX - startTouchPos.x;
+            const dy = touch.clientY - startTouchPos.y;
+
+            panOffset = {
+                x: startPanOffset.x + dx,
+                y: startPanOffset.y + dy,
+            };
+
+            // Prevent scrolling when panning (if zoomed)
+            if (zoomLevel > 1) {
+                event.preventDefault();
+            }
+        } else if (event.touches.length === 2) {
+            // Pinch to zoom
+            event.preventDefault(); // Always prevent scrolling when pinching
+            const dist = Math.hypot(
+                event.touches[0].clientX - event.touches[1].clientX,
+                event.touches[0].clientY - event.touches[1].clientY,
+            );
+
+            if (initialPinchDistance > 0) {
+                const ratio = dist / initialPinchDistance;
+                const newZoom = initialZoom * ratio;
+                zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+            }
+        }
+    }
+
+    function handleTouchEnd() {
+        isTouching = false;
+        initialPinchDistance = 0;
     }
 
     async function handleDownload() {
@@ -336,12 +420,14 @@
         </div>
 
         <div
+            bind:this={stageElement}
             class="svg-stage"
             onwheel={handleWheel}
             onmousedown={handleMouseDown}
             onmousemove={handleMouseMove}
             onmouseup={stopDragging}
             onmouseleave={stopDragging}
+            onkeydown={() => {}}
             role="application"
             aria-label="SVG Viewer Stage"
             style="cursor: {isDragging
