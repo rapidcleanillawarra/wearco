@@ -792,8 +792,7 @@
     }
 
     .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .form-group select {
         background: #1e293b;
         border: 1px solid #334155;
         color: white;
@@ -804,21 +803,11 @@
     }
 
     .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
+    .form-group select:focus {
         outline: none;
         border-color: #3b82f6;
     }
 
-    .form-group textarea {
-        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-        resize: vertical;
-        min-height: 200px;
-    }
-
-    .form-group textarea.error {
-        border-color: #ef4444;
-    }
 
     .json-editor {
         position: relative;

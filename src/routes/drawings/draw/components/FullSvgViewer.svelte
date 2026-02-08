@@ -174,6 +174,16 @@
         isDragging = false;
     }
 
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === "+" || event.key === "=") {
+            zoomIn();
+        } else if (event.key === "-" || event.key === "_") {
+            zoomOut();
+        } else if (event.key === "0" || event.key === "r") {
+            resetZoom();
+        }
+    }
+
     // Touch Handlers
     function handleTouchStart(event: TouchEvent) {
         isTouching = true;
@@ -419,6 +429,7 @@
             </div>
         </div>
 
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <div
             bind:this={stageElement}
             class="svg-stage"
@@ -427,9 +438,10 @@
             onmousemove={handleMouseMove}
             onmouseup={stopDragging}
             onmouseleave={stopDragging}
-            onkeydown={() => {}}
+            onkeydown={handleKeyDown}
             role="application"
             aria-label="SVG Viewer Stage"
+            tabindex="0"
             style="cursor: {isDragging
                 ? 'grabbing'
                 : zoomLevel > 1 || panOffset.x !== 0 || panOffset.y !== 0
