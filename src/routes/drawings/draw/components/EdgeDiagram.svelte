@@ -90,15 +90,19 @@
         );
     });
 
-    // Label Value Calculations (Proportional mapping for sub-dimensions)
-    let labelPitch = $derived(
-        holeCount > 1 ? labelPlateWidth / (holeCount + 1) : 0,
-    ); // Simplified pitch label
-    let labelEdgeDist = $derived(labelPlateWidth / (holeCount + 1)); // Simplified edge dist label
-    let labelTotalHoleDist = $derived(
-        holeCount > 1
-            ? (labelPlateWidth / (holeCount + 1)) * (holeCount - 1)
-            : 0,
+    // Label Value Calculations (Direct lookups from fieldValues)
+    let labelPitch = $derived(getVal(["pitch", "centerEdge-pitch"], 0));
+    let labelEdgeLeft = $derived(
+        getVal(["edge_left", "left_dist", "centerEdge-leftEdge"], 0),
+    );
+    let labelEdgeRight = $derived(
+        getVal(["edge_right", "right_dist", "centerEdge-rightEdge"], 0),
+    );
+    let holesSpread = $derived(
+        getVal(
+            ["total_dist", "span", "holes_spread", "centerEdge-totalHoleDist"],
+            0,
+        ),
     );
 
     // Expose the SVG string for downloading or other uses
@@ -286,7 +290,7 @@
                     y={dimY_left + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(labelEdgeDist)} mm</text
+                    fill="#1e1b4b">{Math.round(labelEdgeLeft)} mm</text
                 >
             </g>
         {/if}
@@ -357,7 +361,7 @@
                     y={dimY_right + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(labelEdgeDist)} mm</text
+                    fill="#1e1b4b">{Math.round(labelEdgeRight)} mm</text
                 >
             </g>
         {/if}
@@ -402,7 +406,7 @@
                     y={dimY_total + 20}
                     text-anchor="middle"
                     font-size="16"
-                    fill="#1e1b4b">{Math.round(labelTotalHoleDist)} mm</text
+                    fill="#1e1b4b">{Math.round(holesSpread)} mm</text
                 >
             </g>
         {/if}
