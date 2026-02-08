@@ -15,11 +15,10 @@ interface ExportOptions {
 }
 
 /**
- * Generates a PDF with the template and overlay values embedded as text
+ * Generates a jsPDF instance with the template and overlay values
  */
-export async function exportPdfWithOverlay(options: ExportOptions): Promise<void> {
+async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
     const {
-        filename = 'edge-template-filled.pdf',
         pdfUrl,
         fieldValues,
         fields,
@@ -68,7 +67,7 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
         // Convert canvas to image
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-        // Create jsPDF document (A4 size by default)
+        // Create jsPDF document (orientated landscape by default for templates)
         const pdfDoc = new jsPDF({
             orientation: 'landscape',
             unit: 'pt',
@@ -135,11 +134,45 @@ export async function exportPdfWithOverlay(options: ExportOptions): Promise<void
             }
         }
 
-        // Download the PDF
-        pdfDoc.save(filename);
-
         // Cleanup
         URL.revokeObjectURL(pdfUrl2);
+
+        return pdfDoc;
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Generates a PDF with the template and overlay values and downloads it
+ */
+export async function exportPdfWithOverlay(options: ExportOptions): Promise<void> {
+    const {
+        filename = 'edge-template-filled.pdf'
+    } = options;
+
+    try {
+        const pdfDoc = await generatePdfDoc(options);
+        // Download the PDF
+        pdfDoc.save(filename);
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Generates a PDF as a base64 string
+ */
+export async function generatePdfAsBase64(options: ExportOptions): Promise<string> {
+    try {
+        const pdfDoc = await generatePdfDoc(options);
+        // dataurlstring includes the prefix (data:application/pdf;filename=generated.pdf;base64,)
+        // but Power Automate often expects just the content bytes or a clean data URI.
+        // We'll return the base64 content part.
+        const dataUrl = pdfDoc.output('datauristring');
+        // Extract base64 part
+        const base64Content = dataUrl.split(',')[1];
+        return base64Content;
     } catch (error) {
         throw error;
     }

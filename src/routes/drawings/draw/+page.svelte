@@ -11,7 +11,10 @@
 	import PdfOverlay from "./components/PdfOverlay.svelte";
 	import SvgDiagramViewer from "./components/SvgDiagramViewer.svelte";
 	import FullSvgViewer from "./components/FullSvgViewer.svelte";
-	import { exportPdfWithOverlay } from "./utils/pdfExport";
+	import {
+		exportPdfWithOverlay,
+		generatePdfAsBase64,
+	} from "./utils/pdfExport";
 	import type { WearcoDiagram } from "$lib/types/svg_diagram";
 
 	let { data } = $props<{
@@ -516,6 +519,67 @@
 										console.log(
 											"Drawing updated successfully",
 										);
+
+										// Export PDF and send to Power Automate
+										if (
+											pdfUrl &&
+											templateData?.fields &&
+											templateData.pageWidth &&
+											templateData.pageHeight
+										) {
+											try {
+												console.log(
+													"Exporting PDF for Power Automate...",
+												);
+												const base64Pdf =
+													await generatePdfAsBase64({
+														pdfUrl,
+														fieldValues:
+															overlayFieldValues,
+														fields: templateData.fields,
+														pageWidth:
+															templateData.pageWidth,
+														pageHeight:
+															templateData.pageHeight,
+													});
+
+												console.log(
+													"Sending PDF to Power Automate...",
+												);
+												const powerAutomateUrl =
+													"https://default61576f99244849ec8803974b47673f.57.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dee13aab7f5d404f96eaf27662d6804c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=oGaWVW5WMyxfegKCQqJ-Z0uANoxF7Pv-pl3RoskO8Hs";
+
+												const paResponse = await fetch(
+													powerAutomateUrl,
+													{
+														method: "POST",
+														headers: {
+															"Content-Type":
+																"application/json",
+														},
+														body: JSON.stringify({
+															pdf: base64Pdf,
+														}),
+													},
+												);
+
+												if (paResponse.ok) {
+													console.log(
+														"PDF sent to Power Automate successfully",
+													);
+												} else {
+													console.error(
+														"Failed to send PDF to Power Automate:",
+														paResponse.status,
+													);
+												}
+											} catch (exportErr) {
+												console.error(
+													"Error during Power Automate PDF export:",
+													exportErr,
+												);
+											}
+										}
 									}
 								} else {
 									console.error("Server error:", result);
