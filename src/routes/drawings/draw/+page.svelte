@@ -5,6 +5,8 @@
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
+	import { deserialize } from "$app/forms";
+	import type { ActionResult } from "@sveltejs/kit";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
 	import SvgDiagramViewer from "./components/SvgDiagramViewer.svelte";
@@ -475,11 +477,13 @@
 									},
 								);
 
-								const result = await response.json();
+								const responseText = await response.text();
+								const result = deserialize(
+									responseText,
+								) as ActionResult;
 
 								if (result.type === "success") {
-									// Parse the actual action data from the result.data string
-									const actionData = JSON.parse(result.data);
+									const actionData = result.data as any;
 
 									showToaster(
 										"success",
@@ -515,9 +519,20 @@
 									}
 								} else {
 									console.error("Server error:", result);
+									let errorMessage = "Unknown error";
+									if (result.type === "failure") {
+										errorMessage =
+											(result.data?.message as string) ||
+											"Validation failed";
+									} else if (result.type === "error") {
+										errorMessage =
+											result.error?.message ||
+											"Server error";
+									}
+
 									showToaster(
 										"error",
-										`Failed to save drawing: ${result?.error?.message || "Unknown error"}`,
+										`Failed to save drawing: ${errorMessage}`,
 									);
 								}
 							} catch (error) {
