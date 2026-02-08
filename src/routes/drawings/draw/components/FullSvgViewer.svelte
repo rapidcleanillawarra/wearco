@@ -170,6 +170,68 @@
             alert("Failed to download SVG.");
         }
     }
+
+    async function handlePrint() {
+        const content =
+            diagram?.type === "edge" ? dynamicSvgContent : updatedSvgContent;
+        if (!content) return;
+
+        // Create a hidden iframe for printing to avoid popup blockers and extra windows
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+
+        const iframeDoc = iframe.contentWindow?.document;
+        if (!iframeDoc) return;
+
+        iframeDoc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print ${diagram?.name || "Diagram"}</title>
+                <style>
+                    @page {
+                        size: A4 landscape;
+                        margin: 0;
+                    }
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    body {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        background: white;
+                    }
+                    svg {
+                        max-width: 95%;
+                        max-height: 95%;
+                        width: auto;
+                        height: auto;
+                    }
+                </style>
+            </head>
+            <body>
+                ${content}
+            </body>
+            </html>
+        `);
+        iframeDoc.close();
+
+        // Wait for images/styles to load within the iframe if any (though SVGs are usually instant)
+        setTimeout(() => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+
+            // Clean up after print dialog is closed
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }, 500);
+    }
 </script>
 
 {#if diagram}
@@ -248,6 +310,27 @@
                         <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     Download
+                </button>
+
+                <button
+                    class="btn-download btn-secondary-header"
+                    onclick={handlePrint}
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path
+                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                        />
+                        <rect x="6" y="14" width="12" height="8" />
+                    </svg>
+                    Print
                 </button>
             </div>
         </div>
@@ -416,6 +499,17 @@
     .btn-download:hover {
         transform: scale(1.05);
         box-shadow: 0 0 15px rgba(var(--color-gold-rgb), 0.4);
+    }
+
+    .btn-secondary-header {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary-header:hover {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
     }
 
     .svg-stage {
