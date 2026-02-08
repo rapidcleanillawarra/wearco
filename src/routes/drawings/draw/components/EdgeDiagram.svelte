@@ -46,7 +46,9 @@
     let labelPlateWidth = $derived(getVal(["width", "centerEdge-width"], 2000));
     let labelPlateHeight = $derived(getVal(["height", "plate_h"], 400));
     let holeCount = $derived(getVal(["hole_count", "holes", "qty"], 20));
-    let labelHoleDiameter = $derived(getVal(["diameter", "hole_size"], 20));
+    let labelHoleDiameter = $derived(
+        getVal(["diameter", "dia", "hole_size"], 20),
+    );
     let holeType = $derived(getVal(["hole_type", "shape"], "circle")); // 'Circle' or 'Square'
 
     // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
@@ -153,9 +155,9 @@
         <!-- Overall Width Dimension -->
         <g class="dim-label">
             <line
-                x1={rectX}
+                x1={rectX + 2}
                 y1={rectY - 20}
-                x2={rectX + visualPlateWidth}
+                x2={rectX + visualPlateWidth - 2}
                 y2={rectY - 20}
                 stroke="#1e1b4b"
                 stroke-width="1"
@@ -175,9 +177,9 @@
         <g class="dim-label">
             <line
                 x1={rectX - 20}
-                y1={rectY}
+                y1={rectY + 2}
                 x2={rectX - 20}
-                y2={rectY + VISUAL_PLATE_HEIGHT}
+                y2={rectY + VISUAL_PLATE_HEIGHT - 2}
                 stroke="#1e1b4b"
                 stroke-width="1"
                 marker-start="url(#arrow-start)"
@@ -224,9 +226,9 @@
             {@const dimY_hole = centerY - VISUAL_HOLE_SIZE / 2 - 40}
             <g class="dim-label">
                 <line
-                    x1={firstHx - VISUAL_HOLE_SIZE / 2}
+                    x1={firstHx - VISUAL_HOLE_SIZE / 2 + 2}
                     y1={dimY_hole}
-                    x2={firstHx + VISUAL_HOLE_SIZE / 2}
+                    x2={firstHx + VISUAL_HOLE_SIZE / 2 - 2}
                     y2={dimY_hole}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -266,9 +268,9 @@
             {@const dimY_left = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
-                    x1={rectX}
+                    x1={rectX + 2}
                     y1={dimY_left}
-                    x2={holePositions[0]}
+                    x2={holePositions[0] - 2}
                     y2={dimY_left}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -290,9 +292,9 @@
             {@const dimY_pitch = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
-                    x1={holePositions[0]}
+                    x1={holePositions[0] + 2}
                     y1={dimY_pitch}
-                    x2={holePositions[1]}
+                    x2={holePositions[1] - 2}
                     y2={dimY_pitch}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -332,9 +334,9 @@
             {@const dimY_right = centerY + VISUAL_PLATE_HEIGHT / 6}
             <g class="dim-label">
                 <line
-                    x1={holePositions[holePositions.length - 1]}
+                    x1={holePositions[holePositions.length - 1] + 2}
                     y1={dimY_right}
-                    x2={rectX + visualPlateWidth}
+                    x2={rectX + visualPlateWidth - 2}
                     y2={dimY_right}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -361,9 +363,9 @@
             {@const dimY_total = centerY + VISUAL_PLATE_HEIGHT / 3}
             <g class="dim-label">
                 <line
-                    x1={holePositions[0]}
+                    x1={holePositions[0] + 2}
                     y1={dimY_total}
-                    x2={holePositions[holePositions.length - 1]}
+                    x2={holePositions[holePositions.length - 1] - 2}
                     y2={dimY_total}
                     stroke="#1e1b4b"
                     stroke-width="1"
