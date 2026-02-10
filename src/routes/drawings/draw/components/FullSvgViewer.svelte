@@ -924,6 +924,11 @@
             justify-content: space-between;
         }
 
+        .dropdown-menu {
+            right: auto;
+            left: 0;
+        }
+
         .svg-stage {
             padding: var(--spacing-sm);
             min-height: 300px;
