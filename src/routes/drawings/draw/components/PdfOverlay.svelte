@@ -80,11 +80,16 @@
                 placeholder={field.label}
             ></textarea>
         {:else if field.type === "radio"}
-            <div class="radio-group" style={getFieldStyle(field)}>
+            <div
+                class="radio-group"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+            >
                 {#each field.options || [] as option (option.value)}
                     <label
                         class="radio-option"
-                        style={getOptionStyle(option.position)}
+                        style="{getOptionStyle(
+                            option.position,
+                        )} transform: rotate({field.rotation || 0}deg);"
                     >
                         <input
                             type="radio"
