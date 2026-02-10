@@ -4,6 +4,7 @@
     import { page } from "$app/stores";
     import type { PageData } from "./$types";
     import TemplateEditor from "./components/TemplateEditor.svelte";
+    import CustomSearchableSelect from "$lib/components/CustomSearchableSelect.svelte";
 
     let { data } = $props<{
         data: PageData & { signedVisualDocumentUrl?: string | null };
@@ -483,28 +484,31 @@
 
                         <div class="form-group">
                             <label for="field_targetField">Target Field</label>
-                            <select
-                                id="field_targetField"
+                            <CustomSearchableSelect
                                 bind:value={selectedField.targetField}
-                            >
-                                <option value="">None</option>
-                                <option value="job_number">Job Number</option>
-                                <option value="work_order">Work Order</option>
-                                <option value="drawing_number"
-                                    >Drawing Number</option
-                                >
-                                <option value="name">Name</option>
-                                <option value="customer">Customer</option>
-                                <option value="customer_source"
-                                    >Customer Source</option
-                                >
-                                <option value="quantity">Quantity</option>
-                                <option value="dl">DL</option>
-                                <option value="checked_by">Checked By</option>
-                                <option value="prog_by">Prog By</option>
-                                <option value="material">Material</option>
-                                <option value="thk">THK</option>
-                            </select>
+                                options={[
+                                    { id: "", label: "None" },
+                                    { id: "job_number", label: "Job Number" },
+                                    { id: "work_order", label: "Work Order" },
+                                    {
+                                        id: "drawing_number",
+                                        label: "Drawing Number",
+                                    },
+                                    { id: "name", label: "Name" },
+                                    { id: "customer", label: "Customer" },
+                                    {
+                                        id: "customer_source",
+                                        label: "Customer Source",
+                                    },
+                                    { id: "quantity", label: "Quantity" },
+                                    { id: "dl", label: "DL" },
+                                    { id: "checked_by", label: "Checked By" },
+                                    { id: "prog_by", label: "Prog By" },
+                                    { id: "material", label: "Material" },
+                                    { id: "thk", label: "THK" },
+                                ]}
+                                placeholder="None"
+                            />
                         </div>
 
                         <div class="form-group">
