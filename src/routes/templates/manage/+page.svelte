@@ -106,6 +106,7 @@
             targetField: "",
             prefix: "",
             suffix: "",
+            rotation: 0,
         });
         selectedFieldId = newId;
     }
@@ -130,6 +131,7 @@
                 },
                 prefix: selectedField.prefix || "",
                 suffix: selectedField.suffix || "",
+                rotation: selectedField.rotation || 0,
             };
             fields.push(copiedField);
             selectedFieldId = newId;
@@ -493,6 +495,19 @@
                                 bind:value={selectedField.suffix}
                                 placeholder="Text after field value"
                             />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_rotation">Rotation</label>
+                            <select
+                                id="field_rotation"
+                                bind:value={selectedField.rotation}
+                            >
+                                <option value={0}>0° (Horizontal)</option>
+                                <option value={90}>90° (Vertical)</option>
+                                <option value={180}>180°</option>
+                                <option value={270}>270°</option>
+                            </select>
                         </div>
 
                         <button

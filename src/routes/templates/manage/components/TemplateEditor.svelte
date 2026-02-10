@@ -17,6 +17,7 @@
         targetField?: string;
         prefix?: string;
         suffix?: string;
+        rotation?: number;
     };
 
     let {
@@ -138,7 +139,7 @@
                 role="button"
                 tabindex="0"
             >
-                {#each fields as field, i (field.id + '--' + i)}
+                {#each fields as field, i (field.id + "--" + i)}
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <div
                         class="field-box"
@@ -147,6 +148,7 @@
                         style:top="{field.position.y * scaleY}px"
                         style:width="{field.position.width * scaleX}px"
                         style:height="{field.position.height * scaleY}px"
+                        style:transform="rotate({field.rotation || 0}deg)"
                         onmousedown={(e) => handleMouseDown(e, field.id)}
                     >
                         <span class="field-label" style:font-size="10px"
