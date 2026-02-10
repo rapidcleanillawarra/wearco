@@ -239,6 +239,7 @@
                 method="POST"
                 action="?/save"
                 id="template-form"
+                enctype="multipart/form-data"
                 use:enhance={({ formData }) => {
                     console.log("=== FORM SUBMITTING ===");
                     console.log("Form data entries:");
