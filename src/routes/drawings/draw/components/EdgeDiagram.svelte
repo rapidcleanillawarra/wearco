@@ -54,8 +54,8 @@
 
     // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
-    const VISUAL_HOLE_SPACING = 60; // Pixels between holes visually
-    const VISUAL_EDGE_PADDING = 80; // Padding from plate edge to first/last hole
+    const VISUAL_HOLE_SPACING = 100; // Pixels between holes visually
+    const VISUAL_EDGE_PADDING = 120; // Padding from plate edge to first/last hole
     const VISUAL_PLATE_HEIGHT = 400; // Fixed visual height of the plate
     const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
     const CANVAS_PADDING = 80; // Padding around the plate for dimensions
