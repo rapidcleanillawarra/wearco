@@ -510,6 +510,44 @@
                             </select>
                         </div>
 
+                        <div class="field-row">
+                            <div class="form-group">
+                                <label for="field_x">X Position</label>
+                                <input
+                                    type="number"
+                                    id="field_x"
+                                    bind:value={selectedField.position.x}
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label for="field_y">Y Position</label>
+                                <input
+                                    type="number"
+                                    id="field_y"
+                                    bind:value={selectedField.position.y}
+                                />
+                            </div>
+                        </div>
+
+                        <div class="field-row">
+                            <div class="form-group">
+                                <label for="field_width">Width</label>
+                                <input
+                                    type="number"
+                                    id="field_width"
+                                    bind:value={selectedField.position.width}
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label for="field_height">Height</label>
+                                <input
+                                    type="number"
+                                    id="field_height"
+                                    bind:value={selectedField.position.height}
+                                />
+                            </div>
+                        </div>
+
                         <button
                             type="button"
                             class="btn-danger"
@@ -609,6 +647,14 @@
         padding: 0.5rem;
         border-radius: 0.375rem;
         font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
     }
 
     .form-group input:focus,

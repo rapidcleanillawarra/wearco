@@ -107,8 +107,8 @@
             }
 
             // Min size constraint
-            if (width < 20) width = 20;
-            if (height < 20) height = 20;
+            if (width < 10) width = 10;
+            if (height < 10) height = 10;
 
             fields[fieldIndex] = {
                 ...field,
