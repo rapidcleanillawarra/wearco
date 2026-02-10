@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { WearcoDiagram } from "$lib/types/svg_diagram";
     import EdgeDiagram from "./EdgeDiagram.svelte";
+    import PitchesModal from "./PitchesModal.svelte";
 
     let {
         diagram,
@@ -11,6 +12,65 @@
         fieldValues?: Record<string, string>;
         onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
+
+    // SVG Configs State (for pitches)
+    let svgConfigs = $state<{
+        svg_configs: Array<{
+            template_id: string;
+            pitch_config: Array<{ from: number; to: number; label: string }>;
+        }>;
+    }>({
+        svg_configs: [],
+    });
+
+    // Initialize config if it doesn't exist for the current template
+    $effect(() => {
+        if (!diagram?.template_id) return;
+
+        const exists = svgConfigs.svg_configs.some(
+            (c) => c.template_id === diagram.template_id,
+        );
+
+        if (!exists) {
+            svgConfigs.svg_configs.push({
+                template_id: diagram.template_id,
+                pitch_config: [
+                    { from: 0, to: 1, label: "P1" },
+                    { from: 0, to: 3, label: "P2" },
+                    { from: 0, to: 5, label: "P3" },
+                    { from: 0, to: 6, label: "P4" },
+                    { from: 0, to: 8, label: "P5" },
+                    { from: 0, to: 10, label: "P6" },
+                ],
+            });
+        }
+    });
+
+    let showPitchesModal = $state(false);
+
+    // Get current pitch config for the active template
+    const currentPitchConfig = $derived.by(() => {
+        if (!diagram) return [];
+        const config = svgConfigs.svg_configs.find(
+            (c) => c.template_id === diagram.template_id,
+        );
+        return config ? config.pitch_config : [];
+    });
+
+    function updatePitchConfig(newConfigs: any[]) {
+        if (!diagram) return;
+        const index = svgConfigs.svg_configs.findIndex(
+            (c) => c.template_id === diagram.template_id,
+        );
+        if (index !== -1) {
+            svgConfigs.svg_configs[index].pitch_config = newConfigs;
+        } else {
+            svgConfigs.svg_configs.push({
+                template_id: diagram.template_id,
+                pitch_config: newConfigs,
+            });
+        }
+    }
 
     // SVG Content State
     let originalSvgContent = $state<string>("");
@@ -422,6 +482,29 @@
                     </button>
                 </div>
 
+                {#if diagram?.type === "edge"}
+                    <button
+                        class="btn-pitches"
+                        onclick={() => (showPitchesModal = true)}
+                        title="Manage Pitches"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <path d="M12 20h9" />
+                            <path
+                                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                            />
+                        </svg>
+                        <span>Pitches</span>
+                    </button>
+                {/if}
+
                 <div class="menu-container" bind:this={menuElement}>
                     <button
                         class="btn-ellipsis"
@@ -532,6 +615,7 @@
                             {fieldValues}
                             variables={diagram.variables}
                             name={diagram.name}
+                            pitchConfigs={currentPitchConfig}
                             bind:svgString={dynamicSvgContent}
                             {onFieldUpdate}
                         />
@@ -544,6 +628,14 @@
             </div>
         </div>
     </section>
+{/if}
+
+{#if showPitchesModal}
+    <PitchesModal
+        pitchConfigs={currentPitchConfig}
+        onClose={() => (showPitchesModal = false)}
+        onSave={updatePitchConfig}
+    />
 {/if}
 
 <style>
@@ -651,6 +743,25 @@
 
     .btn-reset:hover {
         color: var(--color-white);
+    }
+
+    .btn-pitches {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(var(--color-gold-rgb), 0.1);
+        color: var(--color-gold);
+        border: 1px solid rgba(var(--color-gold-rgb), 0.3);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+
+    .btn-pitches:hover {
+        background: rgba(var(--color-gold-rgb), 0.2);
+        transform: scale(1.05);
     }
 
     .btn-ellipsis {

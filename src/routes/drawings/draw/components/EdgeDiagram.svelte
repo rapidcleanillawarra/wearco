@@ -10,12 +10,21 @@
         variables = {},
         name = "Edge Diagram",
         svgString = $bindable(""),
+        pitchConfigs = [
+            { from: 0, to: 1, label: "P1" }, // Pitch 1-2
+            { from: 0, to: 3, label: "P2" }, // Pitch 1-3
+            { from: 0, to: 5, label: "P3" }, // Pitch 1-4
+            { from: 0, to: 6, label: "P4" }, // Pitch 1-5
+            { from: 0, to: 8, label: "P5" }, // Pitch 1-9
+            { from: 0, to: 10, label: "P6" },
+        ],
         onFieldUpdate,
     } = $props<{
         fieldValues?: Record<string, string>;
         variables?: Record<string, string>;
         name?: string;
         svgString?: string;
+        pitchConfigs?: { from: number; to: number; label: string }[];
         onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
 
@@ -59,19 +68,6 @@
     const VISUAL_PLATE_BASE_HEIGHT = 100; // Base visual height of the plate
     const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
     const CANVAS_PADDING = 100; // Padding around the plate for dimensions
-
-    // --- Dynamic Pitch Configuration ---
-    // User can manually edit this to change which holes are measured
-    // fromIndex: starting hole index (0-based)
-    // toIndex: ending hole index (0-based)
-    let pitchConfigs = $state([
-        { from: 0, to: 1, label: "P1" }, // Pitch 1-2
-        { from: 0, to: 3, label: "P2" }, // Pitch 1-3
-        { from: 0, to: 5, label: "P3" }, // Pitch 1-4
-        { from: 0, to: 6, label: "P4" }, // Pitch 1-5
-        { from: 0, to: 8, label: "P5" }, // Pitch 1-9
-        { from: 0, to: 10, label: "P5" }, // Pitch 1-9
-    ]);
 
     // Calculate effective hole count for visual rendering
     // It should be at least the mapped holeCount, but also enough to cover all configured pitches
