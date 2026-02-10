@@ -9,7 +9,6 @@
 	import type { ActionResult } from "@sveltejs/kit";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
-	import SvgDiagramViewer from "./components/SvgDiagramViewer.svelte";
 	import FullSvgViewer from "./components/FullSvgViewer.svelte";
 	import {
 		exportPdfWithOverlay,

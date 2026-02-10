@@ -107,6 +107,33 @@
     let startTouchPos = $state({ x: 0, y: 0 });
     let stageElement = $state<HTMLElement | null>(null);
 
+    // Menu state
+    let showMenu = $state(false);
+    let menuElement = $state<HTMLElement | null>(null);
+
+    function toggleMenu() {
+        showMenu = !showMenu;
+    }
+
+    function closeMenu() {
+        showMenu = false;
+    }
+
+    $effect(() => {
+        if (!showMenu) return;
+
+        function handleClickOutside(event: MouseEvent) {
+            if (menuElement && !menuElement.contains(event.target as Node)) {
+                closeMenu();
+            }
+        }
+
+        window.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            window.removeEventListener("mousedown", handleClickOutside);
+        };
+    });
+
     $effect(() => {
         const el = stageElement;
         if (!el) return;
@@ -395,45 +422,82 @@
                     </button>
                 </div>
 
-                <button class="btn-download" onclick={handleDownload}>
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <div class="menu-container" bind:this={menuElement}>
+                    <button
+                        class="btn-ellipsis"
+                        onclick={toggleMenu}
+                        title="More options"
                     >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    Download
-                </button>
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="1" />
+                            <circle cx="19" cy="12" r="1" />
+                            <circle cx="5" cy="12" r="1" />
+                        </svg>
+                    </button>
 
-                <button
-                    class="btn-download btn-secondary-header"
-                    onclick={handlePrint}
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <polyline points="6 9 6 2 18 2 18 9" />
-                        <path
-                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
-                        />
-                        <rect x="6" y="14" width="12" height="8" />
-                    </svg>
-                    Print
-                </button>
+                    {#if showMenu}
+                        <div class="dropdown-menu">
+                            <button
+                                class="menu-item"
+                                onclick={() => {
+                                    handleDownload();
+                                    closeMenu();
+                                }}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                                    />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Download
+                            </button>
+
+                            <button
+                                class="menu-item"
+                                onclick={() => {
+                                    handlePrint();
+                                    closeMenu();
+                                }}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <polyline points="6 9 6 2 18 2 18 9" />
+                                    <path
+                                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                                    />
+                                    <rect x="6" y="14" width="12" height="8" />
+                                </svg>
+                                Print
+                            </button>
+                        </div>
+                    {/if}
+                </div>
             </div>
         </div>
 
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <div
             bind:this={stageElement}
@@ -589,37 +653,78 @@
         color: var(--color-white);
     }
 
-    .btn-download {
+    .btn-ellipsis {
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: var(--color-gold);
-        color: var(--color-black);
-        border: none;
-        border-radius: var(--radius-lg);
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-        flex: 1;
-        min-width: 120px;
-    }
-
-    .btn-download:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 15px rgba(var(--color-gold-rgb), 0.4);
-    }
-
-    .btn-secondary-header {
         background: rgba(255, 255, 255, 0.1);
         color: var(--color-white);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        transition: all 0.2s;
     }
 
-    .btn-secondary-header:hover {
+    .btn-ellipsis:hover {
         background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+    }
+
+    .menu-container {
+        position: relative;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        min-width: 160px;
+        z-index: 1000;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.15s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: transparent;
+        color: var(--color-gray);
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-size: var(--font-size-sm);
+        transition: all 0.2s;
+    }
+
+    .menu-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--color-white);
+    }
+
+    .menu-item svg {
+        color: var(--color-gold);
     }
 
     .svg-stage {
@@ -695,10 +800,6 @@
         .zoom-controls {
             width: 100%;
             justify-content: space-between;
-        }
-
-        .btn-download {
-            width: 100%;
         }
 
         .svg-stage {
