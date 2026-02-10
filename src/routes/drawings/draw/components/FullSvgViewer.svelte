@@ -57,6 +57,22 @@
         return config ? config.pitch_config : [];
     });
 
+    const holeCount = $derived.by(() => {
+        if (!diagram?.variables) return 0;
+        const key = diagram.variables["hole_count"];
+        if (!key) return 0;
+        return parseFloat(fieldValues[key] || "0") || 0;
+    });
+
+    // Filter pitches based on holeCount for rendering/logic purposes if needed
+    // But we actually want PitchesModal to see ALL and highlight invalid ones.
+    const validPitchConfigs = $derived(
+        currentPitchConfig.filter(
+            (p: { from: number; to: number; label: string }) =>
+                p.from >= 1 && p.to > p.from && p.to <= holeCount,
+        ),
+    );
+
     function updatePitchConfig(newConfigs: any[]) {
         if (!diagram) return;
         const index = svgConfigs.svg_configs.findIndex(
@@ -633,6 +649,7 @@
 {#if showPitchesModal}
     <PitchesModal
         pitchConfigs={currentPitchConfig}
+        {holeCount}
         onClose={() => (showPitchesModal = false)}
         onSave={updatePitchConfig}
     />

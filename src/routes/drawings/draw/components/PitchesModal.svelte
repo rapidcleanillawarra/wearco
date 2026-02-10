@@ -7,10 +7,12 @@
 
     let {
         pitchConfigs = [],
+        holeCount = 0,
         onClose,
         onSave,
     } = $props<{
         pitchConfigs: PitchEntry[];
+        holeCount?: number;
         onClose: () => void;
         onSave: (configs: PitchEntry[]) => void;
     }>();
@@ -55,7 +57,11 @@
     >
         <div class="modal-header">
             <h2 class="title-gradient-sm">Manage Pitches</h2>
-            <p class="modal-subtitle">Configure pitch distances and labels</p>
+            <p class="modal-subtitle">
+                Configure pitch distances. Current holes: <span
+                    class="text-gold font-bold">{holeCount}</span
+                >
+            </p>
             <button
                 class="modal-close"
                 onclick={onClose}
@@ -92,15 +98,23 @@
                     <div class="pitch-row">
                         <input
                             type="number"
-                            class="input-base"
+                            class="input-base {pitch.from < 1 ||
+                            pitch.from > holeCount
+                                ? 'input-error'
+                                : ''}"
                             bind:value={pitch.from}
                             min="1"
+                            max={holeCount}
                         />
                         <input
                             type="number"
-                            class="input-base"
+                            class="input-base {pitch.to <= pitch.from ||
+                            pitch.to > holeCount
+                                ? 'input-error'
+                                : ''}"
                             bind:value={pitch.to}
                             min="1"
+                            max={holeCount}
                         />
                         <input
                             type="text"
@@ -127,6 +141,11 @@
                             </svg>
                         </button>
                     </div>
+                    {#if pitch.from < 1 || pitch.to > holeCount || pitch.to <= pitch.from}
+                        <p class="error-text">
+                            Invalid range. Must be 1 to {holeCount} and "To" > "From".
+                        </p>
+                    {/if}
                 {/each}
             </div>
 
@@ -232,5 +251,22 @@
         color: var(--color-gray);
         background: rgba(0, 0, 0, 0.2);
         border-radius: var(--radius-lg);
+    }
+
+    .input-error {
+        border-color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.1) !important;
+    }
+
+    .error-text {
+        font-size: 10px;
+        color: #ef4444;
+        margin-top: -4px;
+        margin-bottom: 4px;
+        padding-left: 4px;
+    }
+
+    .text-gold {
+        color: var(--color-gold);
     }
 </style>
