@@ -36,12 +36,14 @@
         pdfUrl,
         fields = $bindable([]),
         selectedFieldId = $bindable(null),
+        activeOptionIndex = $bindable(null),
         templateWidth = 842, // Default A4 landscape
         templateHeight = 595,
     } = $props<{
         pdfUrl: string | null;
         fields: Field[];
         selectedFieldId: string | null;
+        activeOptionIndex: number | null;
         templateWidth?: number;
         templateHeight?: number;
     }>();
@@ -51,7 +53,6 @@
     let isResizing = $state(false);
     let dragStart = $state({ x: 0, y: 0 });
     let activeResizeHandle = $state<string | null>(null);
-    let activeOptionIndex = $state<number | null>(null);
     let tempFieldState = $state<Partial<Field> | null>(null); // For smooth updates during drag
 
     const scaleX = $derived(
@@ -93,6 +94,7 @@
 
     function handleBackgroundClick() {
         selectedFieldId = null;
+        activeOptionIndex = null;
     }
 
     function handleMouseMove(e: MouseEvent) {

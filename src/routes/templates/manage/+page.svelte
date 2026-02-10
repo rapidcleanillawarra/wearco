@@ -20,6 +20,7 @@
     let imageDisplay = $state("");
     let fields = $state<any[]>([]);
     let selectedFieldId = $state<string | null>(null);
+    let selectedOptionIndex = $state<number | null>(null);
     let duplicateWarning = $state(false);
     let initialized = $state(false);
     /** Local value for Field ID input; only committed on blur to avoid duplicate-key crashes */
@@ -613,39 +614,111 @@
 
                         <div class="field-row">
                             <div class="form-group">
-                                <label for="field_x">X Position</label>
-                                <input
-                                    type="number"
-                                    id="field_x"
-                                    bind:value={selectedField.position.x}
-                                />
+                                <label for="field_x">
+                                    X Position
+                                    {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                        (Opt {selectedOptionIndex + 1})
+                                    {/if}
+                                </label>
+                                {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                    <input
+                                        type="number"
+                                        id="field_x"
+                                        bind:value={
+                                            selectedField.options[
+                                                selectedOptionIndex
+                                            ].position.x
+                                        }
+                                    />
+                                {:else}
+                                    <input
+                                        type="number"
+                                        id="field_x"
+                                        bind:value={selectedField.position.x}
+                                    />
+                                {/if}
                             </div>
                             <div class="form-group">
-                                <label for="field_y">Y Position</label>
-                                <input
-                                    type="number"
-                                    id="field_y"
-                                    bind:value={selectedField.position.y}
-                                />
+                                <label for="field_y">
+                                    Y Position
+                                    {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                        (Opt {selectedOptionIndex + 1})
+                                    {/if}
+                                </label>
+                                {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                    <input
+                                        type="number"
+                                        id="field_y"
+                                        bind:value={
+                                            selectedField.options[
+                                                selectedOptionIndex
+                                            ].position.y
+                                        }
+                                    />
+                                {:else}
+                                    <input
+                                        type="number"
+                                        id="field_y"
+                                        bind:value={selectedField.position.y}
+                                    />
+                                {/if}
                             </div>
                         </div>
 
                         <div class="field-row">
                             <div class="form-group">
-                                <label for="field_width">Width</label>
-                                <input
-                                    type="number"
-                                    id="field_width"
-                                    bind:value={selectedField.position.width}
-                                />
+                                <label for="field_width">
+                                    Width
+                                    {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                        (Opt {selectedOptionIndex + 1})
+                                    {/if}
+                                </label>
+                                {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                    <input
+                                        type="number"
+                                        id="field_width"
+                                        bind:value={
+                                            selectedField.options[
+                                                selectedOptionIndex
+                                            ].position.width
+                                        }
+                                    />
+                                {:else}
+                                    <input
+                                        type="number"
+                                        id="field_width"
+                                        bind:value={
+                                            selectedField.position.width
+                                        }
+                                    />
+                                {/if}
                             </div>
                             <div class="form-group">
-                                <label for="field_height">Height</label>
-                                <input
-                                    type="number"
-                                    id="field_height"
-                                    bind:value={selectedField.position.height}
-                                />
+                                <label for="field_height">
+                                    Height
+                                    {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                        (Opt {selectedOptionIndex + 1})
+                                    {/if}
+                                </label>
+                                {#if selectedField.type === "radio" && selectedOptionIndex !== null}
+                                    <input
+                                        type="number"
+                                        id="field_height"
+                                        bind:value={
+                                            selectedField.options[
+                                                selectedOptionIndex
+                                            ].position.height
+                                        }
+                                    />
+                                {:else}
+                                    <input
+                                        type="number"
+                                        id="field_height"
+                                        bind:value={
+                                            selectedField.position.height
+                                        }
+                                    />
+                                {/if}
                             </div>
                         </div>
 
@@ -668,6 +741,7 @@
                 pdfUrl={data.signedVisualDocumentUrl || visualDocument}
                 bind:fields
                 bind:selectedFieldId
+                bind:activeOptionIndex={selectedOptionIndex}
             />
         </main>
     </div>
