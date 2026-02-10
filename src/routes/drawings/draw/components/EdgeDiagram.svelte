@@ -356,13 +356,13 @@
 
         <!-- Edge Distance Left -->
         {#if holePositions.length > 0}
-            {@const dimY_left = centerY + visualPlateHeight / 6}
+            {@const dimY_top = centerY - visualPlateHeight / 4}
             <g class="dim-label">
                 <line
                     x1={rectX + 2}
-                    y1={dimY_left}
+                    y1={dimY_top}
                     x2={holePositions[0] - 2}
-                    y2={dimY_left}
+                    y2={dimY_top}
                     stroke="#1e1b4b"
                     stroke-width="1"
                     marker-start="url(#arrow-start)"
@@ -370,25 +370,25 @@
                 />
                 <line
                     x1={rectX}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={rectX}
-                    y2={dimY_left + 10}
+                    y2={dimY_top - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <line
                     x1={holePositions[0]}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={holePositions[0]}
-                    y2={dimY_left + 10}
+                    y2={dimY_top - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <text
                     x={rectX + (holePositions[0] - rectX) / 2}
-                    y={dimY_left + 20}
+                    y={dimY_top - 10}
                     text-anchor="middle"
                     font-size="16"
                     fill="#1e1b4b">{Math.round(labelEdgeLeft)} mm</text
@@ -447,13 +447,13 @@
 
         <!-- Edge Distance Right -->
         {#if holePositions.length > 0}
-            {@const dimY_right = centerY + visualPlateHeight / 6}
+            {@const dimY_top = centerY - visualPlateHeight / 4}
             <g class="dim-label">
                 <line
                     x1={holePositions[holePositions.length - 1] + 2}
-                    y1={dimY_right}
+                    y1={dimY_top}
                     x2={rectX + visualPlateWidth - 2}
-                    y2={dimY_right}
+                    y2={dimY_top}
                     stroke="#1e1b4b"
                     stroke-width="1"
                     marker-start="url(#arrow-start)"
@@ -461,18 +461,18 @@
                 />
                 <line
                     x1={holePositions[holePositions.length - 1]}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={holePositions[holePositions.length - 1]}
-                    y2={dimY_right + 10}
+                    y2={dimY_top - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <line
                     x1={rectX + visualPlateWidth}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={rectX + visualPlateWidth}
-                    y2={dimY_right + 10}
+                    y2={dimY_top - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
@@ -484,7 +484,7 @@
                             visualPlateWidth -
                             holePositions[holePositions.length - 1]) /
                             2}
-                    y={dimY_right + 20}
+                    y={dimY_top - 10}
                     text-anchor="middle"
                     font-size="16"
                     fill="#1e1b4b">{Math.round(labelEdgeRight)} mm</text
