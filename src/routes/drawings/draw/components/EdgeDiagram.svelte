@@ -11,12 +11,12 @@
         name = "Edge Diagram",
         svgString = $bindable(""),
         pitchConfigs = [
-            { from: 0, to: 1, label: "P1" }, // Pitch 1-2
-            { from: 0, to: 3, label: "P2" }, // Pitch 1-3
-            { from: 0, to: 5, label: "P3" }, // Pitch 1-4
-            { from: 0, to: 6, label: "P4" }, // Pitch 1-5
-            { from: 0, to: 8, label: "P5" }, // Pitch 1-9
-            { from: 0, to: 10, label: "P6" },
+            { from: 1, to: 2, label: "P1" }, // Pitch 1-2
+            { from: 1, to: 4, label: "P2" }, // Pitch 1-4
+            { from: 1, to: 6, label: "P3" }, // Pitch 1-6
+            { from: 1, to: 7, label: "P4" }, // Pitch 1-7
+            { from: 1, to: 9, label: "P5" }, // Pitch 1-9
+            { from: 1, to: 11, label: "P6" },
         ],
         onFieldUpdate,
     } = $props<{
@@ -405,50 +405,57 @@
 
         <!-- Dynamic Pitch Dimensions -->
         {#each pitchConfigs as config, i}
-            {#if holePositions.length > config.to}
-                {@const dimY =
-                    centerY +
-                    visualPlateHeight / 6 +
-                    i * (visualPlateHeight / 12)}
-                {@const dist = config.to - config.from}
-                <g class="dim-label">
-                    <line
-                        x1={holePositions[config.from] + 2}
-                        y1={dimY}
-                        x2={holePositions[config.to] - 2}
-                        y2={dimY}
-                        stroke="#1e1b4b"
-                        stroke-width="1"
-                        marker-start="url(#arrow-start)"
-                        marker-end="url(#arrow-end)"
-                    />
-                    <line
-                        x1={holePositions[config.from]}
-                        y1={centerY + 5}
-                        x2={holePositions[config.from]}
-                        y2={dimY + 10}
-                        stroke="#9ca3af"
-                        stroke-width="1"
-                        stroke-dasharray="4 2"
-                    />
-                    <line
-                        x1={holePositions[config.to]}
-                        y1={centerY + 5}
-                        x2={holePositions[config.to]}
-                        y2={dimY + 10}
-                        stroke="#9ca3af"
-                        stroke-width="1"
-                        stroke-dasharray="4 2"
-                    />
-                    <text
-                        x={holePositions[config.from] +
-                            (VISUAL_HOLE_SPACING * dist) / 2}
-                        y={dimY + 20}
-                        text-anchor="middle"
-                        font-size={dist > 1 ? "14" : "16"}
-                        fill="#1e1b4b">{Math.round(labelPitch * dist)} mm</text
-                    >
-                </g>
+            {#if holePositions.length >= config.to}
+                {@const fromIdx = config.from - 1}
+                {@const toIdx = config.to - 1}
+                {#if fromIdx >= 0 && toIdx < holePositions.length}
+                    {@const dimY =
+                        centerY +
+                        visualPlateHeight / 6 +
+                        i * (visualPlateHeight / 12)}
+                    {@const dist = config.to - config.from}
+                    <g class="dim-label">
+                        <line
+                            x1={holePositions[fromIdx] + 2}
+                            y1={dimY}
+                            x2={holePositions[toIdx] - 2}
+                            y2={dimY}
+                            stroke="#1e1b4b"
+                            stroke-width="1"
+                            marker-start="url(#arrow-start)"
+                            marker-end="url(#arrow-end)"
+                        />
+                        <line
+                            x1={holePositions[fromIdx]}
+                            y1={centerY + 5}
+                            x2={holePositions[fromIdx]}
+                            y2={dimY + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <line
+                            x1={holePositions[toIdx]}
+                            y1={centerY + 5}
+                            x2={holePositions[toIdx]}
+                            y2={dimY + 10}
+                            stroke="#9ca3af"
+                            stroke-width="1"
+                            stroke-dasharray="4 2"
+                        />
+                        <text
+                            x={holePositions[fromIdx] +
+                                (holePositions[toIdx] -
+                                    holePositions[fromIdx]) /
+                                    2}
+                            y={dimY + 20}
+                            text-anchor="middle"
+                            font-size={dist > 1 ? "14" : "16"}
+                            fill="#1e1b4b"
+                            >{Math.round(labelPitch * dist)} mm</text
+                        >
+                    </g>
+                {/if}
             {/if}
         {/each}
 

@@ -24,7 +24,7 @@
     function addPitch() {
         localConfigs = [
             ...localConfigs,
-            { from: 0, to: 1, label: `P${localConfigs.length + 1}` },
+            { from: 1, to: 2, label: `P${localConfigs.length + 1}` },
         ];
     }
 
@@ -94,13 +94,13 @@
                             type="number"
                             class="input-base"
                             bind:value={pitch.from}
-                            min="0"
+                            min="1"
                         />
                         <input
                             type="number"
                             class="input-base"
                             bind:value={pitch.to}
-                            min="0"
+                            min="1"
                         />
                         <input
                             type="text"
