@@ -25,14 +25,15 @@
     });
 
     function addPitch() {
+        const lastTo =
+            localConfigs.length > 0
+                ? localConfigs[localConfigs.length - 1].to
+                : 1;
+        const newTo = Math.min(lastTo + 1, holeCount);
+
         localConfigs = [
             ...localConfigs,
-            {
-                from: 1,
-                to: 2,
-                prefix: `P${localConfigs.length + 1} `,
-                suffix: "",
-            },
+            { from: 1, to: newTo, prefix: "", suffix: "" },
         ];
     }
 
@@ -59,7 +60,7 @@
         onclick={(e) => e.stopPropagation()}
         onkeydown={(e) => e.stopPropagation()}
         role="document"
-        style="max-width: 500px;"
+        style="max-width: 700px;"
     >
         <div class="modal-header">
             <h2 class="title-gradient-sm">Manage Pitches</h2>
