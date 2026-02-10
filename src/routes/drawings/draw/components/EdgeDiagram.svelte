@@ -11,7 +11,7 @@
         name = "Edge Diagram",
         svgString = $bindable(""),
         pitchConfigs = [
-            { from: 1, to: 2, label: "P1" }, // Pitch 1-2
+            { from: 1, to: 2, prefix: "P1 ", suffix: "" }, // Pitch 1-2
         ],
         onFieldUpdate,
     } = $props<{
@@ -19,7 +19,13 @@
         variables?: Record<string, string>;
         name?: string;
         svgString?: string;
-        pitchConfigs?: { from: number; to: number; label: string }[];
+        pitchConfigs?: {
+            from: number;
+            to: number;
+            prefix?: string;
+            suffix?: string;
+            label?: string;
+        }[];
         onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
 
@@ -71,8 +77,7 @@
     // 2. to must be greater than from
     let validPitchConfigs = $derived(
         pitchConfigs.filter(
-            (p: { from: number; to: number; label: string }) =>
-                p.from >= 1 && p.to > p.from && p.to <= holeCount,
+            (p: any) => p.from >= 1 && p.to > p.from && p.to <= holeCount,
         ),
     );
 
@@ -402,7 +407,7 @@
             {@const fromIdx = config.from - 1}
             {@const toIdx = config.to - 1}
             {@const dimY =
-                centerY + visualPlateHeight / 6 + i * (visualPlateHeight / 12)}
+                centerY + visualPlateHeight / 6 + i * (visualPlateHeight / 8)}
             {@const dist = config.to - config.from}
             <g class="dim-label">
                 <line
@@ -440,9 +445,9 @@
                     text-anchor="middle"
                     font-size={dist > 1 ? "14" : "16"}
                     fill="#1e1b4b"
-                    >{config.label || `P${i + 1}`} ({Math.round(
+                    >{config.prefix ?? config.label ?? ""}{Math.round(
                         labelPitch * dist,
-                    )} mm)</text
+                    )} mm{config.suffix ?? ""}</text
                 >
             </g>
         {/each}

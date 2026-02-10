@@ -17,7 +17,12 @@
     let svgConfigs = $state<{
         svg_configs: Array<{
             template_id: string;
-            pitch_config: Array<{ from: number; to: number; label: string }>;
+            pitch_config: Array<{
+                from: number;
+                to: number;
+                prefix: string;
+                suffix: string;
+            }>;
         }>;
     }>({
         svg_configs: [],
@@ -34,7 +39,7 @@
         if (!exists) {
             svgConfigs.svg_configs.push({
                 template_id: diagram.template_id,
-                pitch_config: [{ from: 1, to: 2, label: "P1" }],
+                pitch_config: [{ from: 1, to: 2, prefix: "P1 ", suffix: "" }],
             });
         }
     });
@@ -61,8 +66,7 @@
     // But we actually want PitchesModal to see ALL and highlight invalid ones.
     const validPitchConfigs = $derived(
         currentPitchConfig.filter(
-            (p: { from: number; to: number; label: string }) =>
-                p.from >= 1 && p.to > p.from && p.to <= holeCount,
+            (p: any) => p.from >= 1 && p.to > p.from && p.to <= holeCount,
         ),
     );
 

@@ -2,7 +2,8 @@
     interface PitchEntry {
         from: number;
         to: number;
-        label: string;
+        prefix: string;
+        suffix: string;
     }
 
     let {
@@ -11,7 +12,7 @@
         onClose,
         onSave,
     } = $props<{
-        pitchConfigs: PitchEntry[];
+        pitchConfigs: any[];
         holeCount?: number;
         onClose: () => void;
         onSave: (configs: PitchEntry[]) => void;
@@ -26,7 +27,12 @@
     function addPitch() {
         localConfigs = [
             ...localConfigs,
-            { from: 1, to: 2, label: `P${localConfigs.length + 1}` },
+            {
+                from: 1,
+                to: 2,
+                prefix: `P${localConfigs.length + 1} `,
+                suffix: "",
+            },
         ];
     }
 
@@ -86,7 +92,8 @@
                 <div class="pitch-header">
                     <span>From</span>
                     <span>To</span>
-                    <span>Label</span>
+                    <span>Prefix</span>
+                    <span>Suffix</span>
                     <span></span>
                 </div>
                 {#if localConfigs.length === 0}
@@ -119,8 +126,14 @@
                         <input
                             type="text"
                             class="input-base"
-                            bind:value={pitch.label}
-                            placeholder="Label"
+                            bind:value={pitch.prefix}
+                            placeholder="Prefix"
+                        />
+                        <input
+                            type="text"
+                            class="input-base"
+                            bind:value={pitch.suffix}
+                            placeholder="Suffix"
                         />
                         <button
                             class="btn-remove"
@@ -184,7 +197,7 @@
 
     .pitch-header {
         display: grid;
-        grid-template-columns: 80px 80px 1fr 40px;
+        grid-template-columns: 60px 60px 100px 1fr 40px;
         gap: var(--spacing-md);
         padding: 0 var(--spacing-sm);
         color: var(--color-gray);
@@ -195,7 +208,7 @@
 
     .pitch-row {
         display: grid;
-        grid-template-columns: 80px 80px 1fr 40px;
+        grid-template-columns: 60px 60px 100px 1fr 40px;
         gap: var(--spacing-md);
         align-items: center;
     }
