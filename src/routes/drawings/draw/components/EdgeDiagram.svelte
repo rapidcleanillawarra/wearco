@@ -56,21 +56,9 @@
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
     const VISUAL_HOLE_SPACING = 100; // Pixels between holes visually
     const VISUAL_EDGE_PADDING = 120; // Padding from plate edge to first/last hole
-    const VISUAL_PLATE_HEIGHT = 400; // Fixed visual height of the plate
+    const VISUAL_PLATE_BASE_HEIGHT = 100; // Base visual height of the plate
     const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
-    const CANVAS_PADDING = 80; // Padding around the plate for dimensions
-
-    // Calculate visual plate width based on hole count
-    let visualPlateWidth = $derived.by(() => {
-        if (holeCount <= 1)
-            return VISUAL_EDGE_PADDING * 2 + VISUAL_HOLE_SPACING;
-        return VISUAL_EDGE_PADDING * 2 + (holeCount - 1) * VISUAL_HOLE_SPACING;
-    });
-
-    // Position Calculations (Visual Coordinates)
-    const rectX = CANVAS_PADDING;
-    const rectY = CANVAS_PADDING * 2;
-    const centerY = rectY + VISUAL_PLATE_HEIGHT / 2;
+    const CANVAS_PADDING = 100; // Padding around the plate for dimensions
 
     // --- Dynamic Pitch Configuration ---
     // User can manually edit this to change which holes are measured
@@ -81,25 +69,53 @@
         { from: 0, to: 3, label: "P2" }, // Pitch 1-3
         { from: 0, to: 5, label: "P3" }, // Pitch 1-4
         { from: 0, to: 6, label: "P4" }, // Pitch 1-5
-        { from: 0, to: 8, label: "P5" }, // Pitch 1-5
+        { from: 0, to: 8, label: "P5" }, // Pitch 1-9
+        { from: 0, to: 10, label: "P5" }, // Pitch 1-9
     ]);
+
+    // Calculate effective hole count for visual rendering
+    // It should be at least the mapped holeCount, but also enough to cover all configured pitches
+    let maxPitchIndex = $derived(
+        pitchConfigs.reduce(
+            (max: number, p: { from: number; to: number; label: string }) =>
+                Math.max(max, p.to),
+            0,
+        ),
+    );
+    let effectiveHoleCount = $derived(Math.max(holeCount, maxPitchIndex + 1));
+
+    // Calculate visual plate width based on effective hole count
+    let visualPlateWidth = $derived.by(() => {
+        if (effectiveHoleCount <= 1)
+            return VISUAL_EDGE_PADDING * 2 + VISUAL_HOLE_SPACING;
+        return (
+            VISUAL_EDGE_PADDING * 2 +
+            (effectiveHoleCount - 1) * VISUAL_HOLE_SPACING
+        );
+    });
+
+    // Calculate dynamic plate height based on number of pitch distances
+    let visualPlateHeight = $derived(
+        VISUAL_PLATE_BASE_HEIGHT + pitchConfigs.length * 40,
+    );
+
+    // Position Calculations (Visual Coordinates)
+    const rectX = CANVAS_PADDING;
+    const rectY = CANVAS_PADDING * 2;
+    const centerY = $derived(rectY + visualPlateHeight / 2);
 
     // ViewBox Calculations
     let vbWidth = $derived(visualPlateWidth + CANVAS_PADDING * 2);
     // Automatically adjust height based on number of pitch distances
-    let vbHeight = $derived(
-        VISUAL_PLATE_HEIGHT +
-            CANVAS_PADDING * 4 +
-            pitchConfigs.length * (VISUAL_PLATE_HEIGHT / 10),
-    );
+    let vbHeight = $derived(visualPlateHeight + CANVAS_PADDING * 4);
 
     // Hole Positions (Visual Coordinates)
     const holePositions = $derived.by(() => {
-        if (holeCount <= 0) return [];
-        if (holeCount === 1) return [rectX + visualPlateWidth / 2];
+        if (effectiveHoleCount <= 0) return [];
+        if (effectiveHoleCount === 1) return [rectX + visualPlateWidth / 2];
 
         return Array.from(
-            { length: holeCount },
+            { length: effectiveHoleCount },
             (_, i) => rectX + VISUAL_EDGE_PADDING + i * VISUAL_HOLE_SPACING,
         );
     });
@@ -220,7 +236,7 @@
             x={rectX}
             y={rectY}
             width={visualPlateWidth}
-            height={VISUAL_PLATE_HEIGHT}
+            height={visualPlateHeight}
             fill="none"
             stroke="#1e1b4b"
             stroke-width="2"
@@ -253,7 +269,7 @@
                 x1={rectX - 20}
                 y1={rectY + 2}
                 x2={rectX - 20}
-                y2={rectY + VISUAL_PLATE_HEIGHT - 2}
+                y2={rectY + visualPlateHeight - 2}
                 stroke="#1e1b4b"
                 stroke-width="1"
                 marker-start="url(#arrow-start)"
@@ -340,7 +356,7 @@
 
         <!-- Edge Distance Left -->
         {#if holePositions.length > 0}
-            {@const dimY_left = centerY + VISUAL_PLATE_HEIGHT / 6}
+            {@const dimY_left = centerY + visualPlateHeight / 6}
             <g class="dim-label">
                 <line
                     x1={rectX + 2}
@@ -385,8 +401,8 @@
             {#if holePositions.length > config.to}
                 {@const dimY =
                     centerY +
-                    VISUAL_PLATE_HEIGHT / 6 +
-                    i * (VISUAL_PLATE_HEIGHT / 12)}
+                    visualPlateHeight / 6 +
+                    i * (visualPlateHeight / 12)}
                 {@const dist = config.to - config.from}
                 <g class="dim-label">
                     <line
@@ -431,7 +447,7 @@
 
         <!-- Edge Distance Right -->
         {#if holePositions.length > 0}
-            {@const dimY_right = centerY + VISUAL_PLATE_HEIGHT / 6}
+            {@const dimY_right = centerY + visualPlateHeight / 6}
             <g class="dim-label">
                 <line
                     x1={holePositions[holePositions.length - 1] + 2}
@@ -478,7 +494,7 @@
 
         <!-- Total Hole Distance (Inside, above holes) -->
         {#if holePositions.length > 1}
-            {@const dimY_total = centerY - VISUAL_PLATE_HEIGHT / 4}
+            {@const dimY_total = centerY - visualPlateHeight / 4}
             <g class="dim-label">
                 <line
                     x1={holePositions[0] + 2}
