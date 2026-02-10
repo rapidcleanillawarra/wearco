@@ -12,11 +12,6 @@
         svgString = $bindable(""),
         pitchConfigs = [
             { from: 1, to: 2, label: "P1" }, // Pitch 1-2
-            { from: 1, to: 4, label: "P2" }, // Pitch 1-4
-            { from: 1, to: 6, label: "P3" }, // Pitch 1-6
-            { from: 1, to: 7, label: "P4" }, // Pitch 1-7
-            { from: 1, to: 9, label: "P5" }, // Pitch 1-9
-            { from: 1, to: 11, label: "P6" },
         ],
         onFieldUpdate,
     } = $props<{
@@ -65,7 +60,7 @@
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
     const VISUAL_HOLE_SPACING = 100; // Pixels between holes visually
     const VISUAL_EDGE_PADDING = 120; // Padding from plate edge to first/last hole
-    const VISUAL_PLATE_BASE_HEIGHT = 200; // Base visual height of the plate
+    const VISUAL_PLATE_BASE_HEIGHT = 300; // Base visual height of the plate
     const VISUAL_HOLE_SIZE = 40; // Fixed visual diameter/side of holes (increased from 30)
     const CANVAS_PADDING = 100; // Padding around the plate for dimensions
 

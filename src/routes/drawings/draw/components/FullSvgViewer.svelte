@@ -34,14 +34,7 @@
         if (!exists) {
             svgConfigs.svg_configs.push({
                 template_id: diagram.template_id,
-                pitch_config: [
-                    { from: 1, to: 2, label: "P1" },
-                    { from: 1, to: 4, label: "P2" },
-                    { from: 1, to: 6, label: "P3" },
-                    { from: 1, to: 7, label: "P4" },
-                    { from: 1, to: 9, label: "P5" },
-                    { from: 1, to: 11, label: "P6" },
-                ],
+                pitch_config: [{ from: 1, to: 2, label: "P1" }],
             });
         }
     });
