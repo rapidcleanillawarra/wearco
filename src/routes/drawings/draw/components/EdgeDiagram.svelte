@@ -66,7 +66,7 @@
     const VISUAL_HOLE_SPACING = 100; // Pixels between holes visually
     const VISUAL_EDGE_PADDING = 120; // Padding from plate edge to first/last hole
     const VISUAL_PLATE_BASE_HEIGHT = 230; // Base visual height of the plate
-    const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
+    const VISUAL_HOLE_SIZE = 40; // Fixed visual diameter/side of holes (increased from 30)
     const CANVAS_PADDING = 100; // Padding around the plate for dimensions
 
     // Calculate effective hole count for visual rendering
@@ -283,7 +283,7 @@
         </g>
 
         <!-- Holes -->
-        {#each holePositions as hx}
+        {#each holePositions as hx, i}
             {#if holeType.toLowerCase().includes("square")}
                 <rect
                     x={hx - VISUAL_HOLE_SIZE / 2}
@@ -304,6 +304,17 @@
                     stroke-width="2"
                 />
             {/if}
+            <text
+                x={hx}
+                y={centerY}
+                text-anchor="middle"
+                dominant-baseline="central"
+                font-size="16"
+                fill="#1e1b4b"
+                font-weight="bold"
+            >
+                {i + 1}
+            </text>
         {/each}
 
         <!-- Hole Diameter Dimension (Above first or second hole) -->
