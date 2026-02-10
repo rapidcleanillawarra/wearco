@@ -11,7 +11,7 @@
         name = "Edge Diagram",
         svgString = $bindable(""),
         pitchConfigs = [
-            { from: 1, to: 2, prefix: "P1 ", suffix: "" }, // Pitch 1-2
+            { from: 1, to: 2, prefix: "", suffix: "" }, // Pitch 1-2
         ],
         onFieldUpdate,
     } = $props<{
