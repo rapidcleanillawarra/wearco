@@ -2,9 +2,14 @@
     import type { WearcoDiagram } from "$lib/types/svg_diagram";
     import EdgeDiagram from "./EdgeDiagram.svelte";
 
-    let { diagram, fieldValues = {} } = $props<{
+    let {
+        diagram,
+        fieldValues = {},
+        onFieldUpdate,
+    } = $props<{
         diagram: WearcoDiagram | null;
         fieldValues?: Record<string, string>;
+        onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
 
     // SVG Content State
@@ -464,6 +469,7 @@
                             variables={diagram.variables}
                             name={diagram.name}
                             bind:svgString={dynamicSvgContent}
+                            {onFieldUpdate}
                         />
                     </div>
                 {:else if updatedSvgContent}

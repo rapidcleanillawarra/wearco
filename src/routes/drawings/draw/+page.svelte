@@ -771,6 +771,7 @@
 						<FullSvgViewer
 							{diagram}
 							fieldValues={overlayFieldValues}
+							onFieldUpdate={handleOverlayFieldUpdate}
 						/>
 					</div>
 				{/each}

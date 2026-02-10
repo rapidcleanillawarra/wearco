@@ -10,11 +10,13 @@
         variables = {},
         name = "Edge Diagram",
         svgString = $bindable(""),
+        onFieldUpdate,
     } = $props<{
         fieldValues?: Record<string, string>;
         variables?: Record<string, string>;
         name?: string;
         svgString?: string;
+        onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
 
     /**
@@ -45,7 +47,10 @@
     let labelPitch = $derived(getVal("pitch", 0));
     let labelEdgeLeft = $derived(getVal("edge_left", 0));
     let labelEdgeRight = $derived(getVal("edge_right", 0));
-    let holesSpread = $derived(getVal("holes_spread", 0));
+    let calculatedSpread = $derived(
+        holeCount > 1 ? (holeCount - 1) * labelPitch : 0,
+    );
+    let holesSpread = $derived(getVal("holes_spread", calculatedSpread));
 
     // --- Visual Layout Parameters (USED FOR SVG GEOMETRY) ---
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
@@ -102,6 +107,45 @@
         if (svgElement) {
             const serializer = new XMLSerializer();
             svgString = serializer.serializeToString(svgElement);
+        }
+    });
+
+    /**
+     * TWO-WAY SYNC LOGIC
+     * Automate calculations and push them back to the overlay fields.
+     */
+    $effect(() => {
+        if (!onFieldUpdate) return;
+
+        // Calculate Hole Spread (Distance from center of first hole to center of last hole)
+        // We use the calculatedSpread derived above
+
+        // 1. Sync Holes Spread (if mapped)
+        const spreadKey =
+            variables["holes_spread"] || variables["total_holes_distance"];
+        if (spreadKey) {
+            const currentSpreadVal = parseFloat(fieldValues[spreadKey] || "0");
+            if (Math.abs(currentSpreadVal - calculatedSpread) > 0.1) {
+                onFieldUpdate(
+                    spreadKey,
+                    Math.round(calculatedSpread).toString(),
+                );
+            }
+        }
+
+        // 2. Sync Total Width (if mapped)
+        // Usually Width = Left Edge + Spread + Right Edge
+        const calculatedWidth =
+            calculatedSpread + labelEdgeLeft + labelEdgeRight;
+        const widthKey = variables["width"];
+        if (widthKey) {
+            const currentWidthVal = parseFloat(fieldValues[widthKey] || "0");
+            if (
+                calculatedWidth > 0 &&
+                Math.abs(currentWidthVal - calculatedWidth) > 0.1
+            ) {
+                onFieldUpdate(widthKey, Math.round(calculatedWidth).toString());
+            }
         }
     });
 </script>
