@@ -335,6 +335,24 @@
                     marker-start="url(#arrow-start)"
                     marker-end="url(#arrow-end)"
                 />
+                <line
+                    x1={rectX}
+                    y1={centerY + 5}
+                    x2={rectX}
+                    y2={dimY_left + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <line
+                    x1={holePositions[0]}
+                    y1={centerY + 5}
+                    x2={holePositions[0]}
+                    y2={dimY_left + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
                 <text
                     x={rectX + (holePositions[0] - rectX) / 2}
                     y={dimY_left + 20}
@@ -526,6 +544,24 @@
                     stroke-width="1"
                     marker-start="url(#arrow-start)"
                     marker-end="url(#arrow-end)"
+                />
+                <line
+                    x1={holePositions[holePositions.length - 1]}
+                    y1={centerY + 5}
+                    x2={holePositions[holePositions.length - 1]}
+                    y2={dimY_right + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <line
+                    x1={rectX + visualPlateWidth}
+                    y1={centerY + 5}
+                    x2={rectX + visualPlateWidth}
+                    y2={dimY_right + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
                 />
                 <text
                     x={rectX +
