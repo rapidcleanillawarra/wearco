@@ -14,7 +14,6 @@
 
     // Local editable state - initialized once from template data
     let templateName = $state("");
-    let category = $state("Edge");
     let description = $state("");
     let visualDocument = $state("");
     let imageDisplay = $state("");
@@ -32,7 +31,6 @@
         // or if the template ID changed (navigating to different template)
         if (template && !initialized) {
             templateName = template.template_name || "";
-            category = template.category || "Edge";
             description = template.description || "";
             visualDocument = template.visual_document || "";
             imageDisplay = template.image_display || "";
@@ -318,15 +316,6 @@
                         bind:value={templateName}
                         required
                     />
-                </div>
-
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category" name="category" bind:value={category}>
-                        <option value="Edge">Edge</option>
-                        <option value="Corner">Corner</option>
-                        <option value="Other">Other</option>
-                    </select>
                 </div>
 
                 <div class="form-group">

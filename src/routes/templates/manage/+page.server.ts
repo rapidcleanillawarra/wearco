@@ -69,7 +69,6 @@ export const actions: Actions = {
         const formData = await request.formData();
         const id = formData.get('id') as string;
         const name = formData.get('template_name') as string;
-        const category = formData.get('category') as string;
         const description = formData.get('description') as string;
         let visual_document = formData.get('visual_document') as string;
         const image_display = formData.get('image_display') as string;
@@ -112,7 +111,6 @@ export const actions: Actions = {
 
         const dataToSave = {
             template_name: name,
-            category: category || 'Edge',
             description: description || null,
             visual_document: visual_document || null,
             image_display: image_display || null,
