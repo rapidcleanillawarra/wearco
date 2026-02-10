@@ -72,9 +72,26 @@
     const rectY = CANVAS_PADDING * 2;
     const centerY = rectY + VISUAL_PLATE_HEIGHT / 2;
 
+    // --- Dynamic Pitch Configuration ---
+    // User can manually edit this to change which holes are measured
+    // fromIndex: starting hole index (0-based)
+    // toIndex: ending hole index (0-based)
+    let pitchConfigs = $state([
+        { from: 0, to: 1, label: "P1" }, // Pitch 1-2
+        { from: 0, to: 3, label: "P2" }, // Pitch 1-3
+        { from: 0, to: 5, label: "P3" }, // Pitch 1-4
+        { from: 0, to: 6, label: "P4" }, // Pitch 1-5
+        { from: 0, to: 8, label: "P5" }, // Pitch 1-5
+    ]);
+
     // ViewBox Calculations
     let vbWidth = $derived(visualPlateWidth + CANVAS_PADDING * 2);
-    let vbHeight = $derived(VISUAL_PLATE_HEIGHT + CANVAS_PADDING * 4);
+    // Automatically adjust height based on number of pitch distances
+    let vbHeight = $derived(
+        VISUAL_PLATE_HEIGHT +
+            CANVAS_PADDING * 4 +
+            pitchConfigs.length * (VISUAL_PLATE_HEIGHT / 10),
+    );
 
     // Hole Positions (Visual Coordinates)
     const holePositions = $derived.by(() => {
@@ -363,173 +380,54 @@
             </g>
         {/if}
 
-        <!-- Pitch (Between first two holes) -->
-        {#if holePositions.length > 1}
-            {@const dimY_pitch = centerY + VISUAL_PLATE_HEIGHT / 6}
-            <g class="dim-label">
-                <line
-                    x1={holePositions[0] + 2}
-                    y1={dimY_pitch}
-                    x2={holePositions[1] - 2}
-                    y2={dimY_pitch}
-                    stroke="#1e1b4b"
-                    stroke-width="1"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <line
-                    x1={holePositions[0]}
-                    y1={centerY + 5}
-                    x2={holePositions[0]}
-                    y2={dimY_pitch + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <line
-                    x1={holePositions[1]}
-                    y1={centerY + 5}
-                    x2={holePositions[1]}
-                    y2={dimY_pitch + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <text
-                    x={holePositions[0] + VISUAL_HOLE_SPACING / 2}
-                    y={dimY_pitch + 20}
-                    text-anchor="middle"
-                    font-size="16"
-                    fill="#1e1b4b">{Math.round(labelPitch)} mm</text
-                >
-            </g>
-        {/if}
-
-        <!-- Pitch (Between first and third holes) -->
-        {#if holePositions.length > 2}
-            {@const dimY_pitch13 = centerY + VISUAL_PLATE_HEIGHT / 4}
-            <g class="dim-label">
-                <line
-                    x1={holePositions[0] + 2}
-                    y1={dimY_pitch13}
-                    x2={holePositions[2] - 2}
-                    y2={dimY_pitch13}
-                    stroke="#1e1b4b"
-                    stroke-width="1"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <line
-                    x1={holePositions[0]}
-                    y1={centerY + 5}
-                    x2={holePositions[0]}
-                    y2={dimY_pitch13 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <line
-                    x1={holePositions[2]}
-                    y1={centerY + 5}
-                    x2={holePositions[2]}
-                    y2={dimY_pitch13 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <text
-                    x={holePositions[0] + VISUAL_HOLE_SPACING}
-                    y={dimY_pitch13 + 20}
-                    text-anchor="middle"
-                    font-size="14"
-                    fill="#1e1b4b">{Math.round(labelPitch * 2)} mm</text
-                >
-            </g>
-        {/if}
-
-        <!-- Pitch (Between first and fourth holes) -->
-        {#if holePositions.length > 3}
-            {@const dimY_pitch14 = centerY + (VISUAL_PLATE_HEIGHT * 5) / 16}
-            <g class="dim-label">
-                <line
-                    x1={holePositions[0] + 2}
-                    y1={dimY_pitch14}
-                    x2={holePositions[3] - 2}
-                    y2={dimY_pitch14}
-                    stroke="#1e1b4b"
-                    stroke-width="1"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <line
-                    x1={holePositions[0]}
-                    y1={centerY + 5}
-                    x2={holePositions[0]}
-                    y2={dimY_pitch14 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <line
-                    x1={holePositions[3]}
-                    y1={centerY + 5}
-                    x2={holePositions[3]}
-                    y2={dimY_pitch14 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <text
-                    x={holePositions[0] + (VISUAL_HOLE_SPACING * 3) / 2}
-                    y={dimY_pitch14 + 20}
-                    text-anchor="middle"
-                    font-size="14"
-                    fill="#1e1b4b">{Math.round(labelPitch * 3)} mm</text
-                >
-            </g>
-        {/if}
-
-        <!-- Pitch (Between first and fifth holes) -->
-        {#if holePositions.length > 4}
-            {@const dimY_pitch15 = centerY + (VISUAL_PLATE_HEIGHT * 6) / 16}
-            <g class="dim-label">
-                <line
-                    x1={holePositions[0] + 2}
-                    y1={dimY_pitch15}
-                    x2={holePositions[4] - 2}
-                    y2={dimY_pitch15}
-                    stroke="#1e1b4b"
-                    stroke-width="1"
-                    marker-start="url(#arrow-start)"
-                    marker-end="url(#arrow-end)"
-                />
-                <line
-                    x1={holePositions[0]}
-                    y1={centerY + 5}
-                    x2={holePositions[0]}
-                    y2={dimY_pitch15 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <line
-                    x1={holePositions[4]}
-                    y1={centerY + 5}
-                    x2={holePositions[4]}
-                    y2={dimY_pitch15 + 10}
-                    stroke="#9ca3af"
-                    stroke-width="1"
-                    stroke-dasharray="4 2"
-                />
-                <text
-                    x={holePositions[0] + (VISUAL_HOLE_SPACING * 4) / 2}
-                    y={dimY_pitch15 + 20}
-                    text-anchor="middle"
-                    font-size="14"
-                    fill="#1e1b4b">{Math.round(labelPitch * 4)} mm</text
-                >
-            </g>
-        {/if}
+        <!-- Dynamic Pitch Dimensions -->
+        {#each pitchConfigs as config, i}
+            {#if holePositions.length > config.to}
+                {@const dimY =
+                    centerY +
+                    VISUAL_PLATE_HEIGHT / 6 +
+                    i * (VISUAL_PLATE_HEIGHT / 12)}
+                {@const dist = config.to - config.from}
+                <g class="dim-label">
+                    <line
+                        x1={holePositions[config.from] + 2}
+                        y1={dimY}
+                        x2={holePositions[config.to] - 2}
+                        y2={dimY}
+                        stroke="#1e1b4b"
+                        stroke-width="1"
+                        marker-start="url(#arrow-start)"
+                        marker-end="url(#arrow-end)"
+                    />
+                    <line
+                        x1={holePositions[config.from]}
+                        y1={centerY + 5}
+                        x2={holePositions[config.from]}
+                        y2={dimY + 10}
+                        stroke="#9ca3af"
+                        stroke-width="1"
+                        stroke-dasharray="4 2"
+                    />
+                    <line
+                        x1={holePositions[config.to]}
+                        y1={centerY + 5}
+                        x2={holePositions[config.to]}
+                        y2={dimY + 10}
+                        stroke="#9ca3af"
+                        stroke-width="1"
+                        stroke-dasharray="4 2"
+                    />
+                    <text
+                        x={holePositions[config.from] +
+                            (VISUAL_HOLE_SPACING * dist) / 2}
+                        y={dimY + 20}
+                        text-anchor="middle"
+                        font-size={dist > 1 ? "14" : "16"}
+                        fill="#1e1b4b">{Math.round(labelPitch * dist)} mm</text
+                    >
+                </g>
+            {/if}
+        {/each}
 
         <!-- Edge Distance Right -->
         {#if holePositions.length > 0}
