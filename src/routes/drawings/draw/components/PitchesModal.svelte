@@ -47,20 +47,21 @@
     }
 </script>
 
-<div
-    class="modal-overlay"
-    onclick={onClose}
-    onkeydown={(e) => e.key === "Escape" && onClose()}
-    role="dialog"
-    aria-modal="true"
-    tabindex="-1"
->
+<svelte:window onkeydown={(e) => e.key === "Escape" && onClose()} />
+
+<div class="modal-overlay">
+    <button
+        class="modal-backdrop"
+        onclick={onClose}
+        aria-label="Close modal"
+        type="button"
+    ></button>
     <div
         class="modal-container"
-        onclick={(e) => e.stopPropagation()}
-        onkeydown={(e) => e.stopPropagation()}
-        role="document"
+        role="dialog"
+        aria-modal="true"
         style="max-width: 700px;"
+        tabindex="-1"
     >
         <div class="modal-header">
             <h2 class="title-gradient-sm">Manage Pitches</h2>
@@ -102,7 +103,7 @@
                         <p>No pitches configured. Add one to start.</p>
                     </div>
                 {/if}
-                {#each localConfigs as pitch, index}
+                {#each localConfigs as pitch, index (index)}
                     <div class="pitch-row">
                         <input
                             type="number"
