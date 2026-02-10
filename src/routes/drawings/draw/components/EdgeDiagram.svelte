@@ -65,7 +65,7 @@
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
     const VISUAL_HOLE_SPACING = 100; // Pixels between holes visually
     const VISUAL_EDGE_PADDING = 120; // Padding from plate edge to first/last hole
-    const VISUAL_PLATE_BASE_HEIGHT = 230; // Base visual height of the plate
+    const VISUAL_PLATE_BASE_HEIGHT = 200; // Base visual height of the plate
     const VISUAL_HOLE_SIZE = 40; // Fixed visual diameter/side of holes (increased from 30)
     const CANVAS_PADDING = 100; // Padding around the plate for dimensions
 
@@ -322,7 +322,7 @@
         {#if holePositions.length > 0}
             {@const holeIndex = holePositions.length > 1 ? 1 : 0}
             {@const anchorHx = holePositions[holeIndex]}
-            {@const dimY_hole = centerY - VISUAL_HOLE_SIZE / 2 - 40}
+            {@const dimY_hole = centerY - VISUAL_HOLE_SIZE / 2 - 20}
             <g class="dim-label">
                 <line
                     x1={anchorHx - VISUAL_HOLE_SIZE / 2 + 2}
