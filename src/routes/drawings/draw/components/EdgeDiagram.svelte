@@ -56,7 +56,7 @@
     // We use a fixed visual scale so the diagram remains readable regardless of the label values.
     const VISUAL_HOLE_SPACING = 60; // Pixels between holes visually
     const VISUAL_EDGE_PADDING = 80; // Padding from plate edge to first/last hole
-    const VISUAL_PLATE_HEIGHT = 200; // Fixed visual height of the plate
+    const VISUAL_PLATE_HEIGHT = 400; // Fixed visual height of the plate
     const VISUAL_HOLE_SIZE = 30; // Fixed visual diameter/side of holes
     const CANVAS_PADDING = 80; // Padding around the plate for dimensions
 
@@ -514,9 +514,9 @@
             </g>
         {/if}
 
-        <!-- Total Hole Distance -->
+        <!-- Total Hole Distance (Inside, above holes) -->
         {#if holePositions.length > 1}
-            {@const dimY_total = centerY + VISUAL_PLATE_HEIGHT / 3}
+            {@const dimY_total = centerY - VISUAL_PLATE_HEIGHT / 4}
             <g class="dim-label">
                 <line
                     x1={holePositions[0] + 2}
@@ -530,18 +530,18 @@
                 />
                 <line
                     x1={holePositions[0]}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={holePositions[0]}
-                    y2={dimY_total + 10}
+                    y2={dimY_total - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <line
                     x1={holePositions[holePositions.length - 1]}
-                    y1={centerY + 5}
+                    y1={centerY - 5}
                     x2={holePositions[holePositions.length - 1]}
-                    y2={dimY_total + 10}
+                    y2={dimY_total - 10}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
@@ -551,7 +551,7 @@
                         (holePositions[holePositions.length - 1] -
                             holePositions[0]) /
                             2}
-                    y={dimY_total + 20}
+                    y={dimY_total - 10}
                     text-anchor="middle"
                     font-size="16"
                     fill="#1e1b4b">{Math.round(holesSpread)} mm</text
