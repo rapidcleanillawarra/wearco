@@ -167,6 +167,35 @@
         selectedFieldId = raw;
     }
 
+    // Effect to initialize radio options if type is changed to radio
+    $effect(() => {
+        const sel = selectedField;
+        if (sel && sel.type === "radio" && !sel.options) {
+            sel.options = [
+                {
+                    label: "Option 1",
+                    value: "1",
+                    position: {
+                        x: sel.position.x,
+                        y: sel.position.y,
+                        width: 20,
+                        height: 20,
+                    },
+                },
+                {
+                    label: "Option 2",
+                    value: "2",
+                    position: {
+                        x: sel.position.x + 30,
+                        y: sel.position.y,
+                        width: 20,
+                        height: 20,
+                    },
+                },
+            ];
+        }
+    });
+
     let isSaving = $state(false);
 
     // Toaster notification state
@@ -427,6 +456,7 @@
                                 <option value="text">Text Input</option>
                                 <option value="textarea">Text Area</option>
                                 <option value="number">Number</option>
+                                <option value="radio">Radio Group</option>
                             </select>
                         </div>
 
@@ -509,6 +539,73 @@
                                 <option value={270}>270°</option>
                             </select>
                         </div>
+
+                        {#if selectedField.type === "radio"}
+                            <div class="options-management">
+                                <h5>Radio Options</h5>
+                                <div class="options-list">
+                                    {#each selectedField.options || [] as option, idx}
+                                        <div class="option-row">
+                                            <div class="option-inputs">
+                                                <input
+                                                    type="text"
+                                                    bind:value={option.label}
+                                                    placeholder="Label"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    bind:value={option.value}
+                                                    placeholder="Value"
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                class="btn-remove-opt"
+                                                onclick={() => {
+                                                    selectedField.options =
+                                                        selectedField.options.filter(
+                                                            (_, i) => i !== idx,
+                                                        );
+                                                }}>&times;</button
+                                            >
+                                        </div>
+                                    {/each}
+                                </div>
+                                <button
+                                    type="button"
+                                    class="btn-add-opt"
+                                    onclick={() => {
+                                        const options =
+                                            selectedField.options || [];
+                                        const lastOpt =
+                                            options[options.length - 1];
+                                        const newX = lastOpt
+                                            ? lastOpt.position.x + 30
+                                            : selectedField.position.x;
+                                        const newY = lastOpt
+                                            ? lastOpt.position.y
+                                            : selectedField.position.y;
+                                        selectedField.options = [
+                                            ...options,
+                                            {
+                                                label: `Option ${options.length + 1}`,
+                                                value: String(
+                                                    options.length + 1,
+                                                ),
+                                                position: {
+                                                    x: newX,
+                                                    y: newY,
+                                                    width: 20,
+                                                    height: 20,
+                                                },
+                                            },
+                                        ];
+                                    }}
+                                >
+                                    + Add Option
+                                </button>
+                            </div>
+                        {/if}
 
                         <div class="field-row">
                             <div class="form-group">
@@ -655,6 +752,71 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.75rem;
+    }
+
+    .options-management {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #1e293b;
+        border-radius: 0.375rem;
+        border: 1px solid #334155;
+    }
+
+    .options-management h5 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.875rem;
+        color: #94a3b8;
+    }
+
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .option-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .option-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.25rem;
+        flex: 1;
+    }
+
+    .option-inputs input {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-remove-opt {
+        background: none;
+        border: none;
+        color: #ef4444;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .btn-add-opt {
+        width: 100%;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border: 1px dashed #3b82f6;
+        padding: 0.4rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-add-opt:hover {
+        background: rgba(59, 130, 246, 0.2);
     }
 
     .form-group input:focus,

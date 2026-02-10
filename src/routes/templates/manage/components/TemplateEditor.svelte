@@ -2,6 +2,17 @@
     import PdfViewer from "./PdfViewer.svelte";
     import { onMount } from "svelte";
 
+    type Option = {
+        label: string;
+        value: string;
+        position: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+        };
+    };
+
     type Field = {
         id: string;
         type: string;
@@ -18,6 +29,7 @@
         prefix?: string;
         suffix?: string;
         rotation?: number;
+        options?: Option[];
     };
 
     let {
@@ -39,6 +51,7 @@
     let isResizing = $state(false);
     let dragStart = $state({ x: 0, y: 0 });
     let activeResizeHandle = $state<string | null>(null);
+    let activeOptionIndex = $state<number | null>(null);
     let tempFieldState = $state<Partial<Field> | null>(null); // For smooth updates during drag
 
     const scaleX = $derived(
@@ -52,16 +65,27 @@
             : 1,
     );
 
-    function handleMouseDown(e: MouseEvent, fieldId: string) {
+    function handleMouseDown(
+        e: MouseEvent,
+        fieldId: string,
+        optionIndex: number | null = null,
+    ) {
         e.stopPropagation();
         selectedFieldId = fieldId;
+        activeOptionIndex = optionIndex;
         isDragging = true;
         dragStart = { x: e.clientX, y: e.clientY };
     }
 
-    function handleResizeStart(e: MouseEvent, fieldId: string, handle: string) {
+    function handleResizeStart(
+        e: MouseEvent,
+        fieldId: string,
+        handle: string,
+        optionIndex: number | null = null,
+    ) {
         e.stopPropagation();
         selectedFieldId = fieldId;
+        activeOptionIndex = optionIndex;
         isResizing = true;
         activeResizeHandle = handle;
         dragStart = { x: e.clientX, y: e.clientY };
@@ -84,16 +108,36 @@
         const dy = (e.clientY - dragStart.y) / scaleY;
 
         if (isDragging) {
-            fields[fieldIndex] = {
-                ...field,
-                position: {
-                    ...field.position,
-                    x: field.position.x + dx,
-                    y: field.position.y + dy,
-                },
-            };
+            if (activeOptionIndex !== null && field.options) {
+                const updatedOptions = [...field.options];
+                updatedOptions[activeOptionIndex] = {
+                    ...updatedOptions[activeOptionIndex],
+                    position: {
+                        ...updatedOptions[activeOptionIndex].position,
+                        x: updatedOptions[activeOptionIndex].position.x + dx,
+                        y: updatedOptions[activeOptionIndex].position.y + dy,
+                    },
+                };
+                fields[fieldIndex] = { ...field, options: updatedOptions };
+            } else {
+                fields[fieldIndex] = {
+                    ...field,
+                    position: {
+                        ...field.position,
+                        x: field.position.x + dx,
+                        y: field.position.y + dy,
+                    },
+                };
+            }
         } else if (isResizing) {
-            let { x, y, width, height } = field.position;
+            let targetPos;
+            if (activeOptionIndex !== null && field.options) {
+                targetPos = { ...field.options[activeOptionIndex].position };
+            } else {
+                targetPos = { ...field.position };
+            }
+
+            let { x, y, width, height } = targetPos;
 
             if (activeResizeHandle?.includes("e")) width += dx;
             if (activeResizeHandle?.includes("w")) {
@@ -110,10 +154,19 @@
             if (width < 10) width = 10;
             if (height < 10) height = 10;
 
-            fields[fieldIndex] = {
-                ...field,
-                position: { x, y, width, height },
-            };
+            if (activeOptionIndex !== null && field.options) {
+                const updatedOptions = [...field.options];
+                updatedOptions[activeOptionIndex] = {
+                    ...updatedOptions[activeOptionIndex],
+                    position: { x, y, width, height },
+                };
+                fields[fieldIndex] = { ...field, options: updatedOptions };
+            } else {
+                fields[fieldIndex] = {
+                    ...field,
+                    position: { x, y, width, height },
+                };
+            }
         }
 
         dragStart = { x: e.clientX, y: e.clientY };
@@ -140,44 +193,114 @@
                 tabindex="0"
             >
                 {#each fields as field, i (field.id + "--" + i)}
-                    <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <div
-                        class="field-box"
-                        class:selected={selectedFieldId === field.id}
-                        style:left="{field.position.x * scaleX}px"
-                        style:top="{field.position.y * scaleY}px"
-                        style:width="{field.position.width * scaleX}px"
-                        style:height="{field.position.height * scaleY}px"
-                        style:transform="rotate({field.rotation || 0}deg)"
-                        onmousedown={(e) => handleMouseDown(e, field.id)}
-                    >
-                        <span class="field-label" style:font-size="10px"
-                            >{field.label || field.id}</span
-                        >
+                    {#if field.type === "radio" && field.options}
+                        {#each field.options as option, optIndex (field.id + "-opt-" + optIndex)}
+                            <!-- svelte-ignore a11y_no_static_element_interactions -->
+                            <div
+                                class="field-box radio-option"
+                                class:selected={selectedFieldId === field.id}
+                                style:left="{option.position.x * scaleX}px"
+                                style:top="{option.position.y * scaleY}px"
+                                style:width="{option.position.width * scaleX}px"
+                                style:height="{option.position.height *
+                                    scaleY}px"
+                                style:transform="rotate({field.rotation ||
+                                    0}deg)"
+                                onmousedown={(e) =>
+                                    handleMouseDown(e, field.id, optIndex)}
+                            >
+                                <span
+                                    class="field-label"
+                                    style:font-size="10px"
+                                >
+                                    {field.id} ({option.label ||
+                                        `Option ${optIndex + 1}`})
+                                </span>
 
-                        {#if selectedFieldId === field.id}
-                            <div
-                                class="resize-handle nw"
-                                onmousedown={(e) =>
-                                    handleResizeStart(e, field.id, "nw")}
-                            ></div>
-                            <div
-                                class="resize-handle ne"
-                                onmousedown={(e) =>
-                                    handleResizeStart(e, field.id, "ne")}
-                            ></div>
-                            <div
-                                class="resize-handle sw"
-                                onmousedown={(e) =>
-                                    handleResizeStart(e, field.id, "sw")}
-                            ></div>
-                            <div
-                                class="resize-handle se"
-                                onmousedown={(e) =>
-                                    handleResizeStart(e, field.id, "se")}
-                            ></div>
-                        {/if}
-                    </div>
+                                {#if selectedFieldId === field.id}
+                                    <div
+                                        class="resize-handle nw"
+                                        onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                field.id,
+                                                "nw",
+                                                optIndex,
+                                            )}
+                                    ></div>
+                                    <div
+                                        class="resize-handle ne"
+                                        onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                field.id,
+                                                "ne",
+                                                optIndex,
+                                            )}
+                                    ></div>
+                                    <div
+                                        class="resize-handle sw"
+                                        onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                field.id,
+                                                "sw",
+                                                optIndex,
+                                            )}
+                                    ></div>
+                                    <div
+                                        class="resize-handle se"
+                                        onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                field.id,
+                                                "se",
+                                                optIndex,
+                                            )}
+                                    ></div>
+                                {/if}
+                            </div>
+                        {/each}
+                    {:else}
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div
+                            class="field-box"
+                            class:selected={selectedFieldId === field.id}
+                            style:left="{field.position.x * scaleX}px"
+                            style:top="{field.position.y * scaleY}px"
+                            style:width="{field.position.width * scaleX}px"
+                            style:height="{field.position.height * scaleY}px"
+                            style:transform="rotate({field.rotation || 0}deg)"
+                            onmousedown={(e) => handleMouseDown(e, field.id)}
+                        >
+                            <span class="field-label" style:font-size="10px"
+                                >{field.label || field.id}</span
+                            >
+
+                            {#if selectedFieldId === field.id}
+                                <div
+                                    class="resize-handle nw"
+                                    onmousedown={(e) =>
+                                        handleResizeStart(e, field.id, "nw")}
+                                ></div>
+                                <div
+                                    class="resize-handle ne"
+                                    onmousedown={(e) =>
+                                        handleResizeStart(e, field.id, "ne")}
+                                ></div>
+                                <div
+                                    class="resize-handle sw"
+                                    onmousedown={(e) =>
+                                        handleResizeStart(e, field.id, "sw")}
+                                ></div>
+                                <div
+                                    class="resize-handle se"
+                                    onmousedown={(e) =>
+                                        handleResizeStart(e, field.id, "se")}
+                                ></div>
+                            {/if}
+                        </div>
+                    {/if}
                 {/each}
             </div>
         </PdfViewer>
@@ -218,6 +341,21 @@
         border: 2px solid #3b82f6;
         background: rgba(59, 130, 246, 0.2);
         z-index: 20;
+    }
+
+    .radio-option {
+        border-radius: 50%;
+        border-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+    }
+
+    .radio-option.selected {
+        border-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.2);
+    }
+
+    .radio-option .field-label {
+        background: #f59e0b;
     }
 
     .field-label {
