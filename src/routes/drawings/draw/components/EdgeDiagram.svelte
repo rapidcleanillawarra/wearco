@@ -386,6 +386,105 @@
             </g>
         {/if}
 
+        <!-- Pitch (Between first and third holes) -->
+        {#if holePositions.length > 2}
+            {@const dimY_pitch13 = centerY + VISUAL_PLATE_HEIGHT / 4}
+            <g class="dim-label">
+                <line
+                    x1={holePositions[0] + 2}
+                    y1={dimY_pitch13}
+                    x2={holePositions[2] - 2}
+                    y2={dimY_pitch13}
+                    stroke="#1e1b4b"
+                    stroke-width="1"
+                    marker-start="url(#arrow-start)"
+                    marker-end="url(#arrow-end)"
+                />
+                <line
+                    x1={holePositions[2]}
+                    y1={centerY + 5}
+                    x2={holePositions[2]}
+                    y2={dimY_pitch13 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <text
+                    x={holePositions[0] + VISUAL_HOLE_SPACING}
+                    y={dimY_pitch13 + 20}
+                    text-anchor="middle"
+                    font-size="14"
+                    fill="#1e1b4b">{Math.round(labelPitch * 2)} mm</text
+                >
+            </g>
+        {/if}
+
+        <!-- Pitch (Between first and fourth holes) -->
+        {#if holePositions.length > 3}
+            {@const dimY_pitch14 = centerY + (VISUAL_PLATE_HEIGHT * 5) / 16}
+            <g class="dim-label">
+                <line
+                    x1={holePositions[0] + 2}
+                    y1={dimY_pitch14}
+                    x2={holePositions[3] - 2}
+                    y2={dimY_pitch14}
+                    stroke="#1e1b4b"
+                    stroke-width="1"
+                    marker-start="url(#arrow-start)"
+                    marker-end="url(#arrow-end)"
+                />
+                <line
+                    x1={holePositions[3]}
+                    y1={centerY + 5}
+                    x2={holePositions[3]}
+                    y2={dimY_pitch14 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <text
+                    x={holePositions[0] + (VISUAL_HOLE_SPACING * 3) / 2}
+                    y={dimY_pitch14 + 20}
+                    text-anchor="middle"
+                    font-size="14"
+                    fill="#1e1b4b">{Math.round(labelPitch * 3)} mm</text
+                >
+            </g>
+        {/if}
+
+        <!-- Pitch (Between first and fifth holes) -->
+        {#if holePositions.length > 4}
+            {@const dimY_pitch15 = centerY + (VISUAL_PLATE_HEIGHT * 6) / 16}
+            <g class="dim-label">
+                <line
+                    x1={holePositions[0] + 2}
+                    y1={dimY_pitch15}
+                    x2={holePositions[4] - 2}
+                    y2={dimY_pitch15}
+                    stroke="#1e1b4b"
+                    stroke-width="1"
+                    marker-start="url(#arrow-start)"
+                    marker-end="url(#arrow-end)"
+                />
+                <line
+                    x1={holePositions[4]}
+                    y1={centerY + 5}
+                    x2={holePositions[4]}
+                    y2={dimY_pitch15 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <text
+                    x={holePositions[0] + (VISUAL_HOLE_SPACING * 4) / 2}
+                    y={dimY_pitch15 + 20}
+                    text-anchor="middle"
+                    font-size="14"
+                    fill="#1e1b4b">{Math.round(labelPitch * 4)} mm</text
+                >
+            </g>
+        {/if}
+
         <!-- Edge Distance Right -->
         {#if holePositions.length > 0}
             {@const dimY_right = centerY + VISUAL_PLATE_HEIGHT / 6}
