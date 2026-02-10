@@ -36,7 +36,12 @@
         if (!exists) {
             svgConfigs.svg_configs.push({
                 diagram_id: diagram.id,
-                pitch_config: [{ from: 1, to: 2, prefix: "", suffix: "" }],
+                pitch_config: [
+                    { from: 1, to: 2, prefix: "", suffix: "" },
+                    { from: 1, to: 4, prefix: "", suffix: "" },
+                    { from: 1, to: 5, prefix: "", suffix: "" },
+                    { from: 1, to: 7, prefix: "", suffix: "" },
+                ],
             });
         }
     });
