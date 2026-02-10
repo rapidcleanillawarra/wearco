@@ -52,7 +52,25 @@
 		prog_by: "",
 		material: "",
 		thk: "",
-		drawing_data: {},
+		drawing_data: {
+			overlay_data: {},
+			pitchConfig: [],
+		},
+	});
+
+	// SVG Configs State (for pitches) - lifted from FullSvgViewer
+	let svgConfigs = $state<{
+		svg_configs: Array<{
+			diagram_id: string;
+			pitch_config: Array<{
+				from: number;
+				to: number;
+				prefix: string;
+				suffix: string;
+			}>;
+		}>;
+	}>({
+		svg_configs: [],
 	});
 
 	// Initialize drawingFormData when template or drawing changes
@@ -71,8 +89,12 @@
 				prog_by: "",
 				material: "",
 				thk: "",
-				drawing_data: {},
+				drawing_data: {
+					overlay_data: {},
+					pitchConfig: [],
+				},
 			};
+			svgConfigs = { svg_configs: [] };
 			return;
 		}
 
@@ -90,11 +112,18 @@
 			prog_by: "",
 			material: "",
 			thk: "",
-			drawing_data: {},
+			drawing_data: {
+				overlay_data: {},
+				pitchConfig: [],
+			},
 		};
 
 		// Override with drawing data if in edit mode
 		if (mode === "edit" && drawing) {
+			const drawing_data = (drawing.drawing_data as any) || {};
+			const overlay_data = drawing_data.overlay_data || {};
+			const pitchConfig = drawing_data.pitchConfig || [];
+
 			drawingFormData = {
 				...baseData,
 				job_number: drawing.job_number || "",
@@ -109,11 +138,21 @@
 				prog_by: drawing.prog_by || "",
 				material: drawing.material || "",
 				thk: drawing.thk || "",
-				drawing_data:
-					drawing.drawing_data || template.template_data || {},
+				drawing_data: {
+					overlay_data,
+					pitchConfig,
+				},
 			};
+
+			// Initialize svgConfigs from pitchConfig
+			if (pitchConfig && Array.isArray(pitchConfig)) {
+				svgConfigs = { svg_configs: pitchConfig };
+			} else {
+				svgConfigs = { svg_configs: [] };
+			}
 		} else {
 			drawingFormData = baseData;
+			svgConfigs = { svg_configs: [] };
 		}
 	});
 
@@ -161,10 +200,12 @@
 					values[field.id] = fieldUpdateState[field.id] ?? "";
 				}
 			} else {
-				// No targetField - use value from drawing_data
+				// No targetField - use value from drawing_data.overlay_data
 				values[field.id] =
 					fieldUpdateState[field.id] ??
-					((drawingFormData.drawing_data?.[field.id] as string) ||
+					((drawingFormData.drawing_data?.overlay_data?.[
+						field.id
+					] as string) ||
 						"");
 			}
 		});
@@ -683,27 +724,31 @@
 							name="thk"
 							value={drawingFormData.thk}
 						/>
-						<!-- Hidden inputs for overlay field values (fields without targetField go to drawing_data) -->
+						<!-- Hidden inputs for drawing_data structure -->
 						<input
 							type="hidden"
 							name="drawing_data"
 							value={JSON.stringify({
-								...drawingFormData.drawing_data,
-								...Object.fromEntries(
-									Object.entries(fieldUpdateState).filter(
-										([fieldId]) => {
-											const field =
-												templateData?.fields.find(
-													(f) => f.id === fieldId,
+								overlay_data: {
+									...drawingFormData.drawing_data
+										?.overlay_data,
+									...Object.fromEntries(
+										Object.entries(fieldUpdateState).filter(
+											([fieldId]) => {
+												const field =
+													templateData?.fields.find(
+														(f) => f.id === fieldId,
+													);
+												// Only include fields without targetField or with empty targetField
+												return (
+													!field ||
+													getTargetField(field) === ""
 												);
-											// Only include fields without targetField or with empty targetField
-											return (
-												!field ||
-												getTargetField(field) === ""
-											);
-										},
+											},
+										),
 									),
-								),
+								},
+								pitchConfig: svgConfigs.svg_configs,
 							})}
 						/>
 						<button
@@ -768,6 +813,7 @@
 							{diagram}
 							fieldValues={overlayFieldValues}
 							onFieldUpdate={handleOverlayFieldUpdate}
+							bind:svgConfigs
 						/>
 					</div>
 				{/each}

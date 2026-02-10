@@ -6,39 +6,36 @@
     let {
         diagram,
         fieldValues = {},
+        svgConfigs = $bindable({ svg_configs: [] }),
         onFieldUpdate,
     } = $props<{
         diagram: WearcoDiagram | null;
         fieldValues?: Record<string, string>;
+        svgConfigs?: {
+            svg_configs: Array<{
+                diagram_id: string;
+                pitch_config: Array<{
+                    from: number;
+                    to: number;
+                    prefix: string;
+                    suffix: string;
+                }>;
+            }>;
+        };
         onFieldUpdate?: (fieldId: string, value: string) => void;
     }>();
 
-    // SVG Configs State (for pitches)
-    let svgConfigs = $state<{
-        svg_configs: Array<{
-            template_id: string;
-            pitch_config: Array<{
-                from: number;
-                to: number;
-                prefix: string;
-                suffix: string;
-            }>;
-        }>;
-    }>({
-        svg_configs: [],
-    });
-
-    // Initialize config if it doesn't exist for the current template
+    // Initialize config if it doesn't exist for the current diagram
     $effect(() => {
-        if (!diagram?.template_id) return;
+        if (!diagram?.id) return;
 
         const exists = svgConfigs.svg_configs.some(
-            (c) => c.template_id === diagram.template_id,
+            (c: any) => c.diagram_id === diagram.id,
         );
 
         if (!exists) {
             svgConfigs.svg_configs.push({
-                template_id: diagram.template_id,
+                diagram_id: diagram.id,
                 pitch_config: [{ from: 1, to: 2, prefix: "P1 ", suffix: "" }],
             });
         }
@@ -46,11 +43,11 @@
 
     let showPitchesModal = $state(false);
 
-    // Get current pitch config for the active template
+    // Get current pitch config for the active diagram
     const currentPitchConfig = $derived.by(() => {
         if (!diagram) return [];
         const config = svgConfigs.svg_configs.find(
-            (c) => c.template_id === diagram.template_id,
+            (c: any) => c.diagram_id === diagram.id,
         );
         return config ? config.pitch_config : [];
     });
@@ -73,13 +70,13 @@
     function updatePitchConfig(newConfigs: any[]) {
         if (!diagram) return;
         const index = svgConfigs.svg_configs.findIndex(
-            (c) => c.template_id === diagram.template_id,
+            (c: any) => c.diagram_id === diagram.id,
         );
         if (index !== -1) {
             svgConfigs.svg_configs[index].pitch_config = newConfigs;
         } else {
             svgConfigs.svg_configs.push({
-                template_id: diagram.template_id,
+                diagram_id: diagram.id,
                 pitch_config: newConfigs,
             });
         }
