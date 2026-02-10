@@ -277,15 +277,16 @@
             {/if}
         {/each}
 
-        <!-- Hole Diameter Dimension (Above first hole) -->
+        <!-- Hole Diameter Dimension (Above first or second hole) -->
         {#if holePositions.length > 0}
-            {@const firstHx = holePositions[0]}
+            {@const holeIndex = holePositions.length > 1 ? 1 : 0}
+            {@const anchorHx = holePositions[holeIndex]}
             {@const dimY_hole = centerY - VISUAL_HOLE_SIZE / 2 - 40}
             <g class="dim-label">
                 <line
-                    x1={firstHx - VISUAL_HOLE_SIZE / 2 + 2}
+                    x1={anchorHx - VISUAL_HOLE_SIZE / 2 + 2}
                     y1={dimY_hole}
-                    x2={firstHx + VISUAL_HOLE_SIZE / 2 - 2}
+                    x2={anchorHx + VISUAL_HOLE_SIZE / 2 - 2}
                     y2={dimY_hole}
                     stroke="#1e1b4b"
                     stroke-width="1"
@@ -293,25 +294,25 @@
                     marker-end="url(#arrow-end)"
                 />
                 <line
-                    x1={firstHx - VISUAL_HOLE_SIZE / 2}
+                    x1={anchorHx - VISUAL_HOLE_SIZE / 2}
                     y1={centerY - VISUAL_HOLE_SIZE / 2 - 5}
-                    x2={firstHx - VISUAL_HOLE_SIZE / 2}
+                    x2={anchorHx - VISUAL_HOLE_SIZE / 2}
                     y2={dimY_hole - 5}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <line
-                    x1={firstHx + VISUAL_HOLE_SIZE / 2}
+                    x1={anchorHx + VISUAL_HOLE_SIZE / 2}
                     y1={centerY - VISUAL_HOLE_SIZE / 2 - 5}
-                    x2={firstHx + VISUAL_HOLE_SIZE / 2}
+                    x2={anchorHx + VISUAL_HOLE_SIZE / 2}
                     y2={dimY_hole - 5}
                     stroke="#9ca3af"
                     stroke-width="1"
                     stroke-dasharray="4 2"
                 />
                 <text
-                    x={firstHx}
+                    x={anchorHx}
                     y={dimY_hole - 10}
                     text-anchor="middle"
                     font-size="18"
@@ -401,6 +402,15 @@
                     marker-end="url(#arrow-end)"
                 />
                 <line
+                    x1={holePositions[0]}
+                    y1={centerY + 5}
+                    x2={holePositions[0]}
+                    y2={dimY_pitch13 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <line
                     x1={holePositions[2]}
                     y1={centerY + 5}
                     x2={holePositions[2]}
@@ -434,6 +444,15 @@
                     marker-end="url(#arrow-end)"
                 />
                 <line
+                    x1={holePositions[0]}
+                    y1={centerY + 5}
+                    x2={holePositions[0]}
+                    y2={dimY_pitch14 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
+                />
+                <line
                     x1={holePositions[3]}
                     y1={centerY + 5}
                     x2={holePositions[3]}
@@ -465,6 +484,15 @@
                     stroke-width="1"
                     marker-start="url(#arrow-start)"
                     marker-end="url(#arrow-end)"
+                />
+                <line
+                    x1={holePositions[0]}
+                    y1={centerY + 5}
+                    x2={holePositions[0]}
+                    y2={dimY_pitch15 + 10}
+                    stroke="#9ca3af"
+                    stroke-width="1"
+                    stroke-dasharray="4 2"
                 />
                 <line
                     x1={holePositions[4]}
