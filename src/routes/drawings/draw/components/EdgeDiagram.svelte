@@ -130,6 +130,8 @@
             labelEdgeLeft,
             labelEdgeRight,
             holesSpread,
+            pitchConfigs,
+            validPitchConfigs,
         ];
 
         if (svgElement) {
