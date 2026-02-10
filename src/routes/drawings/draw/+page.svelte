@@ -52,7 +52,6 @@
 		prog_by: "",
 		material: "",
 		thk: "",
-		additional_data: {},
 		drawing_data: {},
 	});
 
@@ -72,7 +71,6 @@
 				prog_by: "",
 				material: "",
 				thk: "",
-				additional_data: {},
 				drawing_data: {},
 			};
 			return;
@@ -92,7 +90,6 @@
 			prog_by: "",
 			material: "",
 			thk: "",
-			additional_data: {},
 			drawing_data: {},
 		};
 
@@ -112,8 +109,8 @@
 				prog_by: drawing.prog_by || "",
 				material: drawing.material || "",
 				thk: drawing.thk || "",
-				additional_data:
-					drawing.additional_data || template.template_data || {},
+				drawing_data:
+					drawing.drawing_data || template.template_data || {},
 			};
 		} else {
 			drawingFormData = baseData;
@@ -164,10 +161,10 @@
 					values[field.id] = fieldUpdateState[field.id] ?? "";
 				}
 			} else {
-				// No targetField - use value from additional_data
+				// No targetField - use value from drawing_data
 				values[field.id] =
 					fieldUpdateState[field.id] ??
-					((drawingFormData.additional_data?.[field.id] as string) ||
+					((drawingFormData.drawing_data?.[field.id] as string) ||
 						"");
 			}
 		});
@@ -686,12 +683,12 @@
 							name="thk"
 							value={drawingFormData.thk}
 						/>
-						<!-- Hidden inputs for overlay field values (fields without targetField go to additional_data) -->
+						<!-- Hidden inputs for overlay field values (fields without targetField go to drawing_data) -->
 						<input
 							type="hidden"
-							name="additional_data"
+							name="drawing_data"
 							value={JSON.stringify({
-								...drawingFormData.additional_data,
+								...drawingFormData.drawing_data,
 								...Object.fromEntries(
 									Object.entries(fieldUpdateState).filter(
 										([fieldId]) => {

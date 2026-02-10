@@ -143,17 +143,17 @@ export const actions: Actions = {
         const prog_by = (formData.get('prog_by') as string) || null;
         const material = (formData.get('material') as string) || null;
         const thk = (formData.get('thk') as string) || null;
-        const additional_dataStr = formData.get('additional_data') as string;
+        const drawing_dataStr = formData.get('drawing_data') as string;
 
         if (!templateId) {
             return fail(400, { success: false, message: 'Template is required' });
         }
 
-        let additional_data: Record<string, unknown> = {};
+        let drawing_data: Record<string, unknown> = {};
         try {
-            additional_data = JSON.parse(additional_dataStr || '{}');
+            drawing_data = JSON.parse(drawing_dataStr || '{}');
         } catch {
-            additional_data = {};
+            drawing_data = {};
         }
 
         const userEmail = (await locals.supabase.auth.getUser()).data.user?.email ?? null;
@@ -173,7 +173,7 @@ export const actions: Actions = {
             prog_by,
             material,
             thk,
-            additional_data,
+            drawing_data,
             updated_at: now,
         };
 

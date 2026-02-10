@@ -29,7 +29,6 @@ export interface DrawingFormData {
   prog_by: string;
   material: string;
   thk: string;
-  additional_data: Record<string, any>;
   drawing_data: Record<string, any>;
 }
 

@@ -26,7 +26,7 @@ export interface WearcoDrawing {
   prog_by: string | null
   material: string | null
   thk: string | null
-  additional_data: Record<string, any>
+  drawing_data: Record<string, any> | null
   updated_by: string | null
   deleted_by: string | null
   created_by: string | null
