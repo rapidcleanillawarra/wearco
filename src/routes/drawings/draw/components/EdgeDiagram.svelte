@@ -87,9 +87,7 @@
     });
 
     // Calculate dynamic plate height based on number of VALID pitch distances
-    let visualPlateHeight = $derived(
-        VISUAL_PLATE_BASE_HEIGHT + validPitchConfigs.length * 40,
-    );
+    let visualPlateHeight = $derived(VISUAL_PLATE_BASE_HEIGHT);
 
     // Position Calculations (Visual Coordinates)
     const rectX = CANVAS_PADDING;
