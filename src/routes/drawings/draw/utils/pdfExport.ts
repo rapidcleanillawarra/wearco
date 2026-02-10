@@ -110,8 +110,23 @@ async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
                     textX = field.position.x + padding;
                 }
                 const align = textPosition === 'center' ? 'center' : textPosition === 'right' ? 'right' : 'left';
+                const rotation = field.rotation || 0;
 
-                if (isTextarea) {
+                if (field.type === 'radio') {
+                    // Radio field: Draw a dot for the selected option
+                    const selectedValue = String(value);
+                    const matchingOption = (field.options || []).find(opt => opt.value === selectedValue);
+
+                    if (matchingOption) {
+                        // Calculate center of the option circle
+                        const dotX = matchingOption.position.x + (matchingOption.position.width / 2);
+                        const dotY = matchingOption.position.y + (matchingOption.position.height / 2);
+                        const radius = Math.min(matchingOption.position.width, matchingOption.position.height) / 4;
+
+                        pdfDoc.setFillColor(0, 0, 0);
+                        pdfDoc.circle(dotX, dotY, radius, 'F');
+                    }
+                } else if (isTextarea) {
                     // Textarea: start from top, wrap to field width, respect newlines
                     const maxWidth = field.position.width - padding * 2;
                     const lineHeight = fontSize * 1.2;
@@ -123,13 +138,25 @@ async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
                     for (const line of lines) {
                         // Don't overflow below the field
                         if (textY + lineHeight > field.position.y + field.position.height - padding) break;
-                        pdfDoc.text(line, textX, textY, { align });
+
+                        if (rotation !== 0) {
+                            // jsPDF text rotation: angle is in degrees, counter-clockwise
+                            // We need to rotate around the textX, textY point
+                            pdfDoc.text(line, textX, textY, { align, angle: rotation });
+                        } else {
+                            pdfDoc.text(line, textX, textY, { align });
+                        }
                         textY += lineHeight;
                     }
                 } else {
                     // Single-line: center vertically in the field
                     const textY = field.position.y + (field.position.height / 2) + (fontSize / 3);
-                    pdfDoc.text(text, textX, textY, { align });
+
+                    if (rotation !== 0) {
+                        pdfDoc.text(text, textX, textY, { align, angle: rotation });
+                    } else {
+                        pdfDoc.text(text, textX, textY, { align });
+                    }
                 }
             }
         }

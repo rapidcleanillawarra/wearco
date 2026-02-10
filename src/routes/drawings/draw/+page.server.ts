@@ -103,9 +103,14 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
 
         // Generate PDF URL from storage if visual_document is set
         if (template.visual_document) {
+            // Check if the path already starts with templates/ to avoid double-prefixing
+            const fullPath = template.visual_document.startsWith('templates/')
+                ? template.visual_document
+                : `templates/${template.visual_document}`;
+
             const { data: signedUrlData, error: signedUrlError } = await locals.supabase.storage
                 .from('wearco')
-                .createSignedUrl(`templates/${template.visual_document}`, 3600); // 1 hour expiry
+                .createSignedUrl(fullPath, 3600); // 1 hour expiry
 
             if (!signedUrlError && signedUrlData) {
                 pdfUrl = signedUrlData.signedUrl;
