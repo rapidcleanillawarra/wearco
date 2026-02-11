@@ -153,12 +153,70 @@
             </marker>
         </defs>
 
+        <!-- Shaft Diameter Measurement -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 20}
+            y1={centerY - currentSlot.h / 2}
+            x2={parallelLineX1 - currentSlot.w - 20}
+            y2={centerY + currentSlot.h / 2}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <!-- Top Assembly -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 25}
+            y1={centerY - currentSlot.h / 2}
+            x2={parallelLineX1 - currentSlot.w - 15}
+            y2={centerY - currentSlot.h / 2}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX1 - currentSlot.w - 20}
+            y1={centerY - currentSlot.h / 2}
+            x2={parallelLineX1 - currentSlot.w}
+            y2={centerY - currentSlot.h / 2}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <!-- Bottom Assembly -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 25}
+            y1={centerY + currentSlot.h / 2}
+            x2={parallelLineX1 - currentSlot.w - 15}
+            y2={centerY + currentSlot.h / 2}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX1 - currentSlot.w - 20}
+            y1={centerY + currentSlot.h / 2}
+            x2={parallelLineX1 - currentSlot.w}
+            y2={centerY + currentSlot.h / 2}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <text
+            x={parallelLineX1 - currentSlot.w - 30}
+            y={centerY}
+            text-anchor="end"
+            dominant-baseline="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {shaftDiameter}
+        </text>
+
         <!-- Shaft Overall Measurement -->
         <line
             x1={parallelLineX1 - currentSlot.w}
             y1="10"
             x2={parallelLineX1 - currentSlot.w}
-            y2={centerY}
+            y2={centerY - currentSlot.w / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -167,7 +225,7 @@
             x1={parallelLineX2 + currentSlot.w}
             y1="10"
             x2={parallelLineX2 + currentSlot.w}
-            y2={centerY}
+            y2={centerY - currentSlot.w / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -199,7 +257,7 @@
             x1={parallelLineX1 - currentSlot.w / 2}
             y1="40"
             x2={parallelLineX1 - currentSlot.w / 2}
-            y2={centerY}
+            y2={centerY - currentSlot.w / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -208,7 +266,7 @@
             x1={parallelLineX2 + currentSlot.w / 2}
             y1="40"
             x2={parallelLineX2 + currentSlot.w / 2}
-            y2={centerY}
+            y2={centerY - currentSlot.w / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
