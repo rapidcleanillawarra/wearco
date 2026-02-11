@@ -115,6 +115,29 @@
         xmlns="http://www.w3.org/2000/svg"
         class="dynamic-svg"
     >
+        <defs>
+            <marker
+                id="arrowhead-start"
+                markerWidth="10"
+                markerHeight="7"
+                refX="0"
+                refY="3.5"
+                orient="auto"
+            >
+                <polygon points="10 0, 10 7, 0 3.5" fill="#1e1b4b" />
+            </marker>
+            <marker
+                id="arrowhead-end"
+                markerWidth="10"
+                markerHeight="7"
+                refX="10"
+                refY="3.5"
+                orient="auto"
+            >
+                <polygon points="0 0, 0 7, 10 3.5" fill="#1e1b4b" />
+            </marker>
+        </defs>
+
         <!-- Placeholder Rectangle for Roller Spec -->
         <rect
             x="50"
@@ -129,7 +152,7 @@
         <!-- Parallel lines on left and right -->
         <line
             x1="45"
-            y1="60"
+            y1="30"
             x2="45"
             y2="150"
             stroke="#1e1b4b"
@@ -137,12 +160,34 @@
         />
         <line
             x1="252"
-            y1="60"
+            y1="30"
             x2="252"
             y2="150"
             stroke="#1e1b4b"
             stroke-width="1"
         />
+
+        <!-- Distance Arrow (face_width) -->
+        <line
+            x1="45"
+            y1="35"
+            x2="252"
+            y2="35"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
+        />
+        <text
+            x="148.5"
+            y="30"
+            text-anchor="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {faceWidth}
+        </text>
 
         <!-- Connecting lines from corners -->
         <!-- Left top -->
