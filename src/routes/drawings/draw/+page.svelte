@@ -50,8 +50,7 @@
 		dl: "",
 		checked_by: "",
 		prog_by: "",
-		material: "",
-		thk: "",
+		purchase_order: "",
 		drawing_data: {
 			overlay_data: {},
 			pitchConfig: [],
@@ -87,8 +86,7 @@
 				dl: "",
 				checked_by: "",
 				prog_by: "",
-				material: "",
-				thk: "",
+				purchase_order: "",
 				drawing_data: {
 					overlay_data: {},
 					pitchConfig: [],
@@ -110,8 +108,7 @@
 			dl: "",
 			checked_by: "",
 			prog_by: "",
-			material: "",
-			thk: "",
+			purchase_order: "",
 			drawing_data: {
 				overlay_data: {},
 				pitchConfig: [],
@@ -136,8 +133,7 @@
 				dl: drawing.dl || "",
 				checked_by: drawing.checked_by || "",
 				prog_by: drawing.prog_by || "",
-				material: drawing.material || "",
-				thk: drawing.thk || "",
+				purchase_order: drawing.purchase_order || "",
 				drawing_data: {
 					overlay_data,
 					pitchConfig,
@@ -304,8 +300,7 @@
 				targetField === "dl" ||
 				targetField === "checked_by" ||
 				targetField === "prog_by" ||
-				targetField === "material" ||
-				targetField === "thk"
+				targetField === "purchase_order"
 			) {
 				// String fields
 				drawingFormData[targetField] = value as any;
@@ -348,8 +343,7 @@
 				targetField === "dl" ||
 				targetField === "checked_by" ||
 				targetField === "prog_by" ||
-				targetField === "material" ||
-				targetField === "thk"
+				targetField === "purchase_order"
 			) {
 				// String fields
 				drawingFormData[targetField] = currentValue as any;
@@ -500,8 +494,8 @@
 							{drawing.customer || "Not set"}
 						</span>
 						<span class="meta-item">
-							<strong>Material:</strong>
-							{drawing.material || "Not set"}
+							<strong>Purchase Order:</strong>
+							{drawing.purchase_order || "Not set"}
 						</span>
 						<span class="meta-item">
 							<strong>Quantity:</strong>
@@ -716,13 +710,8 @@
 						/>
 						<input
 							type="hidden"
-							name="material"
-							value={drawingFormData.material}
-						/>
-						<input
-							type="hidden"
-							name="thk"
-							value={drawingFormData.thk}
+							name="purchase_order"
+							value={drawingFormData.purchase_order}
 						/>
 						<!-- Hidden inputs for drawing_data structure -->
 						<input

@@ -27,8 +27,7 @@ export interface DrawingFormData {
   dl: string;
   checked_by: string;
   prog_by: string;
-  material: string;
-  thk: string;
+  purchase_order: string;
   drawing_data: Record<string, any>;
 }
 

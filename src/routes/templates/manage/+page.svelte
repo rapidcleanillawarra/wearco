@@ -503,10 +503,12 @@
                                     },
                                     { id: "quantity", label: "Quantity" },
                                     { id: "dl", label: "DL" },
+                                    {
+                                        id: "purchase_order",
+                                        label: "Purchase Order",
+                                    },
                                     { id: "checked_by", label: "Checked By" },
                                     { id: "prog_by", label: "Prog By" },
-                                    { id: "material", label: "Material" },
-                                    { id: "thk", label: "THK" },
                                 ]}
                                 placeholder="None"
                             />

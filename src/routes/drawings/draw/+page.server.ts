@@ -144,10 +144,7 @@ export const actions: Actions = {
         const quantityStr = formData.get('quantity') as string;
         const quantity = quantityStr ? parseInt(quantityStr, 10) || 0 : 0;
         const dl = (formData.get('dl') as string) || null;
-        const checked_by = (formData.get('checked_by') as string) || null;
-        const prog_by = (formData.get('prog_by') as string) || null;
-        const material = (formData.get('material') as string) || null;
-        const thk = (formData.get('thk') as string) || null;
+        const purchase_order = (formData.get('purchase_order') as string) || null;
         const drawing_dataStr = formData.get('drawing_data') as string;
 
         if (!templateId) {
@@ -174,10 +171,7 @@ export const actions: Actions = {
             customer_source,
             quantity,
             dl,
-            checked_by,
-            prog_by,
-            material,
-            thk,
+            purchase_order,
             drawing_data,
             updated_at: now,
         };
