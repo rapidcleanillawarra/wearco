@@ -104,7 +104,7 @@
     });
 
     // Visual dimensions for the placeholder rectangle
-    const vbWidth = 297;
+    const vbWidth = 450;
     const vbHeight = 210;
 </script>
 
@@ -140,27 +140,27 @@
 
         <!-- Shaft Overall Measurement -->
         <line
-            x1={45 - currentSlot.w}
+            x1={121.5 - currentSlot.w}
             y1="10"
-            x2={45 - currentSlot.w}
+            x2={121.5 - currentSlot.w}
             y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={252 + currentSlot.w}
+            x1={328.5 + currentSlot.w}
             y1="10"
-            x2={252 + currentSlot.w}
+            x2={328.5 + currentSlot.w}
             y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={45 - currentSlot.w}
+            x1={121.5 - currentSlot.w}
             y1="15"
-            x2={252 + currentSlot.w}
+            x2={328.5 + currentSlot.w}
             y2="15"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -169,7 +169,7 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="148.5"
+            x="225"
             y="10"
             text-anchor="middle"
             font-size="10"
@@ -181,27 +181,27 @@
 
         <!-- Back-to-Back Measurement -->
         <line
-            x1="30"
+            x1="106.5"
             y1="30"
-            x2="30"
+            x2="106.5"
             y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1="267"
+            x1="343.5"
             y1="30"
-            x2="267"
+            x2="343.5"
             y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1="30"
+            x1="106.5"
             y1="35"
-            x2="267"
+            x2="343.5"
             y2="35"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -210,7 +210,7 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="148.5"
+            x="225"
             y="30"
             text-anchor="middle"
             font-size="10"
@@ -222,7 +222,7 @@
 
         <!-- Placeholder Rectangle for Roller Spec -->
         <rect
-            x="50"
+            x="126.5"
             y="75"
             width="197"
             height="100"
@@ -233,17 +233,17 @@
 
         <!-- Parallel lines on left and right -->
         <line
-            x1="45"
+            x1="121.5"
             y1="50"
-            x2="45"
+            x2="121.5"
             y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <line
-            x1="252"
+            x1="328.5"
             y1="50"
-            x2="252"
+            x2="328.5"
             y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -251,9 +251,9 @@
 
         <!-- Distance Arrow (face_width) -->
         <line
-            x1="45"
+            x1="121.5"
             y1="55"
-            x2="252"
+            x2="328.5"
             y2="55"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -262,7 +262,7 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="148.5"
+            x="225"
             y="50"
             text-anchor="middle"
             font-size="10"
@@ -275,36 +275,36 @@
         <!-- Connecting lines from corners -->
         <!-- Left top -->
         <line
-            x1="50"
+            x1="126.5"
             y1="75"
-            x2="45"
+            x2="121.5"
             y2="80"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Left bottom -->
         <line
-            x1="50"
+            x1="126.5"
             y1="175"
-            x2="45"
+            x2="121.5"
             y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right top -->
         <line
-            x1="247"
+            x1="323.5"
             y1="75"
-            x2="252"
+            x2="328.5"
             y2="80"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right bottom -->
         <line
-            x1="247"
+            x1="323.5"
             y1="175"
-            x2="252"
+            x2="328.5"
             y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -313,7 +313,7 @@
         <!-- Type-dependent slots -->
         <!-- Left side -->
         <svg
-            x={45 - currentSlot.w}
+            x={121.5 - currentSlot.w}
             y={125 - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
@@ -329,7 +329,7 @@
 
         <!-- Right side -->
         <svg
-            x="252"
+            x="328.5"
             y={125 - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
