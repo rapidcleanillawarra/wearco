@@ -197,7 +197,7 @@
         <!-- Back-to-Back Measurement -->
         <line
             x1={parallelLineX1 - currentSlot.w / 2}
-            y1="30"
+            y1="40"
             x2={parallelLineX1 - currentSlot.w / 2}
             y2={centerY}
             stroke="#1e1b4b"
@@ -206,7 +206,7 @@
         />
         <line
             x1={parallelLineX2 + currentSlot.w / 2}
-            y1="30"
+            y1="40"
             x2={parallelLineX2 + currentSlot.w / 2}
             y2={centerY}
             stroke="#1e1b4b"
@@ -215,9 +215,9 @@
         />
         <line
             x1={parallelLineX1 - currentSlot.w / 2}
-            y1="35"
+            y1="45"
             x2={parallelLineX2 + currentSlot.w / 2}
-            y2="35"
+            y2="45"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -226,7 +226,7 @@
         />
         <text
             x={centerX}
-            y="30"
+            y="40"
             text-anchor="middle"
             font-size="10"
             fill="#1e1b4b"
