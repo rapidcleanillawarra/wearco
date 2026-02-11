@@ -124,6 +124,7 @@
     const parallelLineX1 = rectX - parallelLineOffset;
     const parallelLineX2 = rectX + rectW + parallelLineOffset;
     const across_flats_offset = 7;
+    const slot_width_offset = 8;
 </script>
 
 <div class="dynamic-svg-container">
@@ -412,6 +413,64 @@
             font-weight="bold"
         >
             {acrossFlats}
+        </text>
+
+        <!-- Slot Width Measurement (horizontal, below the right slot) -->
+        <line
+            x1={parallelLineX2 + currentSlot.w / 2 - slot_width_offset}
+            y1={centerY + currentSlot.h / 2 + 20}
+            x2={parallelLineX2 + currentSlot.w / 2 + slot_width_offset}
+            y2={centerY + currentSlot.h / 2 + 20}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+
+        <!-- Left Tick -->
+        <line
+            x1={parallelLineX2 + currentSlot.w / 2 - slot_width_offset}
+            y1={centerY + currentSlot.h / 2 + 15}
+            x2={parallelLineX2 + currentSlot.w / 2 - slot_width_offset}
+            y2={centerY + currentSlot.h / 2 + 25}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <!-- Right Tick -->
+        <line
+            x1={parallelLineX2 + currentSlot.w / 2 + slot_width_offset}
+            y1={centerY + currentSlot.h / 2 + 15}
+            x2={parallelLineX2 + currentSlot.w / 2 + slot_width_offset}
+            y2={centerY + currentSlot.h / 2 + 25}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX2 + currentSlot.w / 2 - slot_width_offset}
+            y1={centerY + currentSlot.h / 2}
+            x2={parallelLineX2 + currentSlot.w / 2 - slot_width_offset}
+            y2={centerY + currentSlot.h / 2 + 25}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="3"
+        />
+        <line
+            x1={parallelLineX2 + currentSlot.w / 2 + slot_width_offset}
+            y1={centerY + currentSlot.h / 2}
+            x2={parallelLineX2 + currentSlot.w / 2 + slot_width_offset}
+            y2={centerY + currentSlot.h / 2 + 25}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="3"
+        />
+        <text
+            x={parallelLineX2 + currentSlot.w / 2}
+            y={centerY + currentSlot.h / 2 + 40}
+            text-anchor="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {slotWidth}
         </text>
 
         <!-- Placeholder Rectangle for Roller Spec -->
