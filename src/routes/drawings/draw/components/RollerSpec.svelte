@@ -105,19 +105,6 @@
         }
     });
 
-<<<<<<< HEAD
-    // Visual dimensions and layout parameters
-    const vbWidth = 600;
-    const vbHeight = 500;
-    const rectX = 100;
-    const rectY = 200;
-    const rectWidth = 400;
-    const rectHeight = 150;
-    const centerX = vbWidth / 2;
-    const centerY = rectY + rectHeight / 2;
-    const leftParallelX = rectX - 10;
-    const rightParallelX = rectX + rectWidth + 10;
-=======
     // Visual dimensions for the placeholder rectangle
     const vbWidth = 750;
     const vbHeight = 310;
@@ -138,7 +125,6 @@
     const parallelLineX2 = rectX + rectW + parallelLineOffset;
     const across_flats_offset = 7;
     const slot_width_offset = 8;
->>>>>>> Roller-Spec-Diagram
 </script>
 
 <div class="dynamic-svg-container">
@@ -291,49 +277,28 @@
 
         <!-- Shaft Overall Measurement -->
         <line
-<<<<<<< HEAD
-            x1={leftParallelX - currentSlot.w}
-            y1="40"
-            x2={leftParallelX - currentSlot.w}
-            y2={centerY}
-=======
             x1={parallelLineX1 - currentSlot.w}
             y1="10"
             x2={parallelLineX1 - currentSlot.w}
-            y2={centerY - currentSlot.w / 2}
->>>>>>> Roller-Spec-Diagram
+            y2={centerY - currentSlot.h / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-<<<<<<< HEAD
-            x1={rightParallelX + currentSlot.w}
-            y1="40"
-            x2={rightParallelX + currentSlot.w}
-            y2={centerY}
-=======
             x1={parallelLineX2 + currentSlot.w}
             y1="10"
             x2={parallelLineX2 + currentSlot.w}
-            y2={centerY - currentSlot.w / 2}
->>>>>>> Roller-Spec-Diagram
+            y2={centerY - currentSlot.h / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-<<<<<<< HEAD
-            x1={leftParallelX - currentSlot.w}
-            y1="50"
-            x2={rightParallelX + currentSlot.w}
-            y2="50"
-=======
             x1={parallelLineX1 - currentSlot.w}
             y1="15"
             x2={parallelLineX2 + currentSlot.w}
             y2="15"
->>>>>>> Roller-Spec-Diagram
             stroke="#1e1b4b"
             stroke-width="1.5"
             marker-start="url(#arrowhead-start)"
@@ -341,11 +306,7 @@
         />
         <text
             x={centerX}
-<<<<<<< HEAD
-            y="45"
-=======
             y="10"
->>>>>>> Roller-Spec-Diagram
             text-anchor="middle"
             font-size="14"
             fill="#1e1b4b"
@@ -356,49 +317,28 @@
 
         <!-- Back-to-Back Measurement -->
         <line
-<<<<<<< HEAD
-            x1={leftParallelX}
-            y1="80"
-            x2={leftParallelX}
-            y2={centerY}
-=======
             x1={parallelLineX1 - currentSlot.w / 2}
             y1="40"
             x2={parallelLineX1 - currentSlot.w / 2}
-            y2={centerY - currentSlot.w / 2}
->>>>>>> Roller-Spec-Diagram
+            y2={centerY - currentSlot.h / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-<<<<<<< HEAD
-            x1={rightParallelX}
-            y1="80"
-            x2={rightParallelX}
-            y2={centerY}
-=======
             x1={parallelLineX2 + currentSlot.w / 2}
             y1="40"
             x2={parallelLineX2 + currentSlot.w / 2}
-            y2={centerY - currentSlot.w / 2}
->>>>>>> Roller-Spec-Diagram
+            y2={centerY - currentSlot.h / 2}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-<<<<<<< HEAD
-            x1={leftParallelX}
-            y1="90"
-            x2={rightParallelX}
-            y2="90"
-=======
             x1={parallelLineX1 - currentSlot.w / 2}
             y1="45"
             x2={parallelLineX2 + currentSlot.w / 2}
             y2="45"
->>>>>>> Roller-Spec-Diagram
             stroke="#1e1b4b"
             stroke-width="1.5"
             marker-start="url(#arrowhead-start)"
@@ -406,11 +346,7 @@
         />
         <text
             x={centerX}
-<<<<<<< HEAD
-            y="85"
-=======
             y="40"
->>>>>>> Roller-Spec-Diagram
             text-anchor="middle"
             font-size="14"
             fill="#1e1b4b"
@@ -419,14 +355,6 @@
             {backToBack}
         </text>
 
-<<<<<<< HEAD
-        <!-- Distance Arrow (face_width) -->
-        <line
-            x1={leftParallelX}
-            y1="120"
-            x2={rightParallelX}
-            y2="120"
-=======
         <!-- Right Side Slot Measurement (across_flats) -->
         <line
             x1={parallelLineX2 + currentSlot.w + 20}
@@ -596,7 +524,6 @@
             y1={rectY - 20}
             x2={parallelLineX2}
             y2={rectY - 20}
->>>>>>> Roller-Spec-Diagram
             stroke="#1e1b4b"
             stroke-width="1.5"
             marker-start="url(#arrowhead-start)"
@@ -604,11 +531,7 @@
         />
         <text
             x={centerX}
-<<<<<<< HEAD
-            y="115"
-=======
             y={rectY - 25}
->>>>>>> Roller-Spec-Diagram
             text-anchor="middle"
             font-size="14"
             fill="#1e1b4b"
@@ -617,45 +540,12 @@
             {faceWidth}
         </text>
 
-        <!-- Placeholder Rectangle for Roller Spec -->
-        <rect
-            x={rectX}
-            y={rectY}
-            width={rectWidth}
-            height={rectHeight}
-            fill="none"
-            stroke="#1e1b4b"
-            stroke-width="1.5"
-        />
-
-        <!-- Parallel lines on left and right -->
-        <line
-            x1={leftParallelX}
-            y1={rectY - 50}
-            x2={leftParallelX}
-            y2={rectY + rectHeight + 20}
-            stroke="#1e1b4b"
-            stroke-width="1.5"
-        />
-        <line
-            x1={rightParallelX}
-            y1={rectY - 50}
-            x2={rightParallelX}
-            y2={rectY + rectHeight + 20}
-            stroke="#1e1b4b"
-            stroke-width="1.5"
-        />
-
         <!-- Connecting lines from corners -->
         <!-- Left top -->
         <line
             x1={rectX}
             y1={rectY}
-<<<<<<< HEAD
-            x2={leftParallelX}
-=======
             x2={parallelLineX1}
->>>>>>> Roller-Spec-Diagram
             y2={rectY + 5}
             stroke="#1e1b4b"
             stroke-width="1.5"
@@ -663,46 +553,27 @@
         <!-- Left bottom -->
         <line
             x1={rectX}
-<<<<<<< HEAD
-            y1={rectY + rectHeight}
-            x2={leftParallelX}
-            y2={rectY + rectHeight - 5}
-=======
             y1={rectY + rectH}
             x2={parallelLineX1}
             y2={rectY + rectH - 5}
->>>>>>> Roller-Spec-Diagram
             stroke="#1e1b4b"
             stroke-width="1.5"
         />
         <!-- Right top -->
         <line
-<<<<<<< HEAD
-            x1={rectX + rectWidth}
-            y1={rectY}
-            x2={rightParallelX}
-=======
             x1={rectX + rectW}
             y1={rectY}
             x2={parallelLineX2}
->>>>>>> Roller-Spec-Diagram
             y2={rectY + 5}
             stroke="#1e1b4b"
             stroke-width="1.5"
         />
         <!-- Right bottom -->
         <line
-<<<<<<< HEAD
-            x1={rectX + rectWidth}
-            y1={rectY + rectHeight}
-            x2={rightParallelX}
-            y2={rectY + rectHeight - 5}
-=======
             x1={rectX + rectW}
             y1={rectY + rectH}
             x2={parallelLineX2}
             y2={rectY + rectH - 5}
->>>>>>> Roller-Spec-Diagram
             stroke="#1e1b4b"
             stroke-width="1.5"
         />
@@ -710,11 +581,7 @@
         <!-- Type-dependent slots -->
         <!-- Left side slot -->
         <svg
-<<<<<<< HEAD
-            x={leftParallelX - currentSlot.w}
-=======
             x={parallelLineX1 - currentSlot.w}
->>>>>>> Roller-Spec-Diagram
             y={centerY - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
@@ -728,56 +595,9 @@
             />
         </svg>
 
-        <!-- Vertical Shaft Diameter Measurement (Left) -->
-        <line
-            x1={leftParallelX - currentSlot.w}
-            y1={centerY - currentSlot.h / 2}
-            x2={leftParallelX - currentSlot.w - 20}
-            y2={centerY - currentSlot.h / 2}
-            stroke="#1e1b4b"
-            stroke-width="1"
-            stroke-dasharray="4"
-        />
-        <line
-            x1={leftParallelX - currentSlot.w}
-            y1={centerY + currentSlot.h / 2}
-            x2={leftParallelX - currentSlot.w - 20}
-            y2={centerY + currentSlot.h / 2}
-            stroke="#1e1b4b"
-            stroke-width="1"
-            stroke-dasharray="4"
-        />
-        <line
-            x1={leftParallelX - currentSlot.w - 15}
-            y1={centerY - currentSlot.h / 2}
-            x2={leftParallelX - currentSlot.w - 15}
-            y2={centerY + currentSlot.h / 2}
-            stroke="#1e1b4b"
-            stroke-width="1.5"
-            marker-start="url(#arrowhead-start)"
-            marker-end="url(#arrowhead-end)"
-        />
-        <text
-            x={leftParallelX - currentSlot.w - 25}
-            y={centerY}
-            text-anchor="middle"
-            font-size="14"
-            fill="#1e1b4b"
-            font-weight="bold"
-            transform="rotate(-90, {leftParallelX -
-                currentSlot.w -
-                25}, {centerY})"
-        >
-            {shaftDiameter}
-        </text>
-
         <!-- Right side -->
         <svg
-<<<<<<< HEAD
-            x={rightParallelX}
-=======
             x={parallelLineX2}
->>>>>>> Roller-Spec-Diagram
             y={centerY - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
