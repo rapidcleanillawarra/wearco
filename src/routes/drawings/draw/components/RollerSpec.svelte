@@ -266,6 +266,47 @@
                 />
             </g>
         </svg>
+
+        <!-- Back-to-Back Measurement -->
+        <line
+            x1="30"
+            y1="115"
+            x2="30"
+            y2="180"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <line
+            x1="267"
+            y1="115"
+            x2="267"
+            y2="180"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <line
+            x1="30"
+            y1="175"
+            x2="267"
+            y2="175"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
+        />
+        <text
+            x="148.5"
+            y="188"
+            text-anchor="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {backToBack}
+        </text>
     </svg>
 </div>
 
