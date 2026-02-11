@@ -90,6 +90,62 @@
             stroke="#1e1b4b"
             stroke-width="1"
         />
+
+        <!-- Parallel lines on left and right -->
+        <line
+            x1="45"
+            y1="60"
+            x2="45"
+            y2="150"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1="252"
+            y1="60"
+            x2="252"
+            y2="150"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+
+        <!-- Connecting lines from corners -->
+        <!-- Left top -->
+        <line
+            x1="50"
+            y1="55"
+            x2="45"
+            y2="60"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <!-- Left bottom -->
+        <line
+            x1="50"
+            y1="155"
+            x2="45"
+            y2="150"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <!-- Right top -->
+        <line
+            x1="247"
+            y1="55"
+            x2="252"
+            y2="60"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <!-- Right bottom -->
+        <line
+            x1="247"
+            y1="155"
+            x2="252"
+            y2="150"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
     </svg>
 </div>
 
