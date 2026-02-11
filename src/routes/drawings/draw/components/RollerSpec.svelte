@@ -138,40 +138,70 @@
             </marker>
         </defs>
 
-        <!-- Placeholder Rectangle for Roller Spec -->
-        <rect
-            x="50"
-            y="55"
-            width="197"
-            height="100"
-            fill="none"
+        <!-- Shaft Overall Measurement -->
+        <line
+            x1={45 - currentSlot.w}
+            y1="10"
+            x2={45 - currentSlot.w}
+            y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
+            stroke-dasharray="4"
         />
+        <line
+            x1={252 + currentSlot.w}
+            y1="10"
+            x2={252 + currentSlot.w}
+            y2="115"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <line
+            x1={45 - currentSlot.w}
+            y1="15"
+            x2={252 + currentSlot.w}
+            y2="15"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
+        />
+        <text
+            x="148.5"
+            y="10"
+            text-anchor="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {shaftOverall}
+        </text>
 
-        <!-- Parallel lines on left and right -->
+        <!-- Back-to-Back Measurement -->
         <line
-            x1="45"
+            x1="30"
             y1="30"
-            x2="45"
-            y2="150"
+            x2="30"
+            y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
+            stroke-dasharray="4"
         />
         <line
-            x1="252"
+            x1="267"
             y1="30"
-            x2="252"
-            y2="150"
+            x2="267"
+            y2="115"
             stroke="#1e1b4b"
             stroke-width="1"
+            stroke-dasharray="4"
         />
-
-        <!-- Distance Arrow (face_width) -->
         <line
-            x1="45"
+            x1="30"
             y1="35"
-            x2="252"
+            x2="267"
             y2="35"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -187,6 +217,58 @@
             fill="#1e1b4b"
             font-weight="bold"
         >
+            {backToBack}
+        </text>
+
+        <!-- Placeholder Rectangle for Roller Spec -->
+        <rect
+            x="50"
+            y="75"
+            width="197"
+            height="100"
+            fill="none"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+
+        <!-- Parallel lines on left and right -->
+        <line
+            x1="45"
+            y1="50"
+            x2="45"
+            y2="170"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1="252"
+            y1="50"
+            x2="252"
+            y2="170"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+
+        <!-- Distance Arrow (face_width) -->
+        <line
+            x1="45"
+            y1="55"
+            x2="252"
+            y2="55"
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
+        />
+        <text
+            x="148.5"
+            y="50"
+            text-anchor="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
             {faceWidth}
         </text>
 
@@ -194,36 +276,36 @@
         <!-- Left top -->
         <line
             x1="50"
-            y1="55"
+            y1="75"
             x2="45"
-            y2="60"
+            y2="80"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Left bottom -->
         <line
             x1="50"
-            y1="155"
+            y1="175"
             x2="45"
-            y2="150"
+            y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right top -->
         <line
             x1="247"
-            y1="55"
+            y1="75"
             x2="252"
-            y2="60"
+            y2="80"
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right bottom -->
         <line
             x1="247"
-            y1="155"
+            y1="175"
             x2="252"
-            y2="150"
+            y2="170"
             stroke="#1e1b4b"
             stroke-width="1"
         />
@@ -232,7 +314,7 @@
         <!-- Left side -->
         <svg
             x={45 - currentSlot.w}
-            y={105 - currentSlot.h / 2}
+            y={125 - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
             viewBox={currentSlot.vb}
@@ -248,7 +330,7 @@
         <!-- Right side -->
         <svg
             x="252"
-            y={105 - currentSlot.h / 2}
+            y={125 - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
             viewBox={currentSlot.vb}
@@ -266,47 +348,6 @@
                 />
             </g>
         </svg>
-
-        <!-- Back-to-Back Measurement -->
-        <line
-            x1="30"
-            y1="10"
-            x2="30"
-            y2="95"
-            stroke="#1e1b4b"
-            stroke-width="1"
-            stroke-dasharray="4"
-        />
-        <line
-            x1="267"
-            y1="10"
-            x2="267"
-            y2="95"
-            stroke="#1e1b4b"
-            stroke-width="1"
-            stroke-dasharray="4"
-        />
-        <line
-            x1="30"
-            y1="15"
-            x2="267"
-            y2="15"
-            stroke="#1e1b4b"
-            stroke-width="1"
-            stroke-dasharray="4"
-            marker-start="url(#arrowhead-start)"
-            marker-end="url(#arrowhead-end)"
-        />
-        <text
-            x="148.5"
-            y="10"
-            text-anchor="middle"
-            font-size="10"
-            fill="#1e1b4b"
-            font-weight="bold"
-        >
-            {backToBack}
-        </text>
     </svg>
 </div>
 
