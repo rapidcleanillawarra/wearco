@@ -69,17 +69,33 @@
     });
 
     // Visual dimensions for the placeholder rectangle
-    const vbWidth = 800;
-    const vbHeight = 600;
+    const vbWidth = 1000;
+    const vbHeight = 1000;
 </script>
 
-<div class="roller-spec-container">
+<div class="dynamic-svg-container">
     <svg
         bind:this={svgElement}
         viewBox="0 0 {vbWidth} {vbHeight}"
         xmlns="http://www.w3.org/2000/svg"
-        class="roller-spec-svg"
+        class="dynamic-svg"
     >
+        <!-- Definitions for arrows or styles -->
+        <defs>
+            <style>
+                .dim-label text {
+                    font-family:
+                        "Inter",
+                        -apple-system,
+                        BlinkMacSystemFont,
+                        "Segoe UI",
+                        Roboto,
+                        sans-serif;
+                    font-weight: 500;
+                }
+            </style>
+        </defs>
+
         <!-- Background/Border for the SVG -->
         <rect
             x="10"
@@ -105,7 +121,7 @@
         <!-- Legend/Labels for Verification -->
         <g
             transform="translate(20, 40)"
-            font-family="Inter, sans-serif"
+            class="dim-label"
             font-size="14"
             fill="#1e1b4b"
         >
@@ -138,7 +154,7 @@
 </div>
 
 <style>
-    .roller-spec-container {
+    .dynamic-svg-container {
         width: 100%;
         height: 100%;
         display: flex;
@@ -148,9 +164,14 @@
         padding: 20px;
     }
 
-    .roller-spec-svg {
+    .dynamic-svg {
         width: 100%;
         height: auto;
         max-height: 100%;
+    }
+
+    .dim-label text {
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
     }
 </style>

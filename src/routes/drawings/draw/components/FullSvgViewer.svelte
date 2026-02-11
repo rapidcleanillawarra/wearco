@@ -352,7 +352,9 @@
 
     async function handleDownload() {
         const content =
-            diagram?.type === "edge" ? dynamicSvgContent : updatedSvgContent;
+            diagram?.type === "edge" || diagram?.type === "roller_spec"
+                ? dynamicSvgContent
+                : updatedSvgContent;
         if (!content) return;
 
         try {
@@ -375,7 +377,9 @@
 
     async function handlePrint() {
         const content =
-            diagram?.type === "edge" ? dynamicSvgContent : updatedSvgContent;
+            diagram?.type === "edge" || diagram?.type === "roller_spec"
+                ? dynamicSvgContent
+                : updatedSvgContent;
         if (!content) return;
 
         // Create a hidden iframe for printing to avoid popup blockers and extra windows
