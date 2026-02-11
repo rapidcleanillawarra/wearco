@@ -104,8 +104,23 @@
     });
 
     // Visual dimensions for the placeholder rectangle
-    const vbWidth = 450;
-    const vbHeight = 210;
+    const vbWidth = 550;
+    const vbHeight = 310;
+
+    // Rectangle Dimensions
+    const rectW = 320;
+    const rectH = 160;
+    const centerX = vbWidth / 2;
+    const centerY = vbHeight / 2 + 25; // Adjusted down to make room for top measurements
+
+    // Calculate rectangle bounds
+    const rectX = centerX - rectW / 2;
+    const rectY = centerY - rectH / 2;
+
+    // Parallel lines Offset from rectangle
+    const parallelLineOffset = 10;
+    const parallelLineX1 = rectX - parallelLineOffset;
+    const parallelLineX2 = rectX + rectW + parallelLineOffset;
 </script>
 
 <div class="dynamic-svg-container">
@@ -140,27 +155,27 @@
 
         <!-- Shaft Overall Measurement -->
         <line
-            x1={121.5 - currentSlot.w}
+            x1={parallelLineX1 - currentSlot.w}
             y1="10"
-            x2={121.5 - currentSlot.w}
-            y2="115"
+            x2={parallelLineX1 - currentSlot.w}
+            y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={328.5 + currentSlot.w}
+            x1={parallelLineX2 + currentSlot.w}
             y1="10"
-            x2={328.5 + currentSlot.w}
-            y2="115"
+            x2={parallelLineX2 + currentSlot.w}
+            y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={121.5 - currentSlot.w}
+            x1={parallelLineX1 - currentSlot.w}
             y1="15"
-            x2={328.5 + currentSlot.w}
+            x2={parallelLineX2 + currentSlot.w}
             y2="15"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -169,7 +184,7 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="225"
+            x={centerX}
             y="10"
             text-anchor="middle"
             font-size="10"
@@ -181,27 +196,27 @@
 
         <!-- Back-to-Back Measurement -->
         <line
-            x1="106.5"
+            x1={rectX - 15}
             y1="30"
-            x2="106.5"
-            y2="115"
+            x2={rectX - 15}
+            y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1="343.5"
+            x1={rectX + rectW + 15}
             y1="30"
-            x2="343.5"
-            y2="115"
+            x2={rectX + rectW + 15}
+            y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1="106.5"
+            x1={rectX - 15}
             y1="35"
-            x2="343.5"
+            x2={rectX + rectW + 15}
             y2="35"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -210,7 +225,7 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="225"
+            x={centerX}
             y="30"
             text-anchor="middle"
             font-size="10"
@@ -222,10 +237,10 @@
 
         <!-- Placeholder Rectangle for Roller Spec -->
         <rect
-            x="126.5"
-            y="75"
-            width="197"
-            height="100"
+            x={rectX}
+            y={rectY}
+            width={rectW}
+            height={rectH}
             fill="none"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -233,28 +248,28 @@
 
         <!-- Parallel lines on left and right -->
         <line
-            x1="121.5"
-            y1="50"
-            x2="121.5"
-            y2="170"
+            x1={parallelLineX1}
+            y1={rectY - 25}
+            x2={parallelLineX1}
+            y2={rectY + rectH - 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <line
-            x1="328.5"
-            y1="50"
-            x2="328.5"
-            y2="170"
+            x1={parallelLineX2}
+            y1={rectY - 25}
+            x2={parallelLineX2}
+            y2={rectY + rectH - 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
 
         <!-- Distance Arrow (face_width) -->
         <line
-            x1="121.5"
-            y1="55"
-            x2="328.5"
-            y2="55"
+            x1={parallelLineX1}
+            y1={rectY - 20}
+            x2={parallelLineX2}
+            y2={rectY - 20}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -262,8 +277,8 @@
             marker-end="url(#arrowhead-end)"
         />
         <text
-            x="225"
-            y="50"
+            x={centerX}
+            y={rectY - 25}
             text-anchor="middle"
             font-size="10"
             fill="#1e1b4b"
@@ -275,37 +290,37 @@
         <!-- Connecting lines from corners -->
         <!-- Left top -->
         <line
-            x1="126.5"
-            y1="75"
-            x2="121.5"
-            y2="80"
+            x1={rectX}
+            y1={rectY}
+            x2={parallelLineX1}
+            y2={rectY + 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Left bottom -->
         <line
-            x1="126.5"
-            y1="175"
-            x2="121.5"
-            y2="170"
+            x1={rectX}
+            y1={rectY + rectH}
+            x2={parallelLineX1}
+            y2={rectY + rectH - 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right top -->
         <line
-            x1="323.5"
-            y1="75"
-            x2="328.5"
-            y2="80"
+            x1={rectX + rectW}
+            y1={rectY}
+            x2={parallelLineX2}
+            y2={rectY + 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
         <!-- Right bottom -->
         <line
-            x1="323.5"
-            y1="175"
-            x2="328.5"
-            y2="170"
+            x1={rectX + rectW}
+            y1={rectY + rectH}
+            x2={parallelLineX2}
+            y2={rectY + rectH - 5}
             stroke="#1e1b4b"
             stroke-width="1"
         />
@@ -313,8 +328,8 @@
         <!-- Type-dependent slots -->
         <!-- Left side -->
         <svg
-            x={121.5 - currentSlot.w}
-            y={125 - currentSlot.h / 2}
+            x={parallelLineX1 - currentSlot.w}
+            y={centerY - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
             viewBox={currentSlot.vb}
@@ -329,8 +344,8 @@
 
         <!-- Right side -->
         <svg
-            x="328.5"
-            y={125 - currentSlot.h / 2}
+            x={parallelLineX2}
+            y={centerY - currentSlot.h / 2}
             width={currentSlot.w}
             height={currentSlot.h}
             viewBox={currentSlot.vb}
