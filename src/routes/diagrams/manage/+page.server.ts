@@ -127,8 +127,8 @@ export const actions: Actions = {
 
         // Validate type field - must be lowercase and one of the expected values or empty
         const normalizedType = type ? type.toLowerCase().trim() : null;
-        if (normalizedType && !['edge', 'top_side'].includes(normalizedType)) {
-            return fail(400, { invalid: true, message: 'Type must be either "edge" or "top_side"' });
+        if (normalizedType && !['edge', 'top_side', 'roller_spec'].includes(normalizedType)) {
+            return fail(400, { invalid: true, message: 'Type must be "edge", "top_side", or "roller_spec"' });
         }
 
         // Parse and validate JSON data

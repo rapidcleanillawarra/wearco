@@ -5,7 +5,7 @@
     import DiagramRow from "./components/DiagramRow.svelte";
     import { fade } from "svelte/transition";
 
-    import type { WearcoTemplate } from '$lib/types/template';
+    import type { WearcoTemplate } from "$lib/types/template";
 
     let { data, form } = $props<{
         data: {
@@ -32,37 +32,50 @@
     let selectedTemplate = $state("all");
     let showCreateModal = $state(false);
     let selectedTemplateId = $state<string>("");
-    let selectedDiagramType = $state<"edge" | "top_side" | "">("");
+    let selectedDiagramType = $state<"edge" | "top_side" | "roller_spec" | "">(
+        "",
+    );
 
     // Derived state for filtering
     const uniqueTemplates = $derived([
         "all",
-        ...new Set(diagrams.map((d: (WearcoSvgDiagram & {
-            wearco_templates?: {
-                template_name: string;
-                category: string;
-            };
-        })) => d.wearco_templates?.template_name).filter(Boolean)),
+        ...new Set(
+            diagrams
+                .map(
+                    (
+                        d: WearcoSvgDiagram & {
+                            wearco_templates?: {
+                                template_name: string;
+                                category: string;
+                            };
+                        },
+                    ) => d.wearco_templates?.template_name,
+                )
+                .filter(Boolean),
+        ),
     ]);
 
     const filteredDiagrams = $derived(
-        diagrams.filter((d: (WearcoSvgDiagram & {
-            wearco_templates?: {
-                template_name: string;
-                category: string;
-            };
-        })) => {
-            const matchesSearch =
-                d.name
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                (d.wearco_templates?.template_name || "")
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase());
-            const matchesTemplate =
-                selectedTemplate === "all" || d.wearco_templates?.template_name === selectedTemplate;
-            return matchesSearch && matchesTemplate;
-        }),
+        diagrams.filter(
+            (
+                d: WearcoSvgDiagram & {
+                    wearco_templates?: {
+                        template_name: string;
+                        category: string;
+                    };
+                },
+            ) => {
+                const matchesSearch =
+                    d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (d.wearco_templates?.template_name || "")
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase());
+                const matchesTemplate =
+                    selectedTemplate === "all" ||
+                    d.wearco_templates?.template_name === selectedTemplate;
+                return matchesSearch && matchesTemplate;
+            },
+        ),
     );
 
     function openCreateModal() {
@@ -76,7 +89,9 @@
             return; // Don't close modal if selections are incomplete
         }
         showCreateModal = false;
-        goto(`/diagrams/manage?template_id=${selectedTemplateId}&type=${selectedDiagramType}`);
+        goto(
+            `/diagrams/manage?template_id=${selectedTemplateId}&type=${selectedDiagramType}`,
+        );
     }
 
     function closeCreateModal() {
@@ -95,9 +110,7 @@
         <div class="header-content">
             <div class="title-section">
                 <h1>Diagrams</h1>
-                <p class="subtitle">
-                    Manage and organize your SVG diagrams
-                </p>
+                <p class="subtitle">Manage and organize your SVG diagrams</p>
             </div>
             <button class="create-btn" onclick={openCreateModal}>
                 <svg
@@ -277,14 +290,41 @@
 
 {#if showCreateModal}
     <!-- Modal Backdrop -->
-    <div class="modal-backdrop" onclick={closeCreateModal} onkeydown={(e) => { if (e.key === 'Escape') closeCreateModal(); }} role="presentation" tabindex="-1"></div>
+    <div
+        class="modal-backdrop"
+        onclick={closeCreateModal}
+        onkeydown={(e) => {
+            if (e.key === "Escape") closeCreateModal();
+        }}
+        role="presentation"
+        tabindex="-1"
+    ></div>
 
     <!-- Modal Dialog -->
-    <div class="modal-dialog" role="dialog" aria-labelledby="modal-title" aria-describedby="modal-description">
+    <div
+        class="modal-dialog"
+        role="dialog"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+    >
         <div class="modal-header">
             <h2 id="modal-title">Create New Diagram</h2>
-            <button class="modal-close" onclick={closeCreateModal} aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button
+                class="modal-close"
+                onclick={closeCreateModal}
+                aria-label="Close modal"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -299,7 +339,9 @@
             {#if data.templates && data.templates.length > 0}
                 <div class="selections-container">
                     <div class="template-selector">
-                        <label for="template-select" class="template-label">Template:</label>
+                        <label for="template-select" class="template-label"
+                            >Template:</label
+                        >
                         <select
                             id="template-select"
                             bind:value={selectedTemplateId}
@@ -318,56 +360,146 @@
                     </div>
 
                     <div class="type-selector">
-                        <div class="type-label" id="type-label">Diagram Type:</div>
-                        <div class="diagram-type-options" role="radiogroup" aria-labelledby="type-label">
+                        <div class="type-label" id="type-label">
+                            Diagram Type:
+                        </div>
+                        <div
+                            class="diagram-type-options"
+                            role="radiogroup"
+                            aria-labelledby="type-label"
+                        >
                             <button
                                 class="diagram-type-option"
-                                class:selected={selectedDiagramType === 'edge'}
-                                onclick={() => selectedDiagramType = 'edge'}
+                                class:selected={selectedDiagramType === "edge"}
+                                onclick={() => (selectedDiagramType = "edge")}
                                 role="radio"
-                                aria-checked={selectedDiagramType === 'edge'}
+                                aria-checked={selectedDiagramType === "edge"}
                                 aria-label="Edge Diagram"
                             >
                                 <div class="option-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="3"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                            ry="2"
+                                        ></rect>
+                                        <line x1="9" y1="9" x2="15" y2="15"
+                                        ></line>
+                                        <line x1="15" y1="9" x2="9" y2="15"
+                                        ></line>
                                     </svg>
                                 </div>
                                 <h3>Edge Diagram</h3>
-                                <p>Create a diagram for edge configurations and layouts</p>
+                                <p>
+                                    Create a diagram for edge configurations and
+                                    layouts
+                                </p>
                             </button>
 
                             <button
                                 class="diagram-type-option"
-                                class:selected={selectedDiagramType === 'top_side'}
-                                onclick={() => selectedDiagramType = 'top_side'}
+                                class:selected={selectedDiagramType ===
+                                    "top_side"}
+                                onclick={() =>
+                                    (selectedDiagramType = "top_side")}
                                 role="radio"
-                                aria-checked={selectedDiagramType === 'top_side'}
+                                aria-checked={selectedDiagramType ===
+                                    "top_side"}
                                 aria-label="Top Side Diagram"
                             >
                                 <div class="option-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                        <rect x="7" y="7" width="3" height="3"></rect>
-                                        <rect x="14" y="7" width="3" height="3"></rect>
-                                        <rect x="7" y="14" width="3" height="3"></rect>
-                                        <rect x="14" y="14" width="3" height="3"></rect>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="3"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                            ry="2"
+                                        ></rect>
+                                        <rect x="7" y="7" width="3" height="3"
+                                        ></rect>
+                                        <rect x="14" y="7" width="3" height="3"
+                                        ></rect>
+                                        <rect x="7" y="14" width="3" height="3"
+                                        ></rect>
+                                        <rect x="14" y="14" width="3" height="3"
+                                        ></rect>
                                     </svg>
                                 </div>
                                 <h3>Top Side Diagram</h3>
-                                <p>Create a diagram for top-side layouts and designs</p>
+                                <p>
+                                    Create a diagram for top-side layouts and
+                                    designs
+                                </p>
+                            </button>
+
+                            <button
+                                class="diagram-type-option"
+                                class:selected={selectedDiagramType ===
+                                    "roller_spec"}
+                                onclick={() =>
+                                    (selectedDiagramType = "roller_spec")}
+                                role="radio"
+                                aria-checked={selectedDiagramType ===
+                                    "roller_spec"}
+                                aria-label="Roller Specification"
+                            >
+                                <div class="option-icon">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <line x1="12" y1="3" x2="12" y2="21"
+                                        ></line>
+                                        <line x1="3" y1="12" x2="21" y2="12"
+                                        ></line>
+                                    </svg>
+                                </div>
+                                <h3>Roller Spec</h3>
+                                <p>
+                                    Configure specifications for rollers without
+                                    visual preview
+                                </p>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-actions">
-                    <button
-                        class="cancel-btn"
-                        onclick={closeCreateModal}
-                    >
+                    <button class="cancel-btn" onclick={closeCreateModal}>
                         Cancel
                     </button>
                     <button
@@ -381,13 +513,17 @@
             {:else}
                 <div class="loading-error">
                     <p class="error-message">
-                        {#if data.error && data.error.includes('templates')}
+                        {#if data.error && data.error.includes("templates")}
                             Failed to load templates. Please try again.
                         {:else}
-                            No templates available. Please create a template first.
+                            No templates available. Please create a template
+                            first.
                         {/if}
                     </p>
-                    <button class="retry-btn" onclick={() => window.location.reload()}>
+                    <button
+                        class="retry-btn"
+                        onclick={() => window.location.reload()}
+                    >
                         Retry
                     </button>
                 </div>
@@ -892,7 +1028,6 @@
         line-height: 1.4;
     }
 
-
     @keyframes fadeIn {
         from {
             opacity: 0;
@@ -926,7 +1061,6 @@
         .modal-content {
             padding: 1rem;
         }
-
 
         .modal-actions {
             flex-direction: column;
