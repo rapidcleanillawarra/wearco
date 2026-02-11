@@ -806,7 +806,10 @@
 		</section>
 
 		{#if orderedDiagrams && orderedDiagrams.length > 0}
-			<div class="svg-diagrams-container">
+			<div
+				class="svg-diagrams-container"
+				class:single-column={orderedDiagrams.length === 1}
+			>
 				{#each orderedDiagrams as diagram}
 					<div class="diagram-item">
 						<FullSvgViewer
@@ -976,6 +979,10 @@
 		grid-template-columns: repeat(2, 1fr);
 		gap: var(--spacing-lg);
 		align-items: start;
+	}
+
+	.svg-diagrams-container.single-column {
+		grid-template-columns: 1fr;
 	}
 
 	.diagram-item {
