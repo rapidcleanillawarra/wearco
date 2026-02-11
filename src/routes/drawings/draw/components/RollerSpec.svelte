@@ -146,6 +146,28 @@
             stroke="#1e1b4b"
             stroke-width="1"
         />
+
+        <!-- Small rectangles outside parallel lines -->
+        <!-- Left side -->
+        <rect
+            x="35"
+            y="95"
+            width="10"
+            height="20"
+            fill="none"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <!-- Right side -->
+        <rect
+            x="252"
+            y="95"
+            width="10"
+            height="20"
+            fill="none"
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
     </svg>
 </div>
 
