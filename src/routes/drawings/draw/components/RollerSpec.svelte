@@ -196,27 +196,27 @@
 
         <!-- Back-to-Back Measurement -->
         <line
-            x1={rectX - 15}
+            x1={parallelLineX1 - currentSlot.w / 2}
             y1="30"
-            x2={rectX - 15}
+            x2={parallelLineX1 - currentSlot.w / 2}
             y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={rectX + rectW + 15}
+            x1={parallelLineX2 + currentSlot.w / 2}
             y1="30"
-            x2={rectX + rectW + 15}
+            x2={parallelLineX2 + currentSlot.w / 2}
             y2={centerY}
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
-            x1={rectX - 15}
+            x1={parallelLineX1 - currentSlot.w / 2}
             y1="35"
-            x2={rectX + rectW + 15}
+            x2={parallelLineX2 + currentSlot.w / 2}
             y2="35"
             stroke="#1e1b4b"
             stroke-width="1"
@@ -246,10 +246,10 @@
             stroke-width="1"
         />
 
-        <!-- Parallel lines on left and right -->
+        <!-- Parallel lines on left and right (Solid part) -->
         <line
             x1={parallelLineX1}
-            y1={rectY - 25}
+            y1={rectY + 5}
             x2={parallelLineX1}
             y2={rectY + rectH - 5}
             stroke="#1e1b4b"
@@ -257,7 +257,7 @@
         />
         <line
             x1={parallelLineX2}
-            y1={rectY - 25}
+            y1={rectY + 5}
             x2={parallelLineX2}
             y2={rectY + rectH - 5}
             stroke="#1e1b4b"
@@ -265,6 +265,24 @@
         />
 
         <!-- Distance Arrow (face_width) -->
+        <line
+            x1={parallelLineX1}
+            y1={rectY - 25}
+            x2={parallelLineX1}
+            y2={rectY + 5}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <line
+            x1={parallelLineX2}
+            y1={rectY - 25}
+            x2={parallelLineX2}
+            y2={rectY + 5}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
         <line
             x1={parallelLineX1}
             y1={rectY - 20}
