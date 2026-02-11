@@ -104,7 +104,7 @@
     });
 
     // Visual dimensions for the placeholder rectangle
-    const vbWidth = 550;
+    const vbWidth = 750;
     const vbHeight = 310;
 
     // Rectangle Dimensions
@@ -153,6 +153,66 @@
             </marker>
         </defs>
 
+        <!-- Roller Diameter Measurement -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 60}
+            y1={rectY}
+            x2={parallelLineX1 - currentSlot.w - 60}
+            y2={rectY + rectH}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
+        />
+        <!-- Top Assembly -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 65}
+            y1={rectY}
+            x2={parallelLineX1 - currentSlot.w - 55}
+            y2={rectY}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX1 - currentSlot.w - 60}
+            y1={rectY}
+            x2={rectX}
+            y2={rectY}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <!-- Bottom Assembly -->
+        <line
+            x1={parallelLineX1 - currentSlot.w - 65}
+            y1={rectY + rectH}
+            x2={parallelLineX1 - currentSlot.w - 55}
+            y2={rectY + rectH}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX1 - currentSlot.w - 60}
+            y1={rectY + rectH}
+            x2={rectX}
+            y2={rectY + rectH}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <text
+            x={parallelLineX1 - currentSlot.w - 70}
+            y={rectY + rectH / 2}
+            text-anchor="end"
+            dominant-baseline="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {rollerDiameter}
+        </text>
+
         <!-- Shaft Diameter Measurement -->
         <line
             x1={parallelLineX1 - currentSlot.w - 20}
@@ -162,6 +222,8 @@
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
+            marker-start="url(#arrowhead-start)"
+            marker-end="url(#arrowhead-end)"
         />
         <!-- Top Assembly -->
         <line
