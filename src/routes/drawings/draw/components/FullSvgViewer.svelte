@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { WearcoDiagram } from "$lib/types/svg_diagram";
     import EdgeDiagram from "./EdgeDiagram.svelte";
+    import RollerSpec from "./RollerSpec.svelte";
     import PitchesModal from "./PitchesModal.svelte";
 
     let {
@@ -631,6 +632,16 @@
                             variables={diagram.variables}
                             name={diagram.name}
                             pitchConfigs={currentPitchConfig}
+                            bind:svgString={dynamicSvgContent}
+                            {onFieldUpdate}
+                        />
+                    </div>
+                {:else if diagram?.type === "roller_spec"}
+                    <div class="inline-svg-container" draggable="false">
+                        <RollerSpec
+                            {fieldValues}
+                            variables={diagram.variables}
+                            name={diagram.name}
                             bind:svgString={dynamicSvgContent}
                             {onFieldUpdate}
                         />
