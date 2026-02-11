@@ -270,27 +270,27 @@
         <!-- Back-to-Back Measurement -->
         <line
             x1="30"
-            y1="115"
+            y1="10"
             x2="30"
-            y2="180"
+            y2="95"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
             x1="267"
-            y1="115"
+            y1="10"
             x2="267"
-            y2="180"
+            y2="95"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
         />
         <line
             x1="30"
-            y1="175"
+            y1="15"
             x2="267"
-            y2="175"
+            y2="15"
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
@@ -299,7 +299,7 @@
         />
         <text
             x="148.5"
-            y="188"
+            y="10"
             text-anchor="middle"
             font-size="10"
             fill="#1e1b4b"
