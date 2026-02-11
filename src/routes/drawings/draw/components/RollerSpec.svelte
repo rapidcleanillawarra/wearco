@@ -39,6 +39,7 @@
     }
 
     // --- Mapped Variables (Variables column in wearco_diagrams table) ---
+    let faceWidth = $derived(getVal("face_width", 0));
     let slotWidth = $derived(getVal("slot_width", 0));
     let backToBack = $derived(getVal("back_to_back", 0));
     let typeOfSlot = $derived(getVal("type_of_slot", ""));
@@ -52,6 +53,7 @@
     $effect(() => {
         // Dependencies to trigger serialization on any change
         const _deps = [
+            faceWidth,
             slotWidth,
             backToBack,
             typeOfSlot,
@@ -110,12 +112,13 @@
             <text font-weight="bold" font-size="16" y="0">{name}</text>
 
             <g transform="translate(0, 30)">
-                <text y="0">Slot Width: {slotWidth} mm</text>
-                <text y="20">Back to Back: {backToBack} mm</text>
-                <text y="40">Type of Slot: {typeOfSlot}</text>
-                <text y="60">Shaft Overall: {shaftOverall} mm</text>
-                <text y="80">Shaft Diameter: {shaftDiameter} mm</text>
-                <text y="100">Roller Diameter: {rollerDiameter} mm</text>
+                <text y="0">Face Width: {faceWidth} mm</text>
+                <text y="20">Slot Width: {slotWidth} mm</text>
+                <text y="40">Back to Back: {backToBack} mm</text>
+                <text y="60">Type of Slot: {typeOfSlot}</text>
+                <text y="80">Shaft Overall: {shaftOverall} mm</text>
+                <text y="100">Shaft Diameter: {shaftDiameter} mm</text>
+                <text y="120">Roller Diameter: {rollerDiameter} mm</text>
             </g>
         </g>
 
