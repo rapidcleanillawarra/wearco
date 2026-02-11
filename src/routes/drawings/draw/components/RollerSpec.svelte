@@ -47,6 +47,35 @@
     let shaftDiameter = $derived(getVal("shaft_diameter", 0));
     let rollerDiameter = $derived(getVal("roller_diameter", 0));
 
+    // --- Slot Configurations ---
+    const SLOT_CONFIGS: Record<
+        string,
+        { path: string; vb: string; w: number; h: number }
+    > = {
+        "2": {
+            path: "m 1.3946827,0.24696316 6.6965304,-0.08134 c 1.817686,-0.119544 0.03757,2.63928104 2.2366689,3.00960104 l 7.099199,-0.02236 c 2.035075,0.0017 0.607359,-2.93530304 2.426854,-2.90588004 l 9.970693,-0.04648 L 29.838118,19.76873 1.3677507,19.83845 C 0.44077471,19.839324 0.22918071,19.340052 0.23593971,18.688059 l -0.06738,-17.4068928 c -0.09179,-0.62045204 0.749669,-0.98153804 1.22610599,-1.03418804 z",
+            vb: "0 0 30 20",
+            w: 30,
+            h: 20,
+        },
+        "3": {
+            path: "M 32.695641,3.21026 49.815396,3.155772 c 1.121294,-0.028895 1.241467,-0.9444672 1.247263,-1.5616953 0.0058,-0.61855213 0.421683,-1.33150165 1.385522,-1.41042947 l 9.959843,-0.0222833 1e-6,19.68949007 -10.127193,0.01066 c -2.416033,-0.483151 0.05065,-2.596906 -2.553006,-2.952311 l -17.092021,0.0075 z",
+            vb: "32.5 0 30 20",
+            w: 30,
+            h: 20,
+        },
+        default: {
+            path: "M 17 0 L 17 20 L 3 20 A 3 3 0 0 1 0 17 L 0 3 A 3 3 0 0 1 3 0 Z",
+            vb: "0 0 17 20",
+            w: 17,
+            h: 20,
+        },
+    };
+
+    let currentSlot = $derived(
+        SLOT_CONFIGS[typeOfSlot] || SLOT_CONFIGS["default"],
+    );
+
     // Expose the SVG string for downloading or other uses
     let svgElement = $state<SVGSVGElement | null>(null);
 
@@ -149,40 +178,42 @@
 
         <!-- Type-dependent slots -->
         <!-- Left side -->
-        {#if typeOfSlot === "2"}
+        <svg
+            x={45 - currentSlot.w}
+            y={105 - currentSlot.h / 2}
+            width={currentSlot.w}
+            height={currentSlot.h}
+            viewBox={currentSlot.vb}
+        >
             <path
-                d="m 1.3946827,0.24696316 6.6965304,-0.08134 c 1.817686,-0.119544 0.03757,2.63928104 2.2366689,3.00960104 l 7.099199,-0.02236 c 2.035075,0.0017 0.607359,-2.93530304 2.426854,-2.90588004 l 9.970693,-0.04648 L 29.838118,19.76873 1.3677507,19.83845 C 0.44077471,19.839324 0.22918071,19.340052 0.23593971,18.688059 l -0.06738,-17.4068928 c -0.09179,-0.62045204 0.749669,-0.98153804 1.22610599,-1.03418804 z"
-                transform="translate(15.2, 95)"
+                d={currentSlot.path}
                 fill="none"
                 stroke="#1e1b4b"
                 stroke-width="1"
             />
-        {:else}
-            <path
-                d="M 45 95 L 45 115 L 28 115 A 3 3 0 0 1 25 112 L 25 98 A 3 3 0 0 1 28 95 Z"
-                fill="none"
-                stroke="#1e1b4b"
-                stroke-width="1"
-            />
-        {/if}
+        </svg>
 
         <!-- Right side -->
-        {#if typeOfSlot === "2"}
-            <path
-                d="m 1.3946827,0.24696316 6.6965304,-0.08134 c 1.817686,-0.119544 0.03757,2.63928104 2.2366689,3.00960104 l 7.099199,-0.02236 c 2.035075,0.0017 0.607359,-2.93530304 2.426854,-2.90588004 l 9.970693,-0.04648 L 29.838118,19.76873 1.3677507,19.83845 C 0.44077471,19.839324 0.22918071,19.340052 0.23593971,18.688059 l -0.06738,-17.4068928 c -0.09179,-0.62045204 0.749669,-0.98153804 1.22610599,-1.03418804 z"
-                transform="translate(281.8, 95) scale(-1, 1)"
-                fill="none"
-                stroke="#1e1b4b"
-                stroke-width="1"
-            />
-        {:else}
-            <path
-                d="M 252 95 L 252 115 L 269 115 A 3 3 0 0 0 272 112 L 272 98 A 3 3 0 0 0 269 95 Z"
-                fill="none"
-                stroke="#1e1b4b"
-                stroke-width="1"
-            />
-        {/if}
+        <svg
+            x="252"
+            y={105 - currentSlot.h / 2}
+            width={currentSlot.w}
+            height={currentSlot.h}
+            viewBox={currentSlot.vb}
+        >
+            <g
+                transform="translate({parseFloat(currentSlot.vb.split(' ')[0]) *
+                    2 +
+                    currentSlot.w}, 0) scale(-1, 1)"
+            >
+                <path
+                    d={currentSlot.path}
+                    fill="none"
+                    stroke="#1e1b4b"
+                    stroke-width="1"
+                />
+            </g>
+        </svg>
     </svg>
 </div>
 
