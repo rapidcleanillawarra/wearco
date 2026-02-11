@@ -147,12 +147,12 @@
             stroke-width="1"
         />
 
-        <!-- Small rectangles outside parallel lines -->
+        <!-- type_of_slot rectangles outside parallel lines -->
         <!-- Left side -->
         <rect
-            x="35"
+            x="25"
             y="95"
-            width="10"
+            width="20"
             height="20"
             fill="none"
             stroke="#1e1b4b"
@@ -162,7 +162,7 @@
         <rect
             x="252"
             y="95"
-            width="10"
+            width="20"
             height="20"
             fill="none"
             stroke="#1e1b4b"
