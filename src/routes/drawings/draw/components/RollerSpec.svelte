@@ -46,6 +46,7 @@
     let shaftOverall = $derived(getVal("shaft_overall", 0));
     let shaftDiameter = $derived(getVal("shaft_diameter", 0));
     let rollerDiameter = $derived(getVal("roller_diameter", 0));
+    let acrossFlats = $derived(getVal("across_flats", 0));
 
     // --- Slot Configurations ---
     const SLOT_CONFIGS: Record<
@@ -95,6 +96,7 @@
             shaftOverall,
             shaftDiameter,
             rollerDiameter,
+            acrossFlats,
         ];
 
         if (svgElement) {
@@ -121,6 +123,7 @@
     const parallelLineOffset = 10;
     const parallelLineX1 = rectX - parallelLineOffset;
     const parallelLineX2 = rectX + rectW + parallelLineOffset;
+    const across_flats_offset = 7;
 </script>
 
 <div class="dynamic-svg-container">
@@ -222,8 +225,6 @@
             stroke="#1e1b4b"
             stroke-width="1"
             stroke-dasharray="4"
-            marker-start="url(#arrowhead-start)"
-            marker-end="url(#arrowhead-end)"
         />
         <!-- Top Assembly -->
         <line
@@ -353,6 +354,64 @@
             font-weight="bold"
         >
             {backToBack}
+        </text>
+
+        <!-- Right Side Slot Measurement (across_flats) -->
+        <line
+            x1={parallelLineX2 + currentSlot.w + 20}
+            y1={centerY - currentSlot.h / 2 + across_flats_offset}
+            x2={parallelLineX2 + currentSlot.w + 20}
+            y2={centerY + currentSlot.h / 2 - across_flats_offset}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <!-- Top Assembly -->
+        <line
+            x1={parallelLineX2 + currentSlot.w + 15}
+            y1={centerY - currentSlot.h / 2 + across_flats_offset}
+            x2={parallelLineX2 + currentSlot.w + 25}
+            y2={centerY - currentSlot.h / 2 + across_flats_offset}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX2 + currentSlot.w}
+            y1={centerY - currentSlot.h / 2 + across_flats_offset}
+            x2={parallelLineX2 + currentSlot.w + 20}
+            y2={centerY - currentSlot.h / 2 + across_flats_offset}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <!-- Bottom Assembly -->
+        <line
+            x1={parallelLineX2 + currentSlot.w + 15}
+            y1={centerY + currentSlot.h / 2 - across_flats_offset}
+            x2={parallelLineX2 + currentSlot.w + 25}
+            y2={centerY + currentSlot.h / 2 - across_flats_offset}
+            stroke="#1e1b4b"
+            stroke-width="1"
+        />
+        <line
+            x1={parallelLineX2 + currentSlot.w}
+            y1={centerY + currentSlot.h / 2 - across_flats_offset}
+            x2={parallelLineX2 + currentSlot.w + 20}
+            y2={centerY + currentSlot.h / 2 - across_flats_offset}
+            stroke="#1e1b4b"
+            stroke-width="1"
+            stroke-dasharray="4"
+        />
+        <text
+            x={parallelLineX2 + currentSlot.w + 30}
+            y={centerY}
+            text-anchor="start"
+            dominant-baseline="middle"
+            font-size="10"
+            fill="#1e1b4b"
+            font-weight="bold"
+        >
+            {acrossFlats}
         </text>
 
         <!-- Placeholder Rectangle for Roller Spec -->
