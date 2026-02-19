@@ -695,11 +695,6 @@
 						/>
 						<input
 							type="hidden"
-							name="dl"
-							value={drawingFormData.dl}
-						/>
-						<input
-							type="hidden"
 							name="checked_by"
 							value={drawingFormData.checked_by}
 						/>

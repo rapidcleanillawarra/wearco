@@ -143,7 +143,6 @@ export const actions: Actions = {
         const customer_source = (formData.get('customer_source') as string) || null;
         const quantityStr = formData.get('quantity') as string;
         const quantity = quantityStr ? parseInt(quantityStr, 10) || 0 : 0;
-        const dl = (formData.get('dl') as string) || null;
         const purchase_order = (formData.get('purchase_order') as string) || null;
         const drawing_dataStr = formData.get('drawing_data') as string;
 
@@ -170,7 +169,6 @@ export const actions: Actions = {
             customer,
             customer_source,
             quantity,
-            dl,
             purchase_order,
             drawing_data,
             updated_at: now,
