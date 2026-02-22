@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
 	import type { DrawingFormData } from "../types";
-	import type { TemplateData } from "./types";
+	import type { TemplateData, TemplateField } from "./types";
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
@@ -9,7 +9,7 @@
 	import type { ActionResult } from "@sveltejs/kit";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
-	import OverlayFieldsMobile from "./components/OverlayFieldsMobile.svelte";
+	import OverlayFieldsMobileInterleaved from "./components/OverlayFieldsMobileInterleaved.svelte";
 	import FullSvgViewer from "./components/FullSvgViewer.svelte";
 	import {
 		exportPdfWithOverlay,
@@ -26,18 +26,159 @@
 	const template = $derived(data.template);
 	const drawing = $derived(data.drawing);
 	const diagrams = $derived(data.diagrams);
+
+	/** Parse diagram section "title#order" → { title, order }. Missing → "Other", order 999 */
+	function parseDiagramSection(sectionStr: string | null | undefined): {
+		title: string;
+		order: number;
+	} {
+		const s = (sectionStr ?? "").trim();
+		if (!s) return { title: "Other", order: 999 };
+		const idx = s.indexOf("#");
+		if (idx === -1) return { title: s || "Other", order: 0 };
+		const title = s.slice(0, idx).trim() || "Other";
+		const order = parseInt(s.slice(idx + 1).trim(), 10);
+		return { title, order: Number.isNaN(order) ? 999 : order };
+	}
+
+	/** Diagrams grouped by section, sections and diagrams sorted by section order. */
+	const orderedDiagramsBySection = $derived.by(() => {
+		const list = diagrams ?? [];
+		const map = new Map<
+			string,
+			{ order: number; diagrams: WearcoDiagram[] }
+		>();
+		const sectionTitles: string[] = [];
+
+		for (const d of list) {
+			const { title, order } = parseDiagramSection(d.section);
+			if (!map.has(title)) {
+				map.set(title, { order: 999, diagrams: [] });
+				sectionTitles.push(title);
+			}
+			const entry = map.get(title)!;
+			entry.diagrams.push(d);
+			if (title !== "Other" && order < entry.order) entry.order = order;
+		}
+
+		for (const entry of map.values()) {
+			entry.diagrams.sort((a, b) => {
+				const oA = parseDiagramSection(a.section).order;
+				const oB = parseDiagramSection(b.section).order;
+				if (oA !== oB) return oA - oB;
+				return (a.layout_order ?? 0) - (b.layout_order ?? 0);
+			});
+		}
+
+		const withOrder = sectionTitles.map((title) => ({
+			title,
+			...map.get(title)!,
+		}));
+		withOrder.sort((a, b) => a.order - b.order);
+		return withOrder;
+	});
+
+	/** Flat list of diagrams in section order (for backward compatibility / desktop grid). */
 	const orderedDiagrams = $derived(
-		[...(diagrams || [])].sort(
-			(a: WearcoDiagram, b: WearcoDiagram) =>
-				(a.layout_order ?? 0) - (b.layout_order ?? 0),
-		),
+		orderedDiagramsBySection.flatMap((s) => s.diagrams),
 	);
+
 	const pdfUrl = $derived(data.pdfUrl);
 
 	// Parse template data for overlay fields
 	const templateData = $derived<TemplateData | null>(
 		template?.template_data as TemplateData | null,
 	);
+
+	/** Normalize section title for matching (e.g. "center edge" and "center-edge" → "center-edge"). */
+	function normalizeSectionKey(s: string): string {
+		return s
+			.toLowerCase()
+			.trim()
+			.replace(/\s+/g, "-")
+			.replace(/-+/g, "-");
+	}
+
+	/** Parse field section "title#order" → { title, order }. Same convention as diagram section. */
+	function parseFieldSection(sectionStr: string | undefined): {
+		title: string;
+		order: number;
+	} {
+		const s = (sectionStr ?? "").trim();
+		if (!s) return { title: "Other", order: 999 };
+		const idx = s.indexOf("#");
+		if (idx === -1) return { title: s || "Other", order: 0 };
+		const title = s.slice(0, idx).trim() || "Other";
+		const order = parseInt(s.slice(idx + 1).trim(), 10);
+		return { title, order: Number.isNaN(order) ? 999 : order };
+	}
+
+	/** Unified sections for mobile: fields and diagrams merged by normalized key, ordered by section order. */
+	const unifiedMobileSections = $derived.by(() => {
+		const fields = templateData?.fields ?? [];
+		const diagramSections = orderedDiagramsBySection ?? [];
+		const map = new Map<
+			string,
+			{
+				order: number;
+				displayTitle: string;
+				fields: TemplateField[];
+				diagrams: WearcoDiagram[];
+			}
+		>();
+
+		for (const field of fields) {
+			const { title, order } = parseFieldSection(field.sections);
+			const key = normalizeSectionKey(title);
+			if (!map.has(key)) {
+				map.set(key, {
+					order: 999,
+					displayTitle: title,
+					fields: [],
+					diagrams: [],
+				});
+			}
+			const entry = map.get(key)!;
+			entry.fields.push(field);
+			if (title !== "Other" && order < entry.order) entry.order = order;
+		}
+
+		for (const { title, diagrams, order } of diagramSections) {
+			const key = normalizeSectionKey(title);
+			if (!map.has(key)) {
+				map.set(key, {
+					order: 999,
+					displayTitle: title,
+					fields: [],
+					diagrams: [],
+				});
+			}
+			const entry = map.get(key)!;
+			entry.diagrams.push(...diagrams);
+			if (title !== "Other" && order < entry.order) entry.order = order;
+		}
+
+		// Sort fields within each section by parseFieldSection order
+		for (const entry of map.values()) {
+			entry.fields.sort((a, b) => {
+				const oA = parseFieldSection(a.sections).order;
+				const oB = parseFieldSection(b.sections).order;
+				return oA - oB;
+			});
+		}
+
+		const result = Array.from(map.entries())
+			.map(([key, entry]) => ({
+				key,
+				displayTitle: entry.displayTitle,
+				order: entry.order,
+				fields: entry.fields,
+				diagrams: entry.diagrams,
+			}))
+			.filter((s) => s.fields.length > 0 || s.diagrams.length > 0)
+			.sort((a, b) => a.order - b.order);
+		return result;
+	});
 
 	// Drawing form data - mutable state that can be updated by overlay fields
 	let drawingFormData = $state<DrawingFormData>({
@@ -790,30 +931,38 @@
 			</div>
 		</section>
 
-		{#if templateData?.fields && templateData.fields.length > 0}
+		{#if unifiedMobileSections.length > 0}
 			<div class="mobile-overlay-section">
-				<OverlayFieldsMobile
-					fields={templateData.fields}
+				<OverlayFieldsMobileInterleaved
+					sections={unifiedMobileSections}
 					fieldValues={overlayFieldValues}
 					onFieldUpdate={handleOverlayFieldUpdate}
 					onFieldBlur={handleOverlayFieldBlur}
+					bind:svgConfigs
 				/>
 			</div>
 		{/if}
 
-		{#if orderedDiagrams && orderedDiagrams.length > 0}
-			<div
-				class="svg-diagrams-container"
-				class:single-column={orderedDiagrams.length === 1}
-			>
-				{#each orderedDiagrams as diagram}
-					<div class="diagram-item">
-						<FullSvgViewer
-							{diagram}
-							fieldValues={overlayFieldValues}
-							onFieldUpdate={handleOverlayFieldUpdate}
-							bind:svgConfigs
-						/>
+		{#if orderedDiagramsBySection && orderedDiagramsBySection.length > 0}
+			<div class="diagrams-wrapper">
+				{#each orderedDiagramsBySection as { title, diagrams }}
+					<div class="diagram-section">
+						<h3 class="diagram-section-title">{title.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>
+						<div
+							class="svg-diagrams-container"
+							class:single-column={diagrams.length === 1}
+						>
+							{#each diagrams as diagram (diagram.id)}
+								<div class="diagram-item">
+									<FullSvgViewer
+										{diagram}
+										fieldValues={overlayFieldValues}
+										onFieldUpdate={handleOverlayFieldUpdate}
+										bind:svgConfigs
+									/>
+								</div>
+							{/each}
+						</div>
 					</div>
 				{/each}
 			</div>
@@ -987,6 +1136,26 @@
 
 	.diagram-item {
 		width: 100%;
+	}
+
+	.diagrams-wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-xl);
+	}
+
+	.diagram-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+	}
+
+	.diagram-section-title {
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-semibold);
+		margin: 0;
+		color: var(--color-white);
+		text-transform: capitalize;
 	}
 
 	/* Toaster notifications */
@@ -1203,6 +1372,15 @@
 
 		.mobile-overlay-section {
 			display: block;
+		}
+
+		.diagrams-wrapper {
+			display: none;
+		}
+
+		.diagram-section-title {
+			font-size: var(--font-size-sm);
+			margin-bottom: var(--spacing-xs);
 		}
 
 		.section-card {
