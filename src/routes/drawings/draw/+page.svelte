@@ -9,6 +9,7 @@
 	import type { ActionResult } from "@sveltejs/kit";
 	import PdfViewer from "./components/PdfViewer.svelte";
 	import PdfOverlay from "./components/PdfOverlay.svelte";
+	import OverlayFieldsMobile from "./components/OverlayFieldsMobile.svelte";
 	import FullSvgViewer from "./components/FullSvgViewer.svelte";
 	import {
 		exportPdfWithOverlay,
@@ -789,6 +790,17 @@
 			</div>
 		</section>
 
+		{#if templateData?.fields && templateData.fields.length > 0}
+			<div class="mobile-overlay-section">
+				<OverlayFieldsMobile
+					fields={templateData.fields}
+					fieldValues={overlayFieldValues}
+					onFieldUpdate={handleOverlayFieldUpdate}
+					onFieldBlur={handleOverlayFieldBlur}
+				/>
+			</div>
+		{/if}
+
 		{#if orderedDiagrams && orderedDiagrams.length > 0}
 			<div
 				class="svg-diagrams-container"
@@ -923,6 +935,10 @@
 	.pdf-viewer-section {
 		padding: 0;
 		overflow: hidden;
+	}
+
+	.mobile-overlay-section {
+		display: none;
 	}
 
 	.section-content {
@@ -1179,6 +1195,14 @@
 		.btn-secondary,
 		.btn-ghost {
 			justify-content: center;
+		}
+
+		.pdf-viewer-section {
+			display: none;
+		}
+
+		.mobile-overlay-section {
+			display: block;
 		}
 
 		.section-card {

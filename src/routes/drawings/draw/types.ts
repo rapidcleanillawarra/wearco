@@ -26,6 +26,8 @@ export interface TemplateField {
         position: TemplateFieldPosition;
     }>;
     position: TemplateFieldPosition;
+    /** Section for mobile grouping, e.g. "center-edge#1" → title "center-edge", order 1 */
+    sections?: string;
 }
 
 /**
