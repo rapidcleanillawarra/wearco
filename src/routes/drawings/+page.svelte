@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import type { WearcoDrawing, WearcoTemplate } from "$lib/types/template";
 	import type { DrawingView } from "./types";
 	import DrawingCard from "./components/DrawingCard.svelte";
 	import DrawingRow from "./components/DrawingRow.svelte";
 	import DrawingsHeader from "./components/DrawingsHeader.svelte";
 	import DrawingsModal from "./components/DrawingsModal.svelte";
+	import DeleteConfirmModal from "./components/DeleteConfirmModal.svelte";
 
 	let { data } = $props<{
 		data: {
@@ -21,6 +23,10 @@
 	let viewMode: "card" | "list" = $state("card");
 
 	let showModal = $state(false);
+	let showDeleteModal = $state(false);
+	let deleteDrawing: DrawingView | null = $state(null);
+	let deleteFormEl: HTMLFormElement | undefined = $state(undefined);
+	let deleting = $state(false);
 	let selectedTemplateId: string | null = $state(null);
 	let searchQuery = $state("");
 	let selectedCustomer = $state("All Customers");
@@ -132,9 +138,32 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === "Escape" && showModal) {
-			closeModal();
+		if (event.key === "Escape") {
+			if (showDeleteModal) closeDeleteModal();
+			else if (showModal) closeModal();
 		}
+	}
+
+	function openDeleteModal(drawing: DrawingView) {
+		deleteDrawing = drawing;
+		showDeleteModal = true;
+	}
+
+	function closeDeleteModal() {
+		if (!deleting) {
+			showDeleteModal = false;
+			deleteDrawing = null;
+		}
+	}
+
+	function handleDeleteResult(result: { type: string; data?: { success?: boolean; error?: string } }) {
+		if (result?.type === "success" && result?.data?.success) {
+			closeDeleteModal();
+			deleteDrawing = null;
+		} else if (result?.data?.error) {
+			console.error("Delete failed:", result.data.error);
+		}
+		deleting = false;
 	}
 </script>
 
@@ -159,7 +188,7 @@
 			{#if viewMode === "card"}
 				<div class="cards-grid">
 					{#each drawingItems as drawing, index}
-						<DrawingCard {drawing} {index} />
+						<DrawingCard {drawing} {index} onDelete={() => openDeleteModal(drawing)} />
 					{/each}
 				</div>
 			{:else}
@@ -175,7 +204,7 @@
 						<span class="list-col actions-col">Actions</span>
 					</div>
 					{#each drawingItems as drawing, index}
-						<DrawingRow {drawing} {index} />
+						<DrawingRow {drawing} {index} onDelete={() => openDeleteModal(drawing)} />
 					{/each}
 				</div>
 			{/if}
@@ -199,6 +228,31 @@
 		onSelectTemplate={selectTemplate}
 		onCreate={createDrawing}
 	/>
+{/if}
+
+{#if showDeleteModal && deleteDrawing}
+	<DeleteConfirmModal
+		drawingTitle={deleteDrawing.title}
+		{deleting}
+		onClose={closeDeleteModal}
+		onConfirm={() => deleteFormEl?.requestSubmit()}
+	/>
+	<form
+		method="POST"
+		action="?/delete"
+		use:enhance={() => {
+			deleting = true;
+			return async ({ result, update }) => {
+				handleDeleteResult(result);
+				await update();
+			};
+		}}
+		class="delete-form"
+		bind:this={deleteFormEl}
+	>
+		<input type="hidden" name="drawing_id" value={deleteDrawing.id} />
+		<button type="submit" class="sr-only">Confirm delete</button>
+	</form>
 {/if}
 
 <style>
@@ -252,6 +306,22 @@
 
 	.error-icon {
 		font-size: 1.5rem;
+	}
+
+	.delete-form {
+		display: none;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	@media (max-width: 768px) {

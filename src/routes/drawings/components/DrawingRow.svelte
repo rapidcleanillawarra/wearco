@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { DrawingView } from "../types";
 
-	let { drawing, index } = $props<{
+	let { drawing, index, onDelete } = $props<{
 		drawing: DrawingView;
 		index: number;
+		onDelete: () => void;
 	}>();
 </script>
 
@@ -54,7 +55,7 @@
 				/>
 			</svg>
 		</a>
-		<button class="row-action delete" aria-label="Delete drawing">
+		<button type="button" class="row-action delete" aria-label="Delete drawing" onclick={onDelete}>
 			<svg
 				width="16"
 				height="16"

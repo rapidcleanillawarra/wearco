@@ -29,6 +29,7 @@ export interface WearcoDrawing {
   updated_by: string | null
   updated_by_name: string | null
   deleted_by: string | null
+  deleted_by_name: string | null
   created_by: string | null
   created_by_name: string | null
   created_at: string
