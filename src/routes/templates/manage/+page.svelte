@@ -60,7 +60,7 @@
                 const targetField =
                     field.targetField ?? field.targetFieldf ?? "";
                 const { targetFieldf: _tf, ...rest } = field;
-                return { ...rest, id: newId, targetField };
+                return { ...rest, id: newId, targetField, sections: rest.sections ?? "" };
             });
 
             fields = sanitizedFields;
@@ -106,6 +106,7 @@
             },
             textPosition: "left",
             targetField: "",
+            sections: "",
             prefix: "",
             suffix: "",
             rotation: 0,
@@ -131,6 +132,7 @@
                     x: selectedField.position.x + 20,
                     y: selectedField.position.y + 20,
                 },
+                sections: selectedField.sections ?? "",
                 prefix: selectedField.prefix || "",
                 suffix: selectedField.suffix || "",
                 rotation: selectedField.rotation || 0,
@@ -511,6 +513,16 @@
                                     { id: "prog_by", label: "Prog By" },
                                 ]}
                                 placeholder="None"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_sections">Sections</label>
+                            <input
+                                type="text"
+                                id="field_sections"
+                                bind:value={selectedField.sections}
+                                placeholder="Sections"
                             />
                         </div>
 
