@@ -14,6 +14,8 @@ export type DrawingView = {
   checkedBy: string
   updatedLabel: string
   quantity: number
+  /** Template image_display URL for card/row thumbnail */
+  imageDisplay: string | null
 }
 
 export interface DrawingFormData {

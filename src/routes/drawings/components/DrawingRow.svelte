@@ -9,7 +9,11 @@
 
 <div class="list-row" style="--animation-delay: {index * 0.05}s">
 	<span class="list-col name-col">
-		<span class="row-icon">📐</span>
+		{#if drawing.imageDisplay}
+			<img src={drawing.imageDisplay} alt="" class="row-thumb" />
+		{:else}
+			<span class="row-icon">📐</span>
+		{/if}
 		<span class="row-name">{drawing.title}</span>
 	</span>
 	<span class="list-col dwg-col" data-label="Dwg #"
@@ -101,6 +105,14 @@
 
 	.row-icon {
 		font-size: 1.5rem;
+	}
+
+	.row-thumb {
+		width: 36px;
+		height: 36px;
+		object-fit: cover;
+		border-radius: var(--radius-sm);
+		flex-shrink: 0;
 	}
 
 	.row-name {

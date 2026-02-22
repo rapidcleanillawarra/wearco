@@ -40,7 +40,13 @@
 		return dateFormatter.format(date);
 	}
 
-	function formatDrawing(drawing: WearcoDrawing): DrawingView {
+	function formatDrawing(
+		drawing: WearcoDrawing,
+		templatesList: WearcoTemplate[],
+	): DrawingView {
+		const template = drawing.template_id
+			? templatesList.find((t) => t.id === drawing.template_id)
+			: null;
 		return {
 			id: drawing.id,
 			title: drawing.job_number || "No Job #",
@@ -57,6 +63,7 @@
 			checkedBy: drawing.checked_by || "---",
 			updatedLabel: formatDate(drawing.updated_at),
 			quantity: drawing.quantity || 1,
+			imageDisplay: template?.image_display ?? null,
 		};
 	}
 
@@ -72,7 +79,7 @@
 
 	const drawingItems = $derived(
 		drawings
-			.map((drawing: WearcoDrawing) => formatDrawing(drawing))
+			.map((drawing: WearcoDrawing) => formatDrawing(drawing, templates))
 			.filter((item: DrawingView) => {
 				const matchesSearch =
 					item.title

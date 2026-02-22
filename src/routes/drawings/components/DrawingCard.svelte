@@ -9,7 +9,11 @@
 
 <article class="template-card" style="--animation-delay: {index * 0.1}s">
 	<div class="card-thumbnail">
-		<span class="thumbnail-icon">📐</span>
+		{#if drawing.imageDisplay}
+			<img src={drawing.imageDisplay} alt="" class="thumbnail-img" />
+		{:else}
+			<span class="thumbnail-icon">📐</span>
+		{/if}
 		<div class="card-badge">{drawing.quantity} pcs</div>
 	</div>
 	<div class="card-content">
@@ -122,6 +126,14 @@
 				rgba(250, 194, 17, 0.05) 0%,
 				transparent 40%
 			);
+	}
+
+	.thumbnail-img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.thumbnail-icon {
