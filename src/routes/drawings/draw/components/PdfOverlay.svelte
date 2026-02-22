@@ -93,9 +93,9 @@
                     >
                         <input
                             type="radio"
-                            name={field.id}
+                            name="overlay-{field.id}"
                             value={option.value}
-                            checked={fieldValues[field.id] === option.value}
+                            checked={String(fieldValues[field.id] ?? "") === String(option.value)}
                             onchange={() =>
                                 onFieldUpdate(field.id, option.value)}
                             onblur={() => onFieldBlur?.(field.id)}

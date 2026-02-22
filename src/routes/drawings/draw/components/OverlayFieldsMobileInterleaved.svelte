@@ -74,7 +74,7 @@
 										<label class="radio-label-inline">
 											<input
 												type="radio"
-												name={field.id}
+												name="mobile-{field.id}"
 												value={option.value}
 												checked={String(fieldValues[field.id] ?? "") === String(option.value)}
 												onchange={() => onFieldUpdate(field.id, option.value)}
