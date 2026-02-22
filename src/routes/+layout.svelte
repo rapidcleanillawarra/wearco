@@ -21,9 +21,11 @@
 		{ name: "Customers", href: "/customers" },
 	];
 
-	// Hide header on login page
-	const isLoginPage = $derived(
-		data?.pathname === "/" || $page.url.pathname === "/",
+	// Hide header on login page and drawings view page
+	const hideHeader = $derived(
+		data?.pathname === "/" ||
+			$page.url.pathname === "/" ||
+			$page.url.pathname === "/drawings/view",
 	);
 
 	let isMenuOpen = $state(false);
@@ -91,7 +93,7 @@
 </svelte:head>
 
 <div class="app-layout">
-	{#if !isLoginPage}
+	{#if !hideHeader}
 		<header class="global-header">
 			<div class="header-inner">
 				<!-- Logo -->
