@@ -1342,7 +1342,12 @@
 	/* Responsive Design */
 	@media (max-width: 768px) {
 		.page-container-dark {
-			padding: var(--spacing-lg);
+			padding: var(--spacing-sm) 0;
+		}
+
+		.page-header {
+			padding-left: var(--spacing-xs);
+			padding-right: var(--spacing-xs);
 		}
 
 		.title-section h1 {
@@ -1372,6 +1377,7 @@
 
 		.mobile-overlay-section {
 			display: block;
+			padding: 0;
 		}
 
 		.diagrams-wrapper {
