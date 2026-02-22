@@ -614,11 +614,6 @@
 	<header class="page-header">
 		<div class="header-content">
 			<div class="title-section">
-				<div class="mode-indicator">
-					<span class="mode-badge mode-{mode}">
-						{mode === "new" ? "New Drawing" : "Edit Drawing"}
-					</span>
-				</div>
 				<h1 class="title-gradient">
 					{mode === "edit" && drawing?.name
 						? drawing.name
