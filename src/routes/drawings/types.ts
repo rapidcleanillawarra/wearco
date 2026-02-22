@@ -7,8 +7,6 @@ export type DrawingView = {
   workOrder: string
   jobNumber: string
   customer: string
-  material: string
-  thickness: string
   drawingNumber: string
   progBy: string
   checkedBy: string

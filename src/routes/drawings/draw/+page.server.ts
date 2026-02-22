@@ -159,7 +159,12 @@ export const actions: Actions = {
             drawing_data = {};
         }
 
-        const userEmail = (await locals.supabase.auth.getUser()).data.user?.email ?? null;
+        const { data: { user } } = await locals.supabase.auth.getUser();
+        const userEmail = user?.email ?? null;
+        const userName =
+            (user?.user_metadata?.display_name as string)?.trim() ||
+            user?.email ||
+            null;
         const now = new Date().toISOString();
 
         const payload = {
@@ -182,7 +187,11 @@ export const actions: Actions = {
             // Update existing drawing
             const { error } = await locals.supabase
                 .from('drawings')
-                .update({ ...payload, updated_by: userEmail })
+                .update({
+                    ...payload,
+                    updated_by: userEmail,
+                    updated_by_name: userName,
+                })
                 .eq('id', drawingId);
 
             if (error) {
@@ -197,6 +206,8 @@ export const actions: Actions = {
                     ...payload,
                     created_by: userEmail,
                     updated_by: userEmail,
+                    created_by_name: userName,
+                    updated_by_name: userName,
                 })
                 .select('id')
                 .single();

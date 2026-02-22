@@ -23,10 +23,14 @@ export interface WearcoDrawing {
   quantity: number | null
   dl: string | null
   purchase_order: string | null
+  checked_by: string | null
+  prog_by: string | null
   drawing_data: Record<string, any> | null
   updated_by: string | null
+  updated_by_name: string | null
   deleted_by: string | null
   created_by: string | null
+  created_by_name: string | null
   created_at: string
   updated_at: string
   deleted_at: string | null

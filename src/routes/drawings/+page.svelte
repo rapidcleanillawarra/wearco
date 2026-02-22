@@ -56,8 +56,6 @@
 				"No Work Order",
 			jobNumber: drawing.job_number || "No Job #",
 			customer: drawing.customer || "No Customer",
-			material: drawing.material || "No Material",
-			thickness: drawing.thk || "No Thickness",
 			drawingNumber: drawing.drawing_number || "No Dwg #",
 			progBy: drawing.prog_by || "---",
 			checkedBy: drawing.checked_by || "---",
@@ -98,9 +96,6 @@
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase()) ||
 					item.checkedBy
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase()) ||
-					item.material
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase());
 
