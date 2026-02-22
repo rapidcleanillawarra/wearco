@@ -32,6 +32,19 @@
 	let selectedCustomer = $state("All Customers");
 	let creating = $state(false);
 
+	let toaster = $state<{
+		show: boolean;
+		type: "success" | "error";
+		message: string;
+	}>({ show: false, type: "success", message: "" });
+
+	function showToaster(type: "success" | "error", message: string) {
+		toaster = { show: true, type, message };
+		setTimeout(() => {
+			toaster = { ...toaster, show: false };
+		}, 4000);
+	}
+
 	const dateFormatter = new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "numeric",
@@ -160,14 +173,55 @@
 		if (result?.type === "success" && result?.data?.success) {
 			closeDeleteModal();
 			deleteDrawing = null;
+			showToaster("success", "Drawing has been successfully deleted.");
 		} else if (result?.data?.error) {
 			console.error("Delete failed:", result.data.error);
+			showToaster("error", result.data.error);
 		}
 		deleting = false;
 	}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
+
+{#if toaster.show}
+	<div class="toaster {toaster.type}">
+		<span class="toaster-icon">
+			{#if toaster.type === "success"}
+				<svg
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+				>
+					<polyline points="20 6 9 17 4 12" />
+				</svg>
+			{:else}
+				<svg
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+				>
+					<line x1="18" y1="6" x2="6" y2="18" />
+					<line x1="6" y1="6" x2="18" y2="18" />
+				</svg>
+			{/if}
+		</span>
+		<span class="toaster-message">{toaster.message}</span>
+		<button
+			class="toaster-close"
+			onclick={() => (toaster = { ...toaster, show: false })}
+			aria-label="Close notification"
+		>
+			&times;
+		</button>
+	</div>
+{/if}
 
 <div class="page-container-dark drawings-page">
 	<DrawingsHeader
@@ -322,6 +376,77 @@
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border: 0;
+	}
+
+	.toaster {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		z-index: 1100;
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-md);
+		padding: var(--spacing-md) var(--spacing-lg);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-2xl);
+		animation: toasterSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		min-width: 300px;
+	}
+
+	@keyframes toasterSlideIn {
+		from {
+			transform: translateX(100%) translateY(0);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0) translateY(0);
+			opacity: 1;
+		}
+	}
+
+	.toaster.success {
+		background: linear-gradient(135deg, #10b981, #059669);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.toaster.error {
+		background: linear-gradient(135deg, #ef4444, #dc2626);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.toaster-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: var(--radius-full);
+	}
+
+	.toaster-message {
+		flex: 1;
+		font-weight: var(--font-weight-medium);
+		font-size: var(--font-size-sm);
+	}
+
+	.toaster-close {
+		background: none;
+		border: none;
+		color: inherit;
+		font-size: 1.5rem;
+		cursor: pointer;
+		padding: 0;
+		margin-left: var(--spacing-sm);
+		line-height: 1;
+		opacity: 0.7;
+		transition: opacity 0.2s;
+	}
+
+	.toaster-close:hover {
+		opacity: 1;
 	}
 
 	@media (max-width: 768px) {

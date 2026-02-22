@@ -27,7 +27,7 @@
 		<div class="modal-header">
 			<h2 id="delete-modal-title" class="title-gradient-sm">Delete drawing?</h2>
 			<p class="modal-subtitle">
-				This will remove "<strong>{drawingTitle}</strong>" from the list. You can restore it from the database if needed.
+				This will remove "<strong>{drawingTitle}</strong>" from the list. Contact IT if you need it to be restored.
 			</p>
 			<button class="modal-close" onclick={onClose} aria-label="Close modal" disabled={deleting}>
 				<svg
