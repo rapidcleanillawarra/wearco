@@ -53,12 +53,11 @@
                 canvas.className = "pdf-page-canvas";
                 pdfContainer!.appendChild(canvas);
 
-                const containerWidth = pdfContainer!.clientWidth;
-                const targetWidth = Math.max(containerWidth, 800);
+                const containerWidth = pdfContainer!.clientWidth || window.innerWidth;
+                const targetWidth = containerWidth;
                 const unscaledViewport = page.getViewport({ scale: 1 });
                 const scale = targetWidth / unscaledViewport.width;
-                const finalScale = Math.max(scale, 1.0);
-                const viewport = page.getViewport({ scale: finalScale });
+                const viewport = page.getViewport({ scale });
 
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
@@ -198,8 +197,8 @@
 
     .pdf-canvas-container {
         position: relative;
-        width: fit-content;
-        margin: 0 auto;
+        width: 100%;
+        max-width: 100%;
     }
 
     .pdf-render-target {
@@ -210,7 +209,7 @@
 
     :global(.pdf-page-canvas) {
         display: block;
-        max-width: none;
+        max-width: 100%;
         height: auto !important;
     }
 
