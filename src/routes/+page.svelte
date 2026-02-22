@@ -1,75 +1,35 @@
 <script lang="ts">
-    import { supabase, signIn, signUp } from "$lib/supabase";
+    import { supabase, signIn } from "$lib/supabase";
     import { goto } from "$app/navigation";
 
     // Form state
     let email = $state("");
     let password = $state("");
-    let isSignUp = $state(false);
     let loading = $state(false);
     let errorMessage = $state("");
-    let successMessage = $state("");
 
     async function handleSubmit(e: Event) {
         e.preventDefault();
         loading = true;
         errorMessage = "";
-        successMessage = "";
-
-        console.log("🔐 Form submitted", { email, isSignUp });
 
         try {
-            if (isSignUp) {
-                console.log("📝 Attempting sign up...");
-                const { data, error } = await signUp(email, password);
-                console.log("📝 Sign up result:", { data, error });
+            const { data, error } = await signIn(email, password);
 
-                if (error) {
-                    console.error("❌ Sign up error:", error);
-                    errorMessage = error.message;
-                } else if (data.user) {
-                    console.log("✅ Sign up successful:", data.user);
-                    successMessage =
-                        "Account created! Please check your email to verify your account.";
-                    email = "";
-                    password = "";
-                }
+            if (error) {
+                errorMessage = error.message;
+            } else if (data?.session || data?.user) {
+                // Use window.location for full page reload to sync cookies with server
+                window.location.href = "/dashboard";
             } else {
-                console.log("🔑 Attempting sign in...");
-                const { data, error } = await signIn(email, password);
-                console.log("🔑 Sign in result - full data object:", data);
-                console.log("🔑 Sign in result - error:", error);
-                console.log("🔑 data.session:", data?.session);
-                console.log("🔑 data.user:", data?.user);
-
-                if (error) {
-                    console.error("❌ Sign in error:", error);
-                    errorMessage = error.message;
-                } else if (data?.session || data?.user) {
-                    console.log(
-                        "✅ Sign in successful, redirecting to /dashboard...",
-                    );
-                    // Use window.location for full page reload to sync cookies with server
-                    window.location.href = "/dashboard";
-                } else {
-                    console.warn(
-                        "⚠️ No session or user in response - check data structure",
-                    );
-                }
+                errorMessage = "Sign in failed. Please try again.";
             }
         } catch (err) {
-            console.error("💥 Unexpected error:", err);
+            console.error("Unexpected error:", err);
             errorMessage = "An unexpected error occurred. Please try again.";
         } finally {
             loading = false;
-            console.log("🏁 Form submission complete");
         }
-    }
-
-    function toggleMode() {
-        isSignUp = !isSignUp;
-        errorMessage = "";
-        successMessage = "";
     }
 
     // Check if already logged in
@@ -95,12 +55,8 @@
 
         <!-- Title -->
         <div class="title-section">
-            <h1>{isSignUp ? "Create Account" : "Welcome Back"}</h1>
-            <p class="subtitle">
-                {isSignUp
-                    ? "Sign up to access your dashboard"
-                    : "Sign in to continue to your dashboard"}
-            </p>
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Sign in to continue to your dashboard</p>
         </div>
 
         <!-- Form -->
@@ -148,33 +104,12 @@
                 </div>
             {/if}
 
-            {#if successMessage}
-                <div class="message success">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                    </svg>
-                    <span>{successMessage}</span>
-                </div>
-            {/if}
-
             <button type="submit" class="submit-btn" disabled={loading}>
                 {#if loading}
                     <span class="spinner"></span>
-                    <span
-                        >{isSignUp
-                            ? "Creating account..."
-                            : "Signing in..."}</span
-                    >
+                    <span>Signing in...</span>
                 {:else}
-                    <span>{isSignUp ? "Create Account" : "Sign In"}</span>
+                    <span>Sign In</span>
                     <svg
                         width="18"
                         height="18"
@@ -189,18 +124,6 @@
                 {/if}
             </button>
         </form>
-
-        <!-- Toggle Mode -->
-        <div class="toggle-section">
-            <p>
-                {isSignUp
-                    ? "Already have an account?"
-                    : "Don't have an account?"}
-                <button type="button" class="toggle-btn" onclick={toggleMode}>
-                    {isSignUp ? "Sign In" : "Sign Up"}
-                </button>
-            </p>
-        </div>
     </div>
 
     <!-- Background decoration -->
@@ -435,12 +358,6 @@
         color: #fca5a5;
     }
 
-    .message.success {
-        background: rgba(34, 197, 94, 0.1);
-        border: 1px solid rgba(34, 197, 94, 0.3);
-        color: #86efac;
-    }
-
     /* Submit Button */
     .submit-btn {
         display: flex;
@@ -489,36 +406,6 @@
         to {
             transform: rotate(360deg);
         }
-    }
-
-    /* Toggle Section */
-    .toggle-section {
-        text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .toggle-section p {
-        color: var(--color-gray);
-        margin: 0;
-        font-size: 0.9rem;
-    }
-
-    .toggle-btn {
-        background: none;
-        border: none;
-        color: var(--color-gold);
-        font-weight: 600;
-        cursor: pointer;
-        padding: 0;
-        margin-left: 0.25rem;
-        transition: all 0.2s ease;
-    }
-
-    .toggle-btn:hover {
-        text-decoration: underline;
-        color: #ffe066;
     }
 
     /* Responsive */
