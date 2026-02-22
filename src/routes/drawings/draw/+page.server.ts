@@ -144,6 +144,8 @@ export const actions: Actions = {
         const quantityStr = formData.get('quantity') as string;
         const quantity = quantityStr ? parseInt(quantityStr, 10) || 0 : 0;
         const purchase_order = (formData.get('purchase_order') as string) || null;
+        const checked_by = (formData.get('checked_by') as string) || null;
+        const prog_by = (formData.get('prog_by') as string) || null;
         const drawing_dataStr = formData.get('drawing_data') as string;
 
         if (!templateId) {
@@ -170,6 +172,8 @@ export const actions: Actions = {
             customer_source,
             quantity,
             purchase_order,
+            checked_by,
+            prog_by,
             drawing_data,
             updated_at: now,
         };
