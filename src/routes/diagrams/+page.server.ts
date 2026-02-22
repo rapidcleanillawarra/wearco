@@ -4,10 +4,10 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
     // Fetch diagrams with their associated template information
     const { data: diagrams, error: diagramsError } = await locals.supabase
-        .from('wearco_diagrams')
+        .from('diagrams')
         .select(`
             *,
-            wearco_templates (
+            templates (
                 template_name,
                 category
             )
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     // Fetch available templates for the create modal dropdown
     const { data: templates, error: templatesError } = await locals.supabase
-        .from('wearco_templates')
+        .from('templates')
         .select('id, template_name, category')
         .order('template_name');
 
@@ -54,7 +54,7 @@ export const actions: Actions = {
 
         // Validate that the template exists
         const { data: template, error: templateError } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('id')
             .eq('id', templateId)
             .single();
@@ -83,14 +83,14 @@ export const actions: Actions = {
         if (id) {
             // Update existing diagram
             const { error: updateError } = await locals.supabase
-                .from('wearco_diagrams')
+                .from('diagrams')
                 .update(diagramPayload)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create new diagram
             const { error: insertError } = await locals.supabase
-                .from('wearco_diagrams')
+                .from('diagrams')
                 .insert({
                     ...diagramPayload,
                     created_at: new Date().toISOString()
@@ -115,7 +115,7 @@ export const actions: Actions = {
         }
 
         const { error } = await locals.supabase
-            .from('wearco_diagrams')
+            .from('diagrams')
             .delete()
             .eq('id', id);
 

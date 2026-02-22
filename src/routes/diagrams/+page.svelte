@@ -10,7 +10,7 @@
     let { data, form } = $props<{
         data: {
             diagrams: (WearcoSvgDiagram & {
-                wearco_templates?: {
+                templates?: {
                     template_name: string;
                     category: string;
                 };
@@ -44,12 +44,12 @@
                 .map(
                     (
                         d: WearcoSvgDiagram & {
-                            wearco_templates?: {
+                            templates?: {
                                 template_name: string;
                                 category: string;
                             };
                         },
-                    ) => d.wearco_templates?.template_name,
+                    ) => d.templates?.template_name,
                 )
                 .filter(Boolean),
         ),
@@ -59,7 +59,7 @@
         diagrams.filter(
             (
                 d: WearcoSvgDiagram & {
-                    wearco_templates?: {
+                    templates?: {
                         template_name: string;
                         category: string;
                     };
@@ -67,12 +67,12 @@
             ) => {
                 const matchesSearch =
                     d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (d.wearco_templates?.template_name || "")
+                    (d.templates?.template_name || "")
                         .toLowerCase()
                         .includes(searchQuery.toLowerCase());
                 const matchesTemplate =
                     selectedTemplate === "all" ||
-                    d.wearco_templates?.template_name === selectedTemplate;
+                    d.templates?.template_name === selectedTemplate;
                 return matchesSearch && matchesTemplate;
             },
         ),

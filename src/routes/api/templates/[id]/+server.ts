@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 
     try {
         const { data: template, error: templateError } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('id, template_name, category, template_data')
             .eq('id', id)
             .single();

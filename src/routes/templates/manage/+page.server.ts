@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
     if (id) {
         const { data, error } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('*')
             .eq('id', id)
             .single();
@@ -124,14 +124,14 @@ export const actions: Actions = {
         if (id) {
             // Update
             const { error: updateError } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .update(dataToSave)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create
             const { data: insertedData, error: insertError } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .insert({
                     ...dataToSave,
                     created_by: (await locals.supabase.auth.getUser()).data.user?.email

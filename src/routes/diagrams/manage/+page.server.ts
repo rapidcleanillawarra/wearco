@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     if (hasOnlyId) {
         // Edit mode: URL has only id parameter
         const { data: templates, error: templatesError } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('id, template_name, category, template_data')
             .order('template_name');
 
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         }
 
         const { data: diagramData, error: diagramError } = await locals.supabase
-            .from('wearco_diagrams')
+            .from('diagrams')
             .select('id, name, template_id, type, dimension, variables')
             .eq('id', id)
             .single();
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         let template = null;
         if (diagramData?.template_id) {
             const { data: templateData, error: templateError } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .select('*')
                 .eq('id', diagramData.template_id)
                 .single();
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     if (hasTemplateIdAndType) {
         // Create mode: URL has both template_id and type
         const { data: templates, error: templatesError } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('id, template_name, category, template_data')
             .order('template_name');
 
@@ -116,7 +116,7 @@ export const actions: Actions = {
 
         // Validate that the template exists
         const { data: template, error: templateError } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .select('id')
             .eq('id', templateId)
             .single();
@@ -156,14 +156,14 @@ export const actions: Actions = {
         if (id) {
             // Update existing diagram
             const { error: updateError } = await locals.supabase
-                .from('wearco_diagrams')
+                .from('diagrams')
                 .update(diagramPayload)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create new diagram
             const { data: newDiagram, error: insertError } = await locals.supabase
-                .from('wearco_diagrams')
+                .from('diagrams')
                 .insert({
                     ...diagramPayload,
                     created_at: new Date().toISOString()

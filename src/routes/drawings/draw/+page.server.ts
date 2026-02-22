@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
         if (mode === 'edit') {
             // EDIT mode: fetch drawing first, then template
             const { data: drawingData, error: drawingErr } = await locals.supabase
-                .from('wearco_drawings')
+                .from('drawings')
                 .select('*')
                 .eq('id', targetId)
                 .single();
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
 
             // Fetch the associated template
             const { data: templateData, error: templateErr } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .select('*')
                 .eq('id', drawing.template_id)
                 .single();
@@ -62,7 +62,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
         } else {
             // NEW mode: fetch template directly
             const { data: templateData, error: templateErr } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .select('*')
                 .eq('id', targetId)
                 .single();
@@ -76,7 +76,7 @@ export const load: PageServerLoad = async ({ locals, url }): Promise<DrawingPage
 
         // Fetch diagrams associated with the template
         const { data: diagramsData, error: diagramsErr } = await locals.supabase
-            .from('wearco_diagrams')
+            .from('diagrams')
             .select('*')
             .eq('template_id', template.id)
             .order('created_at', { ascending: false });
@@ -177,7 +177,7 @@ export const actions: Actions = {
         if (drawingId) {
             // Update existing drawing
             const { error } = await locals.supabase
-                .from('wearco_drawings')
+                .from('drawings')
                 .update({ ...payload, updated_by: userEmail })
                 .eq('id', drawingId);
 
@@ -188,7 +188,7 @@ export const actions: Actions = {
         } else {
             // Create new drawing
             const { data, error } = await locals.supabase
-                .from('wearco_drawings')
+                .from('drawings')
                 .insert({
                     ...payload,
                     created_by: userEmail,

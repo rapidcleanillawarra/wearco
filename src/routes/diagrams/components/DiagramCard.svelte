@@ -4,7 +4,7 @@
 
     let { diagram, index, onEdit } = $props<{
         diagram: WearcoSvgDiagram & {
-            wearco_templates?: {
+            templates?: {
                 template_name: string;
                 category: string;
             };
@@ -25,14 +25,14 @@
 <article class="diagram-card" style="--animation-delay: {index * 0.1}s">
     <div class="card-thumbnail">
         <span class="thumbnail-icon">📊</span>
-        {#if diagram.wearco_templates?.category}
-            <div class="card-badge">{diagram.wearco_templates.category}</div>
+        {#if diagram.templates?.category}
+            <div class="card-badge">{diagram.templates.category}</div>
         {/if}
     </div>
     <div class="card-content">
         <h3 class="card-title">{diagram.name}</h3>
         <p class="card-description">
-            {diagram.wearco_templates?.template_name || "No template associated"}
+            {diagram.templates?.template_name || "No template associated"}
         </p>
         <div class="card-meta">
             <span class="meta-item">

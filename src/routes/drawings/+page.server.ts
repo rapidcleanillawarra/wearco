@@ -3,13 +3,13 @@ import type { WearcoDrawing, WearcoTemplate } from '$lib/types/template'
 
 export const load: PageServerLoad = async ({ locals }) => {
   const { data: drawings, error } = await locals.supabase
-    .from('wearco_drawings')
+    .from('drawings')
     .select('*')
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
 
   const { data: templates, error: templateError } = await locals.supabase
-    .from('wearco_templates')
+    .from('templates')
     .select('*')
     .order('template_name', { ascending: true })
 

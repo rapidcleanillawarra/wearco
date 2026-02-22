@@ -38,7 +38,7 @@
         return defaultValue;
     }
 
-    // --- Mapped Variables (Variables column in wearco_diagrams table) ---
+    // --- Mapped Variables (Variables column in diagrams table) ---
     let faceWidth = $derived(getVal("face_width", 0));
     let slotWidth = $derived(getVal("slot_width", 0));
     let backToBack = $derived(getVal("back_to_back", 0));

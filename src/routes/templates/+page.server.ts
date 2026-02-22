@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
     const { data: templates, error } = await locals.supabase
-        .from('wearco_templates')
+        .from('templates')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -43,14 +43,14 @@ export const actions: Actions = {
         if (id) {
             // Update existing
             const { error: updateError } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .update(templateData)
                 .eq('id', id);
             error = updateError;
         } else {
             // Create new - Initialize with basic structure
             const { error: insertError } = await locals.supabase
-                .from('wearco_templates')
+                .from('templates')
                 .insert({
                     ...templateData,
                     template_data: { drawings: [] }, // Default empty structure
@@ -76,7 +76,7 @@ export const actions: Actions = {
         }
 
         const { error } = await locals.supabase
-            .from('wearco_templates')
+            .from('templates')
             .delete()
             .eq('id', id);
 
