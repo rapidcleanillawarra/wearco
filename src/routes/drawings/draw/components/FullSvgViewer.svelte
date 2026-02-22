@@ -176,11 +176,11 @@
     let startMousePos = $state({ x: 0, y: 0 });
     let startPanOffset = $state({ x: 0, y: 0 });
 
-    // Touch State
+    // Touch State (mobile: only 2-finger pan/zoom so 1-finger scroll works)
     let initialPinchDistance = $state(0);
     let initialZoom = $state(1);
     let isTouching = $state(false);
-    let startTouchPos = $state({ x: 0, y: 0 });
+    let startTouchCenter = $state({ x: 0, y: 0 });
     let stageElement = $state<HTMLElement | null>(null);
 
     // Menu state
@@ -292,57 +292,57 @@
         }
     }
 
-    // Touch Handlers
+    // Touch Handlers: on mobile, only 2-finger gestures pan/zoom so 1-finger scroll is not interrupted
+    function getTouchCenter(touches: TouchList): { x: number; y: number } {
+        const n = touches.length;
+        let x = 0, y = 0;
+        for (let i = 0; i < n; i++) {
+            x += touches[i].clientX;
+            y += touches[i].clientY;
+        }
+        return { x: x / n, y: y / n };
+    }
+
     function handleTouchStart(event: TouchEvent) {
-        isTouching = true;
-        if (event.touches.length === 1) {
-            // Single touch for panning
-            const touch = event.touches[0];
-            startTouchPos = { x: touch.clientX, y: touch.clientY };
-            startPanOffset = { ...panOffset };
-        } else if (event.touches.length === 2) {
-            // Two touches for pinching
+        if (event.touches.length === 2) {
+            isTouching = true;
             const dist = Math.hypot(
                 event.touches[0].clientX - event.touches[1].clientX,
                 event.touches[0].clientY - event.touches[1].clientY,
             );
             initialPinchDistance = dist;
             initialZoom = zoomLevel;
+            startTouchCenter = getTouchCenter(event.touches);
+            startPanOffset = { ...panOffset };
         }
+        // Single touch: do nothing so the page can scroll
     }
 
     function handleTouchMove(event: TouchEvent) {
-        if (!isTouching) return;
+        if (!isTouching || event.touches.length !== 2) return;
 
-        if (event.touches.length === 1) {
-            // Pan
-            const touch = event.touches[0];
-            const dx = touch.clientX - startTouchPos.x;
-            const dy = touch.clientY - startTouchPos.y;
+        event.preventDefault(); // Only prevent scroll when using 2 fingers for viewer pan/zoom
 
-            panOffset = {
-                x: startPanOffset.x + dx,
-                y: startPanOffset.y + dy,
-            };
+        const dist = Math.hypot(
+            event.touches[0].clientX - event.touches[1].clientX,
+            event.touches[0].clientY - event.touches[1].clientY,
+        );
+        const center = getTouchCenter(event.touches);
 
-            // Prevent scrolling when panning (if zoomed)
-            if (zoomLevel > 1) {
-                event.preventDefault();
-            }
-        } else if (event.touches.length === 2) {
-            // Pinch to zoom
-            event.preventDefault(); // Always prevent scrolling when pinching
-            const dist = Math.hypot(
-                event.touches[0].clientX - event.touches[1].clientX,
-                event.touches[0].clientY - event.touches[1].clientY,
-            );
-
-            if (initialPinchDistance > 0) {
-                const ratio = dist / initialPinchDistance;
-                const newZoom = initialZoom * ratio;
-                zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
-            }
+        // Two-finger pinch zoom
+        if (initialPinchDistance > 0) {
+            const ratio = dist / initialPinchDistance;
+            const newZoom = initialZoom * ratio;
+            zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
         }
+
+        // Two-finger pan (by movement of center)
+        const dx = center.x - startTouchCenter.x;
+        const dy = center.y - startTouchCenter.y;
+        panOffset = {
+            x: startPanOffset.x + dx,
+            y: startPanOffset.y + dy,
+        };
     }
 
     function handleTouchEnd() {
