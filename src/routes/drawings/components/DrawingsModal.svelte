@@ -5,12 +5,14 @@
 	let {
 		templates = [],
 		selectedTemplateId,
+		creating = false,
 		onClose,
 		onSelectTemplate,
 		onCreate,
 	} = $props<{
 		templates: WearcoTemplate[];
 		selectedTemplateId: string | null;
+		creating?: boolean;
 		onClose: () => void;
 		onSelectTemplate: (id: string) => void;
 		onCreate: () => void;
@@ -64,20 +66,26 @@
 			<button
 				class="btn-primary create-btn"
 				onclick={onCreate}
-				disabled={!selectedTemplateId}
+				disabled={!selectedTemplateId || creating}
+				aria-busy={creating}
 			>
-				<span>Create Drawing</span>
-				<svg
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.5"
-				>
-					<line x1="5" y1="12" x2="19" y2="12" />
-					<polyline points="12 5 19 12 12 19" />
-				</svg>
+				{#if creating}
+					<span class="btn-loader" aria-hidden="true"></span>
+					<span>Creating…</span>
+				{:else}
+					<span>Create Drawing</span>
+					<svg
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+					>
+						<line x1="5" y1="12" x2="19" y2="12" />
+						<polyline points="12 5 19 12 12 19" />
+					</svg>
+				{/if}
 			</button>
 		</div>
 	</div>
@@ -125,6 +133,22 @@
 
 	.create-btn:hover:not(:disabled) svg {
 		transform: translateX(4px);
+	}
+
+	.btn-loader {
+		width: 1.125rem;
+		height: 1.125rem;
+		border: 2px solid currentColor;
+		border-right-color: transparent;
+		border-radius: 50%;
+		animation: spin 0.6s linear infinite;
+		flex-shrink: 0;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	@media (max-width: 768px) {

@@ -24,6 +24,7 @@
 	let selectedTemplateId: string | null = $state(null);
 	let searchQuery = $state("");
 	let selectedCustomer = $state("All Customers");
+	let creating = $state(false);
 
 	const dateFormatter = new Intl.DateTimeFormat("en-US", {
 		month: "short",
@@ -119,8 +120,12 @@
 	}
 
 	function createDrawing() {
-		if (selectedTemplateId) {
-			window.location.href = `/drawings/draw?template_id=${selectedTemplateId}`;
+		if (selectedTemplateId && !creating) {
+			creating = true;
+			// Allow the loader to render before navigating
+			requestAnimationFrame(() => {
+				window.location.href = `/drawings/draw?template_id=${selectedTemplateId}`;
+			});
 		}
 	}
 
@@ -187,6 +192,7 @@
 	<DrawingsModal
 		{templates}
 		{selectedTemplateId}
+		{creating}
 		onClose={closeModal}
 		onSelectTemplate={selectTemplate}
 		onCreate={createDrawing}
