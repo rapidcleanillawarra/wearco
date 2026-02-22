@@ -99,7 +99,7 @@
 	}
 
 	.card-thumbnail {
-		height: 120px;
+		height: 200px;
 		background: linear-gradient(
 			135deg,
 			var(--color-dark-gray) 0%,

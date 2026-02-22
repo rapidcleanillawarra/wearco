@@ -108,8 +108,8 @@
 	}
 
 	.row-thumb {
-		width: 36px;
-		height: 36px;
+		width: 48px;
+		height: 48px;
 		object-fit: cover;
 		border-radius: var(--radius-sm);
 		flex-shrink: 0;
