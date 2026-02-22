@@ -396,6 +396,10 @@
 	// Form state for saving drawings (if needed)
 	let isSaving = $state(false);
 
+	/** When false on mobile, the floating save FAB is shown (top save button scrolled out of view). */
+	let topSaveButtonVisible = $state(true);
+	let headerSaveSentinel = $state<HTMLElement | null>(null);
+
 	// Toaster notification state
 	let toaster = $state<{
 		show: boolean;
@@ -414,6 +418,20 @@
 			toaster = { ...toaster, show: false };
 		}, 4000);
 	}
+
+	// Show floating save FAB on mobile when the top save button scrolls out of view
+	$effect(() => {
+		const el = headerSaveSentinel;
+		if (!el) return;
+		const io = new IntersectionObserver(
+			([entry]) => {
+				topSaveButtonVisible = entry.isIntersecting;
+			},
+			{ threshold: 0, rootMargin: "0px" },
+		);
+		io.observe(el);
+		return () => io.disconnect();
+	});
 
 	// Handle overlay field updates
 	function handleOverlayFieldUpdate(fieldId: string, value: string) {
@@ -673,6 +691,8 @@
 
 				{#if template}
 					<form
+						id="draw-save-form"
+						bind:this={headerSaveSentinel}
 						method="POST"
 						action="?/save"
 						onsubmit={async (e) => {
@@ -905,6 +925,37 @@
 			</div>
 		</div>
 	</header>
+
+	<!-- Mobile: floating save FAB when top save button is scrolled out of view -->
+	{#if template && !topSaveButtonVisible}
+		<button
+			type="submit"
+			form="draw-save-form"
+			class="floating-save-fab"
+			disabled={isSaving}
+			title={mode === "new" ? "Create Drawing" : "Update Drawing"}
+			aria-label={mode === "new" ? "Create Drawing" : "Update Drawing"}
+		>
+			{#if isSaving}
+				<span class="spinner"></span>
+			{:else}
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+					<polyline points="17 21 17 13 7 13 7 21" />
+					<polyline points="7 3 7 8 15 8" />
+				</svg>
+			{/if}
+		</button>
+	{/if}
 
 	<main class="templates-main">
 		<section class="section-card pdf-viewer-section">
@@ -1331,6 +1382,47 @@
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
+		}
+	}
+
+	/* Floating save FAB: mobile only, bottom-right, shows when top save is out of view */
+	.floating-save-fab {
+		display: none;
+	}
+
+	@media (max-width: 768px) {
+		.floating-save-fab {
+			display: flex;
+			position: fixed;
+			bottom: var(--spacing-lg);
+			right: var(--spacing-lg);
+			width: 56px;
+			height: 56px;
+			border-radius: 50%;
+			align-items: center;
+			justify-content: center;
+			background: var(--gradient-button);
+			color: var(--color-black);
+			border: none;
+			box-shadow: var(--shadow-gold-lg);
+			cursor: pointer;
+			z-index: 1000;
+			transition: var(--transition-smooth);
+		}
+
+		.floating-save-fab:hover:not(:disabled) {
+			transform: scale(1.08);
+			box-shadow: 0 6px 24px rgba(212, 175, 55, 0.5);
+		}
+
+		.floating-save-fab:disabled {
+			opacity: 0.8;
+			cursor: not-allowed;
+		}
+
+		.floating-save-fab .spinner {
+			width: 24px;
+			height: 24px;
 		}
 	}
 
