@@ -76,7 +76,7 @@
 												type="radio"
 												name={field.id}
 												value={option.value}
-												checked={fieldValues[field.id] === option.value}
+												checked={String(fieldValues[field.id] ?? "") === String(option.value)}
 												onchange={() => onFieldUpdate(field.id, option.value)}
 												onblur={() => onFieldBlur?.(field.id)}
 												class="radio-input"

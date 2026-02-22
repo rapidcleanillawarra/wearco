@@ -257,7 +257,9 @@
 			},
 		};
 
-		// Override with drawing data if in edit mode
+		// Override with drawing data if in edit mode and we have a drawing.
+		// When in edit but drawing is temporarily undefined (e.g. after PDF worker re-renders),
+		// do not overwrite with baseData so overlay_data and radio selection are preserved.
 		if (mode === "edit" && drawing) {
 			const drawing_data = (drawing.drawing_data as any) || {};
 			const overlay_data = drawing_data.overlay_data || {};
@@ -288,10 +290,11 @@
 			} else {
 				svgConfigs = { svg_configs: [] };
 			}
-		} else {
+		} else if (mode !== "edit") {
 			drawingFormData = baseData;
 			svgConfigs = { svg_configs: [] };
 		}
+		// When mode === "edit" && !drawing: leave drawingFormData and svgConfigs unchanged
 	});
 
 	// Mutable state for field value updates (user input)
@@ -338,13 +341,12 @@
 					values[field.id] = fieldUpdateState[field.id] ?? "";
 				}
 			} else {
-				// No targetField - use value from drawing_data.overlay_data
+				// No targetField - use value from drawing_data.overlay_data (stringify for radio/text consistency)
+				const raw =
+					drawingFormData.drawing_data?.overlay_data?.[field.id];
 				values[field.id] =
 					fieldUpdateState[field.id] ??
-					((drawingFormData.drawing_data?.overlay_data?.[
-						field.id
-					] as string) ||
-						"");
+					(raw != null ? String(raw) : "");
 			}
 		});
 		return values;

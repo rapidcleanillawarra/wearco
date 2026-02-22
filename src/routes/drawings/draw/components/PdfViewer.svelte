@@ -64,7 +64,11 @@
                 pdfContainer.innerHTML = "";
             }
 
-            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            // verbosity: 0 = errors only (suppresses "TT: undefined function" font warnings)
+            const loadingTask = pdfjsLib.getDocument({
+                url: pdfUrl,
+                verbosity: 0,
+            });
             pdfDoc = await loadingTask.promise;
 
             // Render all pages
