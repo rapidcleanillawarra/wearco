@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
         const { data: diagramData, error: diagramError } = await locals.supabase
             .from('diagrams')
-            .select('id, name, template_id, type, dimension, variables')
+            .select('id, name, template_id, type, section, variables')
             .eq('id', id)
             .single();
 
@@ -103,7 +103,7 @@ export const actions: Actions = {
         const name = formData.get('name') as string;
         const templateId = formData.get('template_id') as string;
         const type = formData.get('type') as string;
-        const dimensionJson = formData.get('dimension') as string;
+        const section = (formData.get('section') as string)?.trim() || null;
         const variablesJson = formData.get('variables') as string;
 
         if (!name) {
@@ -131,11 +131,9 @@ export const actions: Actions = {
             return fail(400, { invalid: true, message: 'Type must be "edge", "top_side", or "roller_spec"' });
         }
 
-        // Parse and validate JSON data
-        let diagramDimension;
+        // Parse and validate variables JSON
         let diagramVariables;
         try {
-            diagramDimension = dimensionJson ? JSON.parse(dimensionJson) : null;
             diagramVariables = variablesJson ? JSON.parse(variablesJson) : null;
         } catch (e) {
             return fail(400, { invalid: true, message: 'Invalid JSON format' });
@@ -145,7 +143,7 @@ export const actions: Actions = {
             name,
             template_id: templateId,
             type: normalizedType,
-            dimension: diagramDimension,
+            section,
             variables: diagramVariables,
             updated_at: new Date().toISOString()
         };

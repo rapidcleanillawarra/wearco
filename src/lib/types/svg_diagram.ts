@@ -5,7 +5,7 @@ export interface WearcoDiagram {
     template_id: string;
     name: string;
     type: string | null;
-    dimension: Record<string, any> | null;
+    section: string | null;
     variables: Record<string, any>;
     file: string | null;
     layout_order?: number | null;

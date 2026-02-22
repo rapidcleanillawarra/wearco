@@ -26,13 +26,9 @@
     let diagramName = $state("");
     let templateId = $state("");
     let diagramType = $state("");
-    let diagramDimension = $state("{}");
+    let diagramSection = $state("");
     let diagramVariables = $state("{}");
     let initialized = $state(false);
-
-    // Dimension state variables
-    let dimensionHeight = $state("0");
-    let dimensionWidth = $state("0");
 
     // Get all fields from selected template (prefer server template data, fallback to templates array)
     let edgeFields = $derived.by(() => {
@@ -153,13 +149,6 @@
         }
     });
 
-    // Update diagramDimension JSON when height/width change
-    $effect(() => {
-        const height = parseFloat(dimensionHeight) || 0;
-        const width = parseFloat(dimensionWidth) || 0;
-        diagramDimension = JSON.stringify({ height, width }, null, 2);
-    });
-
     // Effect to initialize local state when diagram data loads
     $effect(() => {
         const diagram = data.diagram;
@@ -175,15 +164,7 @@
                     templateId =
                         diagram.template_id || data.selectedTemplateId || "";
                     diagramType = diagram.type || "";
-                    diagramDimension = diagram.dimension
-                        ? JSON.stringify(diagram.dimension, null, 2)
-                        : "{}";
-                    if (diagram.dimension) {
-                        dimensionHeight =
-                            diagram.dimension.height?.toString() || "0";
-                        dimensionWidth =
-                            diagram.dimension.width?.toString() || "0";
-                    }
+                    diagramSection = diagram.section ?? "";
                     diagramVariables = diagram.variables
                         ? JSON.stringify(diagram.variables, null, 2)
                         : "{}";
@@ -248,17 +229,8 @@
                 diagramName = template.template_name || "";
                 templateId = template.id;
                 diagramType = typeParam || template.category || "";
-                diagramDimension = template.template_data?.dimension
-                    ? JSON.stringify(template.template_data.dimension, null, 2)
-                    : "{}";
-                if (template.template_data?.dimension) {
-                    dimensionHeight =
-                        template.template_data.dimension.height?.toString() ||
-                        "0";
-                    dimensionWidth =
-                        template.template_data.dimension.width?.toString() ||
-                        "0";
-                }
+                diagramSection =
+                    (template.template_data?.section as string) ?? "";
                 diagramVariables = template.template_data?.variables
                     ? JSON.stringify(template.template_data.variables, null, 2)
                     : "{}";
@@ -270,7 +242,7 @@
                 diagramName = "";
                 templateId = "";
                 diagramType = "";
-                diagramDimension = "{}";
+                diagramSection = "";
                 diagramVariables = "{}";
                 variables = {};
             } finally {
@@ -345,11 +317,7 @@
                     id="diagram-form"
                     use:enhance={({ formData }) => {
                         formData.append("variables", JSON.stringify(variables));
-                        const dimension = {
-                            height: parseFloat(dimensionHeight) || 0,
-                            width: parseFloat(dimensionWidth) || 0,
-                        };
-                        formData.append("dimension", JSON.stringify(dimension));
+                        formData.append("section", diagramSection);
                         isSaving = true;
                         return async ({ result }) => {
                             isSaving = false;
@@ -428,28 +396,16 @@
                         </div>
                     </div>
 
-                    <div class="form-section dimension-section">
-                        <h2>Dimension</h2>
+                    <div class="form-section section-section">
+                        <h2>Section</h2>
                         <div class="form-group">
-                            <label for="dimension_height">Height</label>
+                            <label for="section">Section</label>
                             <input
-                                type="number"
-                                id="dimension_height"
-                                bind:value={dimensionHeight}
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="dimension_width">Width</label>
-                            <input
-                                type="number"
-                                id="dimension_width"
-                                bind:value={dimensionWidth}
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
+                                type="text"
+                                id="section"
+                                name="section"
+                                bind:value={diagramSection}
+                                placeholder="e.g. center edge#1, end edge#1"
                             />
                         </div>
                     </div>
