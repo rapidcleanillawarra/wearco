@@ -937,11 +937,23 @@
 
         .header-actions {
             width: 100%;
+            display: flex;
+            flex-wrap: wrap;
         }
 
+        /* Swap order: ellipsis (Print/Download) before Pitches on mobile so menu is visible */
         .zoom-controls {
+            order: 0;
             width: 100%;
             justify-content: space-between;
+        }
+
+        .menu-container {
+            order: 1;
+        }
+
+        .btn-pitches {
+            order: 2;
         }
 
         .dropdown-menu {
