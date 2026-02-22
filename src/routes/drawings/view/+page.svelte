@@ -221,8 +221,6 @@
 	}
 
 	.diagram-item {
-		border: 1px solid #e5e7eb;
-		border-radius: 4px;
 		overflow: hidden;
 		break-inside: avoid;
 	}
@@ -247,7 +245,6 @@
 
 		.diagram-item {
 			break-inside: avoid;
-			border-color: #ccc;
 		}
 	}
 </style>
