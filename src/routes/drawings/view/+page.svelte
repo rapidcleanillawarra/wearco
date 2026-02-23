@@ -157,9 +157,9 @@
 		if (!pdfUrl) return;
 		isExporting = true;
 		try {
-			const filename = drawing?.name
-				? `${drawing.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`
-				: "drawing.pdf";
+			const jobNumber = (drawing?.job_number ?? "").trim() || "drawing";
+			const safeJob = jobNumber.replace(/[<>:"/\\|?*]/g, "_").trim() || "drawing";
+			const filename = `Wearco - ${safeJob}.pdf`;
 
 			let doc: import("jspdf").jsPDF;
 
@@ -357,9 +357,8 @@
 		font-size: 18px;
 		font-weight: 600;
 		margin: 0 0 12px 0;
-		padding-bottom: 6px;
-		border-bottom: 1px solid #e5e7eb;
 		color: #1e1b4b;
+		text-align: center;
 	}
 
 	.diagrams-grid {
