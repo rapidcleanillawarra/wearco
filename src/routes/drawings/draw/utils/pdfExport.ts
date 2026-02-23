@@ -15,9 +15,10 @@ interface ExportOptions {
 }
 
 /**
- * Generates a jsPDF instance with the template and overlay values
+ * Generates a jsPDF instance with the template and overlay values.
+ * Exported for view page multi-page export (template + diagram sections).
  */
-async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
+export async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
     const {
         pdfUrl,
         fieldValues,
@@ -171,6 +172,38 @@ async function generatePdfDoc(options: ExportOptions): Promise<jsPDF> {
 }
 
 /**
+ * Creates a one-page jsPDF with the first page of the given PDF URL as image (no overlay).
+ * Used for view export when there is no template or when adding diagram pages elsewhere.
+ */
+export async function createPdfWithPdfPageOnly(pdfUrl: string): Promise<jsPDF> {
+    const response = await fetch(pdfUrl);
+    const pdfBlob = await response.blob();
+    const url = URL.createObjectURL(pdfBlob);
+    const pdfjsLib = await import('pdfjs-dist');
+    const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    const page = await pdf.getPage(1);
+    const scale = 2;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Could not create canvas context');
+    await page.render({ canvasContext: context, viewport, canvas: context.canvas }).promise;
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    URL.revokeObjectURL(url);
+    const pdfDoc = new jsPDF({
+        orientation: viewport.width > viewport.height ? 'landscape' : 'portrait',
+        unit: 'pt',
+        format: [viewport.width, viewport.height],
+    });
+    pdfDoc.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+    return pdfDoc;
+}
+
+/**
  * Generates a PDF with the template and overlay values and downloads it
  */
 export async function exportPdfWithOverlay(options: ExportOptions): Promise<void> {
@@ -200,6 +233,38 @@ export async function generatePdfAsBase64(options: ExportOptions): Promise<strin
         // Extract base64 part
         const base64Content = dataUrl.split(',')[1];
         return base64Content;
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Generates a PDF with the template and overlay values and opens the print dialog
+ */
+export async function printPdfWithOverlay(options: Omit<ExportOptions, 'filename'>): Promise<void> {
+    try {
+        const pdfDoc = await generatePdfDoc(options);
+        const blob = pdfDoc.output('blob');
+        const url = URL.createObjectURL(blob);
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('title', 'Print PDF');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.top = '0';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        iframe.onload = () => {
+            try {
+                iframe.contentWindow?.print();
+            } finally {
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                    URL.revokeObjectURL(url);
+                }, 500);
+            }
+        };
     } catch (error) {
         throw error;
     }

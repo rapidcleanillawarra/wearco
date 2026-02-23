@@ -5,6 +5,11 @@
 	import { SvelteMap } from "svelte/reactivity";
 	import ViewPdfWithOverlay from "./components/ViewPdfWithOverlay.svelte";
 	import ViewSvgDiagram from "./components/ViewSvgDiagram.svelte";
+	import {
+		generatePdfDoc,
+		createPdfWithPdfPageOnly,
+	} from "../draw/utils/pdfExport";
+	import html2canvas from "html2canvas";
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -144,9 +149,99 @@
 			{ from: 1, to: 2, prefix: "", suffix: "" },
 		];
 	}
+
+	let isExporting = $state(false);
+	let viewPageEl: HTMLDivElement | undefined = $state();
+
+	async function handleExport() {
+		if (!pdfUrl) return;
+		isExporting = true;
+		try {
+			const filename = drawing?.name
+				? `${drawing.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`
+				: "drawing.pdf";
+
+			let doc: import("jspdf").jsPDF;
+
+			if (
+				templateData?.fields &&
+				templateData.pageWidth &&
+				templateData.pageHeight
+			) {
+				doc = await generatePdfDoc({
+					pdfUrl,
+					fieldValues: overlayFieldValues,
+					fields: templateData.fields,
+					pageWidth: templateData.pageWidth,
+					pageHeight: templateData.pageHeight,
+				});
+			} else {
+				doc = await createPdfWithPdfPageOnly(pdfUrl);
+			}
+
+			// Add diagram sections as next pages (A4 landscape)
+			const sectionEls = viewPageEl?.querySelectorAll<HTMLElement>(
+				".diagram-section",
+			);
+			if (sectionEls?.length) {
+				const pageW = 841.89;
+				const pageH = 595.28; // A4 landscape pt
+				const pxToPt = 72 / 96; // 1 CSS px ≈ 0.75 pt
+
+				for (const section of sectionEls) {
+					const canvas = await html2canvas(section, {
+						scale: 2,
+						useCORS: true,
+						logging: false,
+						backgroundColor: "#ffffff",
+					});
+					const imgData = canvas.toDataURL("image/jpeg", 0.95);
+					const imgWpt = canvas.width * pxToPt;
+					const imgHpt = canvas.height * pxToPt;
+					const scale = Math.min(pageW / imgWpt, pageH / imgHpt);
+					const w = imgWpt * scale;
+					const h = imgHpt * scale;
+					const x = (pageW - w) / 2;
+					const y = (pageH - h) / 2;
+
+					doc.addPage([pageW, pageH], "l");
+					doc.addImage(imgData, "JPEG", x, y, w, h);
+				}
+			}
+
+			doc.save(filename);
+		} catch (err) {
+			alert("Failed to export PDF. Please try again.");
+		} finally {
+			isExporting = false;
+		}
+	}
 </script>
 
-<div class="view-page">
+<div class="view-page" bind:this={viewPageEl}>
+	<header class="view-toolbar">
+		<a href="/drawings" class="view-toolbar-back">← Back to Drawings</a>
+		{#if pdfUrl}
+			<button
+				class="view-print-btn"
+				onclick={handleExport}
+				disabled={isExporting}
+				aria-label="Export PDF"
+			>
+				{#if isExporting}
+					<span class="view-print-spinner"></span>
+					Exporting…
+				{:else}
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+						<polyline points="7 10 12 15 17 10" />
+						<line x1="12" y1="15" x2="12" y2="3" />
+					</svg>
+					Export PDF
+				{/if}
+			</button>
+		{/if}
+	</header>
 	<section class="pdf-section">
 		<ViewPdfWithOverlay
 			url={pdfUrl}
@@ -192,6 +287,63 @@
 		max-width: 100%;
 	}
 
+	.view-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 12px 16px;
+		border-bottom: 1px solid #e5e7eb;
+		background: #f9fafb;
+	}
+
+	.view-toolbar-back {
+		color: #4b5563;
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.view-toolbar-back:hover {
+		color: #1e1b4b;
+	}
+
+	.view-print-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 16px;
+		background: #1e1b4b;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.view-print-btn:hover:not(:disabled) {
+		background: #312e81;
+	}
+
+	.view-print-btn:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	.view-print-spinner {
+		width: 16px;
+		height: 16px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-top-color: white;
+		border-radius: 50%;
+		animation: view-spin 0.7s linear infinite;
+	}
+
+	@keyframes view-spin {
+		to { transform: rotate(360deg); }
+	}
+
 	.pdf-section {
 		width: 100%;
 	}
@@ -229,6 +381,10 @@
 		:global(body) {
 			margin: 0;
 			padding: 0;
+		}
+
+		.view-toolbar {
+			display: none !important;
 		}
 
 		.view-page {
